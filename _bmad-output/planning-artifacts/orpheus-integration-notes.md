@@ -1,0 +1,134 @@
+# Notes d'intégration Orpheus
+
+> Ce fichier centralise toutes les informations concernant Orpheus relevées durant la conception de FOXEO.
+> À utiliser lors de la configuration/mise à jour d'Orpheus.
+
+---
+
+## Contexte
+
+**Orpheus** = Agent IA dans Cursor/BMAD projects (développement)
+**Élio Hub/Lab/One** = Agents IA dans les dashboards FOXEO (interface client)
+
+Orpheus reste dans l'environnement de développement. Il ne communique PAS directement avec les clients.
+
+---
+
+## Flux de communication Orpheus → Client
+
+```
+Orpheus (dev)
+    ↓ génère contenu significatif (screenshot, maquette, avancée)
+    ↓
+Élio Hub (dashboard MiKL)
+    ↓ MiKL valide/modifie
+    ↓
+Élio One (dashboard client)
+    ↓ transmet au client
+Client reçoit mise à jour projet
+```
+
+**Règle** : Aucune communication Orpheus → Client sans validation MiKL.
+
+---
+
+## Intégrations à prévoir
+
+### 1. Génération de contenu projet
+Quand Orpheus crée quelque chose de significatif :
+- Screenshot d'avancement
+- Document (brief, specs, etc.)
+- Modèle Excalidraw
+- Maquette/wireframe
+- Code déployable
+
+**Action Orpheus** : Générer un "paquet de mise à jour" contenant :
+- Type de contenu
+- Description courte
+- Fichier(s) attaché(s)
+- Suggestion de message client
+
+**Destination** : File d'attente Élio Hub pour validation MiKL.
+
+### 2. Facturation projet
+Orpheus détermine la facturation pour un projet client :
+- Prestations réalisées
+- Tarifs appliqués
+- Éléments à facturer
+
+**Format de sortie** :
+- Document structuré (JSON ou Markdown)
+- OU prompt texte avec toutes les infos
+
+**Destination** : Élio Hub → Page "Nouvelle Facture" qui met en forme automatiquement.
+
+### 3. Suivi projet (Timeline ONE)
+Orpheus doit pouvoir alimenter la timeline de suivi projet visible par le client dans FOXEO-ONE.
+
+**Événements à remonter** :
+- Étape démarrée
+- Étape terminée
+- Livrable disponible
+- Demande de validation
+
+**Format** :
+```json
+{
+  "type": "project_update",
+  "client_id": "xxx",
+  "event": "milestone_completed",
+  "title": "Logo V2 terminé",
+  "description": "Déclinaisons couleurs prêtes",
+  "attachments": ["logo-v2.png", "declinaisons.pdf"],
+  "suggested_message": "Ton logo est prêt ! Jette un œil aux déclinaisons.",
+  "requires_validation": true
+}
+```
+
+---
+
+## Configuration Orpheus requise
+
+### Variables d'environnement
+```
+FOXEO_HUB_API_URL=https://api.foxeo-hub.com
+FOXEO_HUB_API_KEY=xxx
+ELIO_HUB_WEBHOOK=https://api.foxeo-hub.com/webhooks/orpheus
+```
+
+### Commandes Orpheus à implémenter
+| Commande | Description |
+|----------|-------------|
+| `/foxeo-update` | Envoyer mise à jour projet vers Élio Hub |
+| `/foxeo-invoice` | Générer données facturation |
+| `/foxeo-timeline` | Ajouter événement timeline client |
+| `/foxeo-status` | Vérifier statut file d'attente |
+
+### Règles de comportement
+1. **Jamais de contact direct client** - Tout passe par Élio Hub
+2. **Validation MiKL obligatoire** - Sauf configuration explicite contraire
+3. **Format standardisé** - JSON pour l'interopérabilité
+4. **Traçabilité** - Logger toutes les communications vers FOXEO
+
+---
+
+## Points en attente de décision
+
+- [ ] Définir le format exact du "paquet de mise à jour"
+- [ ] API REST ou WebSocket pour la communication ?
+- [ ] Fréquence max des mises à jour (éviter spam)
+- [ ] Gestion des erreurs si Élio Hub indisponible
+- [ ] Authentification Orpheus → FOXEO (JWT ? API Key ?)
+
+---
+
+## Notes diverses
+
+*Ajouter ici toute note concernant Orpheus au fil du projet*
+
+- (2026-02-03) Orpheus doit pouvoir générer des données de facturation transmissibles à Élio Hub pour création automatique de factures
+- (2026-02-03) Le suivi projet ONE sera alimenté par Orpheus via Élio Hub avec validation MiKL systématique
+
+---
+
+*Dernière mise à jour : 2026-02-03*

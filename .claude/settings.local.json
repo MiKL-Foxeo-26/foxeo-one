@@ -1,0 +1,7 @@
+{
+  "disabledMcpjsonServers": [
+    "shadcn",
+    "supabase",
+    "github"
+  ]
+}
