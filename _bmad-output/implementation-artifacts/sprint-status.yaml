@@ -1,0 +1,177 @@
+# generated: 2026-02-10
+# project: foxeo-dash
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-10
+project: foxeo-dash
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Fondation Plateforme & Authentification (10 stories)
+  epic-1: backlog
+  1-1-setup-monorepo-packages-partages-dashboard-shell: backlog
+  1-2-migrations-supabase-fondation: backlog
+  1-3-authentification-client-inscription-login-sessions: backlog
+  1-4-authentification-mikl-login-2fa-middleware-hub-admin: backlog
+  1-5-rls-isolation-donnees-multi-tenant: backlog
+  1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: backlog
+  1-7-design-system-fondation-dark-mode-palettes-responsive-accessibilite: backlog
+  1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: backlog
+  1-9-consentements-legal-cgu-traitement-ia-traces-notification-maj: backlog
+  1-10-structure-multi-langue-p3-preparation-i18n: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Gestion de la Relation Client — CRM Hub (12 stories)
+  epic-2: backlog
+  2-1-module-crm-liste-clients-filtres-recherche-rapide: backlog
+  2-2-creation-edition-de-fiche-client: backlog
+  2-3-fiche-client-complete-vue-detaillee-multi-onglets: backlog
+  2-4-assignation-parcours-lab-gestion-des-acces: backlog
+  2-5-integration-cursor-ouverture-dossier-bmad-client: backlog
+  2-6-notes-privees-epinglage-a-traiter-plus-tard: backlog
+  2-7-rappels-personnels-calendrier-deadlines: backlog
+  2-8-statistiques-globales-temps-passe-par-client: backlog
+  2-9a-suspendre-reactiver-un-client: backlog
+  2-9b-cloturer-un-client-archiver-les-donnees: backlog
+  2-9c-upgrader-un-client-ponctuel-vers-lab-ou-one: backlog
+  2-10-alertes-inactivite-lab-import-clients-csv: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Communication Temps Reel & Notifications (7 stories)
+  epic-3: backlog
+  3-1-module-chat-migration-messages-messagerie-temps-reel-mikl-client: backlog
+  3-2-module-notifications-infrastructure-in-app-temps-reel: backlog
+  3-3-notifications-email-transactionnelles: backlog
+  3-4-preferences-de-notification-client-mikl: backlog
+  3-5-indicateur-de-presence-en-ligne: backlog
+  3-6-gestion-des-conflits-de-modification-concurrente: backlog
+  3-7-support-client-signalement-de-problemes-aide-en-ligne: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Gestion Documentaire (7 stories)
+  epic-4: backlog
+  4-1-module-documents-migration-structure-upload-avec-validation: backlog
+  4-2-visualisation-documents-viewer-html-telechargement-pdf: backlog
+  4-3-partage-de-documents-mikl-client-visibilite: backlog
+  4-4-organisation-en-dossiers-recherche-dans-les-documents: backlog
+  4-5-synchronisation-documents-vers-dossier-bmad-local: backlog
+  4-6-autosave-brouillons-undo-actions-recentes: backlog
+  4-7-export-documents-en-formats-standards: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Visioconference & Onboarding Prospect (6 stories)
+  epic-5: backlog
+  5-1-module-visio-migration-meetings-salle-de-visio-openvidu: backlog
+  5-2-enregistrement-visio-transcription-automatique-historique: backlog
+  5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: backlog
+  5-4-flux-post-visio-onboarding-prospect: backlog
+  5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: backlog
+  5-6-ecran-de-graduation-lab-vers-one: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Parcours Lab — Accompagnement Creation (6 stories)
+  epic-6: backlog
+  6-1-module-parcours-lab-migration-structure-vue-parcours-progression: backlog
+  6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: backlog
+  6-3-soumission-de-brief-pour-validation-notifications: backlog
+  6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: backlog
+  6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: backlog
+  6-6-elio-lab-configuration-orpheus-personnalisation-agent: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Validation Hub (6 stories)
+  epic-7: backlog
+  7-1-module-validation-hub-structure-types-file-attente-des-demandes: backlog
+  7-2-vue-detaillee-dune-demande-avec-contexte-complet: backlog
+  7-3-validation-refus-de-demande-avec-commentaire: backlog
+  7-4-demande-de-precisions-sur-une-soumission: backlog
+  7-5-actions-de-traitement-workflows-post-decision: backlog
+  7-6-temps-reel-compteur-de-demandes-abonnement-realtime: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Agents IA Elio — Hub, Lab, One (11 stories)
+  epic-8: backlog
+  8-1-consolidation-infrastructure-elio-module-unifie-composants-partages-gestion-des-erreurs: backlog
+  8-2-conversations-elio-liste-commutation-historique-persistant-complet: backlog
+  8-3-feedback-reponses-elio-documents-dans-le-chat-historique-configs: backlog
+  8-4-profil-de-communication-stockage-affinement-transmission-graduation: backlog
+  8-5-elio-hub-interface-chat-mikl-aide-fonctionnalites-recherche-client: backlog
+  8-6-elio-hub-correction-redaction-generation-de-brouillons: backlog
+  8-7-elio-one-chat-faq-guidance-dashboard-heritage-lab: backlog
+  8-8-elio-one-collecte-devolutions-soumission-validation-hub: backlog
+  8-9a-elio-one-plus-systeme-de-tiers-actions-modules: backlog
+  8-9b-elio-one-plus-generation-de-documents: backlog
+  8-9c-elio-one-plus-alertes-proactives: backlog
+  epic-8-retrospective: optional
+
+  # Epic 9: Graduation Lab vers One & Cycle de Vie Client (7 stories)
+  epic-9: backlog
+  9-1-graduation-lab-vers-one-declenchement-migration-automatique-du-contexte: backlog
+  9-2-graduation-lab-vers-one-notification-client-activation-acces-one: backlog
+  9-3-demande-abandon-de-parcours-lab-par-le-client: backlog
+  9-4-changement-de-tier-abonnement-client-one: backlog
+  9-5a-export-rgpd-des-donnees-client: backlog
+  9-5b-transfert-instance-one-au-client-sortant: backlog
+  9-5c-anonymisation-retention-des-donnees-apres-resiliation: backlog
+  epic-9-retrospective: optional
+
+  # Epic 10: Dashboard One & Modules Commerciaux (4 stories)
+  epic-10: backlog
+  10-1-dashboard-one-accueil-personnalise-navigation-modules-actives: backlog
+  10-2-documents-herites-du-lab-livrables-teasing-lab: backlog
+  10-3-configuration-modules-actifs-par-mikl-injection-documentation-elio-one: backlog
+  10-4-personnalisation-branding-dashboard-one-par-client: backlog
+  epic-10-retrospective: optional
+
+  # Epic 11: Facturation & Abonnements (5 stories)
+  epic-11: backlog
+  11-1-module-facturation-structure-integration-invoice-ninja-types: backlog
+  11-2-creation-envoi-de-devis-par-mikl: backlog
+  11-3-abonnements-recurrents-stripe-gestion-des-echecs-de-paiement: backlog
+  11-4-historique-facturation-client-avoirs-informations-de-paiement: backlog
+  11-5-facturation-lab-199-paiement-forfait-deduction-setup-one: backlog
+  epic-11-retrospective: optional
+
+  # Epic 12: Administration, Analytics & Templates (8 stories)
+  epic-12: backlog
+  12-1-module-admin-logs-activite-par-client-mode-maintenance: backlog
+  12-2-export-complet-donnees-client-backups-automatiques: backlog
+  12-3-templates-reutilisables-parcours-lab-emails-automatiques: backlog
+  12-4-analytics-metriques-usage: backlog
+  12-5a-monitoring-sante-systeme-alertes-dysfonctionnement: backlog
+  12-5b-preparation-integrations-p2-webhooks-api: backlog
+  12-6-provisioning-instance-one-depuis-le-hub: backlog
+  12-7-monitoring-instances-one-usage-seuils-alertes: backlog
+  12-8-documentation-obligatoire-par-module-verification: backlog
+  epic-12-retrospective: optional
