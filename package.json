@@ -12,9 +12,11 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "test": "turbo test",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "gen:types": "supabase gen types typescript --local > packages/types/src/database.types.ts"
   },
   "devDependencies": {
+    "supabase": "^2.76.7",
     "turbo": "^2.3.0",
     "vitest": "^3.0.0"
   },
