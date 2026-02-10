@@ -14,6 +14,25 @@
     "lint": {
       "dependsOn": ["^build"]
     },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:rls": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:contracts": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "gen:types": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     }

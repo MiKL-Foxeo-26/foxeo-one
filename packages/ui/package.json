@@ -8,7 +8,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./globals.css": "./src/globals.css"
+    "./globals.css": "./src/globals.css",
+    "./themes/hub.css": "./src/themes/hub.css",
+    "./themes/lab.css": "./src/themes/lab.css",
+    "./themes/one.css": "./src/themes/one.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"

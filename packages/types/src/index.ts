@@ -1,0 +1,24 @@
+/**
+ * @foxeo/types - Types partages pour Foxeo One
+ */
+
+export type { ActionError, ActionResponse } from './action-response'
+export { successResponse, errorResponse } from './action-response'
+
+export type {
+  ModuleTarget,
+  ModuleRoute,
+  ModuleNavigation,
+  ModuleManifest,
+} from './module-manifest'
+
+export type { UserRole, DashboardType, UserSession } from './auth.types'
+
+export type {
+  ElioTier,
+  ElioConfig,
+  CustomBranding,
+  ClientConfig,
+} from './client-config.types'
+
+export type { Json, Database } from './database.types'

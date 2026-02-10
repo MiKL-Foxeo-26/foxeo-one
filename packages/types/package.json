@@ -1,5 +1,5 @@
 {
-  "name": "@foxeo/utils",
+  "name": "@foxeo/types",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,12 +11,6 @@
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0"
-  },
-  "dependencies": {
-    "@foxeo/types": "*",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.0",
-    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@foxeo/tsconfig": "*",

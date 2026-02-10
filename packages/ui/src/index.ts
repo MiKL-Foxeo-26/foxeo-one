@@ -22,3 +22,9 @@ export * from './skeleton'
 export * from './tabs'
 export * from './textarea'
 export * from './tooltip'
+
+// Dashboard components
+export { DashboardShell } from './components/dashboard-shell'
+export { ShellSkeleton } from './components/shell-skeleton'
+export { ModuleSkeleton } from './components/module-skeleton'
+export { EmptyState } from './components/empty-state'
