@@ -1,7 +1,7 @@
 /**
  * Supabase database types — Story 1.2
  *
- * Types manuels alignes sur les migrations SQL (00001-00007).
+ * Types manuels alignes sur les migrations SQL (00001-00009).
  * Seront remplaces par `npm run gen:types` quand Supabase local sera disponible.
  *
  * IMPORTANT: Apres chaque migration, regenerer avec:
@@ -237,6 +237,31 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts: {
+        Row: {
+          id: string
+          email: string
+          ip_address: string | null
+          success: boolean
+          attempted_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          ip_address?: string | null
+          success?: boolean
+          attempted_at?: string
+        }
+        /** Table append-only — tracking brute force protection (NFR-S5). */
+        Update: {
+          id?: string
+          email?: string
+          ip_address?: string | null
+          success?: boolean
+          attempted_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -247,6 +272,29 @@ export type Database = {
       fn_update_updated_at: {
         Args: Record<string, never>
         Returns: unknown
+      }
+      fn_check_login_attempts: {
+        Args: {
+          p_email: string
+          p_window_minutes?: number
+          p_max_attempts?: number
+        }
+        Returns: { blocked: boolean; remainingSeconds: number }
+      }
+      fn_record_login_attempt: {
+        Args: {
+          p_email: string
+          p_ip_address?: string
+          p_success?: boolean
+        }
+        Returns: undefined
+      }
+      fn_link_auth_user: {
+        Args: {
+          p_auth_user_id: string
+          p_email: string
+        }
+        Returns: { clientId: string; name: string } | null
       }
     }
     Enums: Record<string, never>

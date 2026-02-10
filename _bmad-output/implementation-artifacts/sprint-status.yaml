@@ -42,7 +42,7 @@ development_status:
   epic-1: in-progress
   1-1-setup-monorepo-packages-partages-dashboard-shell: review
   1-2-migrations-supabase-fondation: done
-  1-3-authentification-client-inscription-login-sessions: backlog
+  1-3-authentification-client-inscription-login-sessions: done
   1-4-authentification-mikl-login-2fa-middleware-hub-admin: backlog
   1-5-rls-isolation-donnees-multi-tenant: backlog
   1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: backlog

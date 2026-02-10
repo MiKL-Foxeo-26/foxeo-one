@@ -8,6 +8,8 @@ export default defineConfig({
       'packages/**/src/**/*.test.ts',
       'supabase/**/*.test.ts',
       'tests/**/*.test.ts',
+      'apps/**/*.test.ts',
+      'apps/**/*.test.tsx',
     ],
   },
 })

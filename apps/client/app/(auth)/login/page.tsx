@@ -1,11 +1,44 @@
+import { Suspense } from 'react'
+import Link from 'next/link'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Skeleton } from '@foxeo/ui'
+import { LoginForm } from './login-form'
+
 export default function LoginPage() {
   return (
-    <div className="w-full max-w-sm space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Foxeo</h1>
-        <p className="text-muted-foreground mt-2">Connexion a votre espace</p>
+    <Card className="w-full max-w-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold">Foxeo</CardTitle>
+        <CardDescription>Connexion a votre espace</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Suspense fallback={<LoginFormSkeleton />}>
+          <LoginForm />
+        </Suspense>
+      </CardContent>
+      <CardFooter className="justify-center">
+        <p className="text-sm text-muted-foreground">
+          Pas encore de compte ?{' '}
+          <Link href="/signup" className="text-primary underline-offset-4 hover:underline">
+            Creer un compte
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+  )
+}
+
+function LoginFormSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-10 w-full" />
       </div>
-      {/* Auth form placeholder — Story 1.3 */}
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <Skeleton className="h-10 w-full" />
     </div>
   )
 }

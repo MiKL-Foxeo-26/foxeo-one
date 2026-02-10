@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { DashboardShell } from '@foxeo/ui'
+import { LogoutButton } from './logout-button'
 
 function ClientSidebar() {
   return (
@@ -26,6 +27,7 @@ function ClientHeader() {
       <span className="text-sm font-medium">Mon espace</span>
       <div className="flex items-center gap-2">
         {/* Notifications, profile, Elio chat — future stories */}
+        <LogoutButton />
       </div>
     </div>
   )

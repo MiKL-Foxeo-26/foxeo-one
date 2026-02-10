@@ -1,0 +1,201 @@
+'use server'
+
+import { headers } from 'next/headers'
+import { z } from 'zod'
+import { createServerSupabaseClient } from '@foxeo/supabase'
+import {
+  type ActionResponse,
+  type UserSession,
+  successResponse,
+  errorResponse,
+} from '@foxeo/types'
+import { emailSchema, passwordSchema } from '@foxeo/utils'
+
+// --- Validation Schemas ---
+
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, 'Mot de passe requis'),
+})
+
+export const signupSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: z.string().min(1, 'Confirmation requise'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Les mots de passe ne correspondent pas',
+  path: ['confirmPassword'],
+})
+
+// --- Server Actions ---
+
+export async function loginAction(
+  formData: FormData
+): Promise<ActionResponse<UserSession>> {
+  const raw = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+  }
+
+  const parsed = loginSchema.safeParse(raw)
+  if (!parsed.success) {
+    return errorResponse(
+      parsed.error.errors[0]?.message ?? 'Donnees invalides',
+      'VALIDATION_ERROR',
+      parsed.error.flatten()
+    )
+  }
+
+  const { email, password } = parsed.data
+  const supabase = await createServerSupabaseClient()
+
+  // Check brute force protection via SECURITY DEFINER function
+  const { data: lockout } = await supabase.rpc('fn_check_login_attempts', {
+    p_email: email,
+  }) as { data: { blocked: boolean; remainingSeconds: number } | null }
+
+  if (lockout?.blocked) {
+    const minutes = Math.ceil(lockout.remainingSeconds / 60)
+    return errorResponse(
+      `Trop de tentatives. Reessayez dans ${minutes} minute${minutes > 1 ? 's' : ''}.`,
+      'RATE_LIMITED',
+      { remainingSeconds: lockout.remainingSeconds }
+    )
+  }
+
+  // Attempt sign in
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+  // Get IP for recording attempt
+  const headersList = await headers()
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headersList.get('x-real-ip') ??
+    'unknown'
+
+  if (authError || !authData.user) {
+    await supabase.rpc('fn_record_login_attempt', {
+      p_email: email,
+      p_ip_address: ip,
+      p_success: false,
+    })
+    return errorResponse(
+      'Email ou mot de passe incorrect',
+      'AUTH_ERROR'
+    )
+  }
+
+  // Record successful login
+  await supabase.rpc('fn_record_login_attempt', {
+    p_email: email,
+    p_ip_address: ip,
+    p_success: true,
+  })
+
+  // Fetch client record to build session
+  const { data: client } = await supabase
+    .from('clients')
+    .select('id, name, client_type, status')
+    .eq('auth_user_id', authData.user.id)
+    .single() as { data: { id: string; name: string; client_type: string; status: string } | null }
+
+  // Fetch client config for dashboard type
+  const { data: config } = client
+    ? await supabase
+        .from('client_configs')
+        .select('dashboard_type')
+        .eq('client_id', client.id)
+        .single() as { data: { dashboard_type: string } | null }
+    : { data: null }
+
+  const session: UserSession = {
+    id: authData.user.id,
+    email: authData.user.email ?? email,
+    role: 'client',
+    dashboardType:
+      (config?.dashboard_type as UserSession['dashboardType']) ?? 'lab',
+    clientId: client?.id,
+    displayName: client?.name ?? undefined,
+  }
+
+  return successResponse(session)
+}
+
+export async function signupAction(
+  formData: FormData
+): Promise<ActionResponse<UserSession>> {
+  const raw = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword'),
+  }
+
+  const parsed = signupSchema.safeParse(raw)
+  if (!parsed.success) {
+    return errorResponse(
+      parsed.error.errors[0]?.message ?? 'Donnees invalides',
+      'VALIDATION_ERROR',
+      parsed.error.flatten()
+    )
+  }
+
+  const { email, password } = parsed.data
+  const supabase = await createServerSupabaseClient()
+
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  })
+
+  if (authError) {
+    if (authError.message.includes('already registered')) {
+      return errorResponse(
+        'Un compte existe deja avec cet email',
+        'DUPLICATE_EMAIL'
+      )
+    }
+    return errorResponse(authError.message, 'AUTH_ERROR')
+  }
+
+  if (!authData.user) {
+    return errorResponse(
+      'Erreur lors de la creation du compte',
+      'AUTH_ERROR'
+    )
+  }
+
+  // Link auth user to existing client record (if MiKL pre-created one)
+  const { data: linked } = await supabase.rpc('fn_link_auth_user', {
+    p_auth_user_id: authData.user.id,
+    p_email: email,
+  }) as { data: { clientId: string; name: string } | null }
+
+  const session: UserSession = {
+    id: authData.user.id,
+    email: authData.user.email ?? email,
+    role: 'client',
+    dashboardType: 'lab',
+    clientId: linked?.clientId,
+    displayName: linked?.name ?? undefined,
+  }
+
+  return successResponse(session)
+}
+
+export async function logoutAction(): Promise<ActionResponse<null>> {
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    return errorResponse(
+      'Erreur lors de la deconnexion',
+      'AUTH_ERROR'
+    )
+  }
+
+  return successResponse(null)
+}
