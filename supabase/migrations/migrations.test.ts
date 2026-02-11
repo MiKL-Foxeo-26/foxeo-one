@@ -21,6 +21,11 @@ const MIGRATION_FILES = [
   '00005_create_activity_logs.sql',
   '00006_create_updated_at_triggers.sql',
   '00007_rls_activity_logs.sql',
+  '00008_create_login_attempts.sql',
+  '00009_secure_login_attempts_link_auth.sql',
+  '00010_operators_auth_user_id.sql',
+  '00011_rls_functions.sql',
+  '00012_rls_policies.sql',
 ]
 
 describe('Supabase project structure', () => {
@@ -204,6 +209,106 @@ describe('Migration 00007: RLS activity_logs', () => {
     // Only two policies should exist: select_operator and insert_authenticated
     const policyMatches = sql.match(/CREATE POLICY/g)
     expect(policyMatches).toHaveLength(2)
+  })
+})
+
+describe('Migration 00011: RLS functions', () => {
+  const sql = readFileSync(join(MIGRATIONS_DIR, '00011_rls_functions.sql'), 'utf-8')
+
+  it('creates is_admin() function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION is_admin()')
+    expect(sql).toContain('SECURITY DEFINER')
+    expect(sql).toContain('STABLE')
+    expect(sql).toContain('SET search_path = public')
+  })
+
+  it('creates is_owner(UUID) function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION is_owner(p_client_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+  })
+
+  it('creates is_operator(UUID) function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION is_operator(p_operator_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+  })
+
+  it('creates fn_get_operator_by_email(TEXT) function with email guard', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_get_operator_by_email(p_email TEXT)')
+    expect(sql).toContain('SECURITY DEFINER')
+    // Guard: user can only query their own email
+    expect(sql).toContain("auth.jwt()->>'email'")
+  })
+
+  it('creates fn_link_operator_auth_user(UUID, TEXT) function with auth guard', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_link_operator_auth_user(p_auth_user_id UUID, p_email TEXT)')
+    expect(sql).toContain('SECURITY DEFINER')
+    // Guard: user can only link their own auth_user_id
+    expect(sql).toContain('p_auth_user_id != auth.uid()')
+  })
+
+  it('grants execute to authenticated role', () => {
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION is_admin() TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION is_owner(UUID) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION is_operator(UUID) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_get_operator_by_email(TEXT) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_link_operator_auth_user(UUID, TEXT) TO authenticated')
+  })
+})
+
+describe('Migration 00012: RLS policies', () => {
+  const sql = readFileSync(join(MIGRATIONS_DIR, '00012_rls_policies.sql'), 'utf-8')
+
+  it('enables RLS on operators', () => {
+    expect(sql).toContain('ALTER TABLE operators ENABLE ROW LEVEL SECURITY')
+  })
+
+  it('enables RLS on clients', () => {
+    expect(sql).toContain('ALTER TABLE clients ENABLE ROW LEVEL SECURITY')
+  })
+
+  it('enables RLS on client_configs', () => {
+    expect(sql).toContain('ALTER TABLE client_configs ENABLE ROW LEVEL SECURITY')
+  })
+
+  it('enables RLS on consents', () => {
+    expect(sql).toContain('ALTER TABLE consents ENABLE ROW LEVEL SECURITY')
+  })
+
+  it('creates operators_select_self policy', () => {
+    expect(sql).toContain('CREATE POLICY operators_select_self')
+    expect(sql).toContain('auth_user_id = auth.uid()')
+  })
+
+  it('creates operators_update_self policy', () => {
+    expect(sql).toContain('CREATE POLICY operators_update_self')
+  })
+
+  it('creates clients_select_owner and clients_select_operator policies', () => {
+    expect(sql).toContain('CREATE POLICY clients_select_owner')
+    expect(sql).toContain('CREATE POLICY clients_select_operator')
+  })
+
+  it('creates clients_update_operator and clients_insert_operator policies', () => {
+    expect(sql).toContain('CREATE POLICY clients_update_operator')
+    expect(sql).toContain('CREATE POLICY clients_insert_operator')
+  })
+
+  it('creates client_configs policies', () => {
+    expect(sql).toContain('CREATE POLICY client_configs_select_owner')
+    expect(sql).toContain('CREATE POLICY client_configs_select_operator')
+    expect(sql).toContain('CREATE POLICY client_configs_update_operator')
+    expect(sql).toContain('CREATE POLICY client_configs_insert_operator')
+  })
+
+  it('creates consents policies', () => {
+    expect(sql).toContain('CREATE POLICY consents_select_owner')
+    expect(sql).toContain('CREATE POLICY consents_select_operator')
+    expect(sql).toContain('CREATE POLICY consents_insert_authenticated')
+  })
+
+  it('has exactly 13 policies total', () => {
+    const policyMatches = sql.match(/CREATE POLICY/g)
+    expect(policyMatches).toHaveLength(13)
   })
 })
 

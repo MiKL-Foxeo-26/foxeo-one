@@ -112,12 +112,13 @@ export async function hubLoginAction(
     p_success: true,
   } as never)
 
-  // Verify operator exists in operators table
-  const { data: operator } = await supabase
-    .from('operators')
-    .select('id, name, role, two_factor_enabled')
-    .eq('email', email)
-    .single() as { data: { id: string; name: string; role: string; two_factor_enabled: boolean } | null }
+  // Verify operator via SECURITY DEFINER function (bypasses RLS)
+  // Direct table query would fail before auth_user_id is linked
+  const { data: operator } = (await supabase.rpc('fn_get_operator_by_email' as never, {
+    p_email: email,
+  } as never)) as unknown as {
+    data: { id: string; name: string; role: string; twoFactorEnabled: boolean; authUserId: string | null } | null
+  }
 
   if (!operator) {
     // Sign out — not an operator
@@ -125,18 +126,12 @@ export async function hubLoginAction(
     return errorResponse('Acces non autorise. Compte operateur requis.', 'UNAUTHORIZED')
   }
 
-  // Link auth_user_id if not yet linked
-  const { data: operatorRecord } = await supabase
-    .from('operators')
-    .select('auth_user_id')
-    .eq('id', operator.id)
-    .single() as { data: { auth_user_id: string | null } | null }
-
-  if (operatorRecord && !operatorRecord.auth_user_id) {
-    await supabase
-      .from('operators')
-      .update({ auth_user_id: authData.user.id } as never)
-      .eq('id', operator.id)
+  // Link auth_user_id if not yet linked (SECURITY DEFINER, bypasses RLS)
+  if (!operator.authUserId) {
+    await supabase.rpc('fn_link_operator_auth_user' as never, {
+      p_auth_user_id: authData.user.id,
+      p_email: email,
+    } as never)
   }
 
   // Check MFA status
@@ -148,7 +143,7 @@ export async function hubLoginAction(
 
   return successResponse({
     requiresMfa: hasVerifiedTotp,
-    needsSetup: !hasVerifiedTotp && !operator.two_factor_enabled,
+    needsSetup: !hasVerifiedTotp && !operator.twoFactorEnabled,
     operatorId: operator.id,
     operatorName: operator.name,
   })
@@ -205,12 +200,12 @@ export async function hubVerifyMfaAction(
     return errorResponse('Code 2FA incorrect. Veuillez reessayer.', 'MFA_INVALID_CODE')
   }
 
-  // Session is now AAL2 — build UserSession
-  const { data: operator } = await supabase
-    .from('operators')
-    .select('id, name, role')
-    .eq('email', user.email ?? '')
-    .single() as { data: { id: string; name: string; role: string } | null }
+  // Session is now AAL2 — build UserSession via SECURITY DEFINER function
+  const { data: operator } = (await supabase.rpc('fn_get_operator_by_email' as never, {
+    p_email: user.email ?? '',
+  } as never)) as unknown as {
+    data: { id: string; name: string; role: string; twoFactorEnabled: boolean; authUserId: string | null } | null
+  }
 
   const session: UserSession = {
     id: user.id,

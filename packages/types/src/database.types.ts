@@ -302,6 +302,35 @@ export type Database = {
         }
         Returns: { clientId: string; name: string } | null
       }
+      is_admin: {
+        Args: Record<string, never>
+        Returns: boolean
+      }
+      is_owner: {
+        Args: {
+          p_client_id: string
+        }
+        Returns: boolean
+      }
+      is_operator: {
+        Args: {
+          p_operator_id: string
+        }
+        Returns: boolean
+      }
+      fn_get_operator_by_email: {
+        Args: {
+          p_email: string
+        }
+        Returns: { id: string; name: string; role: string; twoFactorEnabled: boolean; authUserId: string | null } | null
+      }
+      fn_link_operator_auth_user: {
+        Args: {
+          p_auth_user_id: string
+          p_email: string
+        }
+        Returns: { id: string; name: string } | null
+      }
     }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>

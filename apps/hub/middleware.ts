@@ -48,12 +48,13 @@ export async function middleware(request: NextRequest) {
   // TODO: Optimize — consider caching operator role in JWT custom claims
   // to avoid a DB query on every protected route navigation.
   if (user && !isPublic) {
-    // Verify operator exists in operators table
-    const { data: operator } = await supabase
-      .from('operators')
-      .select('id, role, two_factor_enabled')
-      .eq('email', user.email ?? '')
-      .single() as { data: { id: string; role: string; two_factor_enabled: boolean } | null }
+    // Verify operator exists via SECURITY DEFINER function (bypasses RLS)
+    // Direct table query would fail if auth_user_id not yet linked
+    const { data: operator } = (await supabase.rpc('fn_get_operator_by_email' as never, {
+      p_email: user.email ?? '',
+    } as never)) as unknown as {
+      data: { id: string; name: string; role: string; twoFactorEnabled: boolean; authUserId: string | null } | null
+    }
 
     if (!operator) {
       // Not an operator — sign out and redirect
@@ -68,7 +69,7 @@ export async function middleware(request: NextRequest) {
 
     if (aal?.currentLevel !== 'aal2') {
       // 2FA not yet setup → redirect to setup
-      if (!operator.two_factor_enabled) {
+      if (!operator.twoFactorEnabled) {
         return NextResponse.redirect(new URL('/setup-mfa', request.url))
       }
       // 2FA setup but not verified this session → redirect to verify
