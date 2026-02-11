@@ -1,7 +1,7 @@
 /**
  * Supabase database types — Story 1.2
  *
- * Types manuels alignes sur les migrations SQL (00001-00009).
+ * Types manuels alignes sur les migrations SQL (00001-00010).
  * Seront remplaces par `npm run gen:types` quand Supabase local sera disponible.
  *
  * IMPORTANT: Apres chaque migration, regenerer avec:
@@ -31,6 +31,8 @@ export type Database = {
           name: string
           role: 'operator' | 'admin'
           two_factor_enabled: boolean
+          auth_user_id: string | null
+          mfa_metadata: Json
           created_at: string
           updated_at: string
         }
@@ -40,6 +42,8 @@ export type Database = {
           name: string
           role?: 'operator' | 'admin'
           two_factor_enabled?: boolean
+          auth_user_id?: string | null
+          mfa_metadata?: Json
           created_at?: string
           updated_at?: string
         }
@@ -49,6 +53,8 @@ export type Database = {
           name?: string
           role?: 'operator' | 'admin'
           two_factor_enabled?: boolean
+          auth_user_id?: string | null
+          mfa_metadata?: Json
           created_at?: string
           updated_at?: string
         }
