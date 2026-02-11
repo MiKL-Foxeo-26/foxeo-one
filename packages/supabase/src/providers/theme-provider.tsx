@@ -17,7 +17,18 @@ type ThemeContextType = {
   setTheme: (theme: Theme) => void
 }
 
+const STORAGE_KEY = 'foxeo-theme'
+
 const ThemeContext = createContext<ThemeContextType | null>(null)
+
+function getStoredTheme(defaultTheme: Theme): Theme {
+  if (typeof window === 'undefined') return defaultTheme
+  const stored = localStorage.getItem(STORAGE_KEY) as Theme | null
+  if (stored === 'light' || stored === 'dark' || stored === 'system') {
+    return stored
+  }
+  return defaultTheme
+}
 
 export function ThemeProvider({
   children,
@@ -28,7 +39,17 @@ export function ThemeProvider({
   defaultTheme?: Theme
   dashboardTheme?: DashboardTheme
 }) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [theme, setThemeState] = useState<Theme>(defaultTheme)
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    setThemeState(getStoredTheme(defaultTheme))
+  }, [defaultTheme])
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme)
+    localStorage.setItem(STORAGE_KEY, newTheme)
+  }
 
   useEffect(() => {
     const root = document.documentElement
@@ -52,6 +73,21 @@ export function ThemeProvider({
 
     root.classList.add(effectiveTheme)
   }, [theme, dashboardTheme])
+
+  // Listen for system preference changes when theme is 'system'
+  useEffect(() => {
+    if (theme !== 'system') return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e: MediaQueryListEvent) => {
+      const root = document.documentElement
+      root.classList.remove('light', 'dark')
+      root.classList.add(e.matches ? 'dark' : 'light')
+    }
+
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [theme])
 
   return (
     <ThemeContext.Provider value={{ theme, dashboardTheme, setTheme }}>

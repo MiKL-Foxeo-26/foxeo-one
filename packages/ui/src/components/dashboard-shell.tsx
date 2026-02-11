@@ -1,5 +1,11 @@
-import { type ReactNode } from 'react'
+'use client'
+
+import { useState, type ReactNode } from 'react'
+import { Menu } from 'lucide-react'
 import { cn } from '@foxeo/utils'
+import { Button } from '../button'
+import { Sheet, SheetContent, SheetTitle } from '../sheet'
+import { useIsMobile } from '../use-mobile'
 
 type DashboardShellProps = {
   density?: 'compact' | 'comfortable' | 'spacious'
@@ -20,20 +26,67 @@ export function DashboardShell({
   header,
   children,
 }: DashboardShellProps) {
+  const isMobile = useIsMobile()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+    <div
+      className="flex h-screen overflow-hidden bg-background text-foreground"
+      data-density={density}
+    >
+      {/* Skip to content — WCAG 2.4.1 */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
+      >
+        Aller au contenu principal
+      </a>
+
+      {/* Desktop sidebar */}
       {sidebar && (
-        <aside className="hidden md:flex md:flex-col md:w-64 border-r border-sidebar-border bg-sidebar">
+        <aside
+          className="hidden md:flex md:flex-col md:w-64 border-r border-sidebar-border bg-sidebar"
+          role="navigation"
+          aria-label="Menu principal"
+        >
           {sidebar}
         </aside>
       )}
+
+      {/* Mobile sidebar (Sheet drawer) */}
+      {sidebar && isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-64 p-0 bg-sidebar">
+            <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
+            <nav role="navigation" aria-label="Menu principal">
+              {sidebar}
+            </nav>
+          </SheetContent>
+        </Sheet>
+      )}
+
       <div className="flex flex-1 flex-col overflow-hidden">
         {header && (
           <header className="flex h-14 items-center border-b border-border px-4 bg-card">
+            {/* Mobile hamburger */}
+            {sidebar && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden mr-2"
+                onClick={() => setSidebarOpen(true)}
+                aria-label="Ouvrir le menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
             {header}
           </header>
         )}
-        <main className={cn('flex-1 overflow-y-auto', densityClasses[density])}>
+        <main
+          id="main-content"
+          className={cn('flex-1 overflow-y-auto', densityClasses[density])}
+        >
           {children}
         </main>
       </div>

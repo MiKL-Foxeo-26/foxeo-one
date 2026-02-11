@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { DashboardShell } from '@foxeo/ui'
+import { DashboardShell, ThemeToggle } from '@foxeo/ui'
 import { LogoutButton } from './logout-button'
 
 function HubSidebar() {
@@ -27,6 +27,7 @@ function HubHeader() {
       <span className="text-sm font-medium">Hub Operateur</span>
       <div className="flex items-center gap-2">
         {/* Notifications, profile — future stories */}
+        <ThemeToggle />
         <LogoutButton />
       </div>
     </div>
