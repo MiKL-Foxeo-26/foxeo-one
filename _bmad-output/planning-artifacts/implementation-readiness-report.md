@@ -450,7 +450,7 @@ Les 12 epics et 79 stories respectent les standards de qualite du workflow creat
 | Risque | Mitigation |
 |--------|-----------|
 | Epic 8 (Agents IA Elio) est le plus gros (25 FRs, 9 stories) | Decouvrir des sous-stories si necessaire pendant le sprint |
-| Integration services self-hosted (OpenVidu, Invoice Ninja, Cal.com) | VPS Docker Compose a preparer en parallele du dev |
+| Integration services (OpenVidu, Cal.com self-hosted + Pennylane SaaS) | VPS Docker Compose (OpenVidu, Cal.com) + Pennylane API v2 config a preparer en parallele du dev |
 | Graduation (Epic 9) necessite provisioning d'instance (Supabase + Vercel) | Script foxeo-cli provision a developper et tester tot |
 | Communication Hub↔Instances via API REST | Definir le contrat API HMAC tot (Epic 1) pour que les epics suivants puissent l'utiliser |
 | Cout par client One sur tiers gratuits (~5-7eur/mois) | Monitoring seuils (FR162-165) et workflow upgrade planifie |

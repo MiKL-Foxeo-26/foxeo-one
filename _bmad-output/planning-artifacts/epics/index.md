@@ -170,7 +170,7 @@
     - [Story 10.4 : Personnalisation branding dashboard One par client](./epic-10-dashboard-one-modules-commerciaux-stories-detaillees.md#story-104-personnalisation-branding-dashboard-one-par-client)
     - [Resume Epic 10 — Couverture FRs](./epic-10-dashboard-one-modules-commerciaux-stories-detaillees.md#resume-epic-10-couverture-frs)
   - [Epic 11 : Facturation & Abonnements — Stories detaillees](./epic-11-facturation-abonnements-stories-detaillees.md)
-    - [Story 11.1 : Module Facturation — Structure, integration Invoice Ninja & types](./epic-11-facturation-abonnements-stories-detaillees.md#story-111-module-facturation-structure-integration-invoice-ninja-types)
+    - [Story 11.1 : Module Facturation — Structure, integration Pennylane & types](./epic-11-facturation-abonnements-stories-detaillees.md#story-111-module-facturation-structure-integration-pennylane-types)
     - [Story 11.2 : Creation & envoi de devis par MiKL](./epic-11-facturation-abonnements-stories-detaillees.md#story-112-creation-envoi-de-devis-par-mikl)
     - [Story 11.3 : Abonnements recurrents Stripe & gestion des echecs de paiement](./epic-11-facturation-abonnements-stories-detaillees.md#story-113-abonnements-recurrents-stripe-gestion-des-echecs-de-paiement)
     - [Story 11.4 : Historique facturation client, avoirs & informations de paiement](./epic-11-facturation-abonnements-stories-detaillees.md#story-114-historique-facturation-client-avoirs-informations-de-paiement)

@@ -46,10 +46,8 @@ foxeo-dash/
 │   │   │   │   ├── webhooks/               # Callbacks externes + instances
 │   │   │   │   │   ├── cal-com/
 │   │   │   │   │   │   └── route.ts        # Webhook Cal.com → création prospect
-│   │   │   │   │   ├── invoice-ninja/
-│   │   │   │   │   │   └── route.ts        # Webhook Invoice Ninja → paiements
-│   │   │   │   │   ├── stripe/
-│   │   │   │   │   │   └── route.ts        # Webhook Stripe → status paiement
+│   │   │   │   │   ├── pennylane/
+│   │   │   │   │   │   └── route.ts        # (Réservé) Webhook Pennylane si disponible à l'avenir
 │   │   │   │   │   ├── openvidu/
 │   │   │   │   │   │   └── route.ts        # Webhook OpenVidu → recording ready
 │   │   │   │   │   └── client-instance/
@@ -93,9 +91,6 @@ foxeo-dash/
 │       │   │           └── error.tsx         # Error boundary du module
 │       │   │
 │       │   ├── api/
-│       │   │   ├── webhooks/
-│       │   │   │   └── stripe/
-│       │   │   │       └── route.ts          # Webhook Stripe (paiement client)
 │       │   │   └── hub/                      # API Hub↔Client (communication inter-instances)
 │       │   │       ├── sync/
 │       │   │       │   └── route.ts          # Sync état client → Hub
@@ -322,20 +317,23 @@ foxeo-dash/
 │       │   └── types/
 │       │       └── notification.types.ts
 │       │
-│       ├── facturation/                      # Module facturation (FR94-98, Invoice Ninja)
+│       ├── facturation/                      # Module facturation (FR94-98, Pennylane API v2)
 │       │   ├── index.ts
 │       │   ├── manifest.ts                   # targets: ['hub', 'client-one']
 │       │   ├── components/
 │       │   │   ├── invoice-list.tsx
 │       │   │   ├── quote-form.tsx
 │       │   │   ├── payment-status.tsx
-│       │   │   └── billing-history.tsx
+│       │   │   ├── billing-history.tsx
+│       │   │   └── financial-overview.tsx     # Vue santé financière Hub (balance, CA)
 │       │   ├── hooks/
 │       │   │   └── use-invoices.ts
 │       │   ├── actions/
-│       │   │   ├── create-quote.ts           # Proxy → Invoice Ninja API
-│       │   │   ├── convert-to-invoice.ts
-│       │   │   └── record-payment.ts
+│       │   │   ├── create-quote.ts           # Proxy → Pennylane API v2
+│       │   │   ├── create-invoice.ts         # Proxy → Pennylane customer_invoices
+│       │   │   └── create-subscription.ts    # Proxy → Pennylane billing_subscriptions
+│       │   ├── config/
+│       │   │   └── pennylane.ts              # Client HTTP Pennylane (Bearer token, env vars)
 │       │   └── types/
 │       │       └── facturation.types.ts
 │       │
@@ -471,8 +469,6 @@ foxeo-dash/
 │   ├── docker-compose.prod.yml               # Override production
 │   ├── openvidu/
 │   │   └── agent-speech-processing.yaml
-│   ├── invoice-ninja/
-│   │   └── .env.example
 │   └── cal-com/
 │       └── .env.example
 │
@@ -541,7 +537,7 @@ foxeo-dash/
 | One ↔ Supabase One | Direct via `@foxeo/supabase` | Single-tenant (DB dédiée client) |
 | **Hub ↔ Instance One** | **API REST + webhooks signés (HMAC)** | **Pas de DB partagée — communication API uniquement** |
 | **Hub ↔ Lab** | **API REST + webhooks signés (HMAC)** | **Même pattern que One pour cohérence** |
-| Hub ↔ Invoice Ninja | Proxy via Server Actions (dans module facturation) | Token dans env variables |
+| Hub ↔ Pennylane | Proxy via Server Actions (dans module facturation) + Edge Function polling (sync cron 5min) | Bearer token dans Supabase Vault |
 | Hub ↔ OpenVidu | Proxy via Server Actions (dans module visio) | LiveKit SDK server-side |
 | Hub ↔ Cal.com | Webhook entrant | API Route `/api/webhooks/cal-com` |
 | Hub ↔ Deepgram | Via Supabase Edge Function post-recording | API key dans Supabase Vault |
@@ -576,7 +572,7 @@ Elles ne contiennent AUCUNE logique métier.
 | Registre clients (Hub) | Supabase Hub | TanStack Query + RLS operator |
 | Données client Lab | Supabase Lab (partagé) | TanStack Query + RLS client_id |
 | Données client One | Supabase One (dédié, propriété client) | TanStack Query (single-tenant) |
-| Factures, devis, paiements | Invoice Ninja DB | Proxy API depuis Server Actions module facturation |
+| Factures, devis, paiements | Pennylane (SaaS) | Proxy API v2 depuis Server Actions + table miroir `billing_sync` via Edge Function polling |
 | Rendez-vous | Cal.com DB | Webhook → copie dans Supabase (Hub ou instance) |
 | Enregistrements visio | Supabase Storage (instance concernée) | Upload via OpenVidu Egress → S3 |
 | Fichiers documents | Supabase Storage (instance concernée) | Upload direct + signed URLs |
@@ -643,11 +639,13 @@ Elles ne contiennent AUCUNE logique métier.
                                            │  PostgreSQL  │
                                            └──────────────┘
 
-External Services (webhooks entrants uniquement):
+External Services:
   Cal.com ──────────► /api/webhooks/cal-com ──────► Supabase (prospect)
-  Invoice Ninja ────► /api/webhooks/invoice-ninja ► Supabase (paiement)
-  Stripe ───────────► /api/webhooks/stripe ────────► Supabase (status)
   OpenVidu ─────────► /api/webhooks/openvidu ──────► Edge Function (transcription)
+
+Polling Services (pas de webhooks disponibles):
+  Edge Function (cron 5min) ──► Pennylane API v2 ──► billing_sync table
+       └──► Supabase Realtime ──► invalidate TanStack Query (Hub + Client)
 
 Inter-instances (API REST signées HMAC):
   Hub ─────────────► Instance One /api/hub/sync ──► Config, updates

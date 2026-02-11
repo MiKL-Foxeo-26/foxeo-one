@@ -252,8 +252,7 @@ So that **je sais que tout fonctionne et je suis informe immediatement en cas de
 - **Services externes** :
   | Service | Verification | Seuil |
   |---------|-------------|-------|
-  | Invoice Ninja | `GET /api/v1/ping` | < 2s |
-  | Stripe | Status API | Operationnel |
+  | Pennylane API v2 | `GET /api/external/v2/customers?page_size=1` | < 2s |
   | DeepSeek (LLM) | `GET /health` ou test prompt | < 5s |
   | Cal.com | API check | < 2s |
   | OpenVidu | API check | < 2s |
@@ -270,7 +269,7 @@ So that **je sais que tout fonctionne et je suis informe immediatement en cas de
 1. Le statut global passe a orange (degrade) ou rouge (critique)
 2. Une notification prioritaire est envoyee a MiKL : "Alerte systeme — {service} ne repond pas ({details})"
 3. L'evenement est logge dans `activity_logs` (type 'system_alert')
-4. Si le service est un service externe (Invoice Ninja, Stripe, etc.) : le systeme reste fonctionnel en mode degrade (NFR-R6, NFR-I5) avec message explicite aux utilisateurs
+4. Si le service est un service externe (Pennylane, Cal.com, etc.) : le systeme reste fonctionnel en mode degrade (NFR-R6, NFR-I5) avec message explicite aux utilisateurs
 **And** une alerte n'est envoyee qu'une fois par incident (pas de spam, debounce 15 minutes)
 
 ---

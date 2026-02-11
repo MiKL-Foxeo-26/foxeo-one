@@ -80,7 +80,7 @@ L'accompagnement humain avec visio et suivi de projet reste le coeur de Foxeo. L
 - CRM centralisé (gestion prospects et clients)
 - Validation Hub : workflow d'approbation des livrables
 - Agenda & visio intégrés (avec enregistrement + transcription automatique)
-- Facturation & devis (Invoice Ninja intégré)
+- Facturation & devis (Pennylane intégré)
 - Chat direct avec chaque client
 - Analytics : chiffre d'affaires, activité clients, suivi temps
 - Élio Hub : assistant IA pour rédiger réponses, emails, suggestions
@@ -422,19 +422,21 @@ Le devis Foxeo n'est **pas un forfait générique**. C'est un **prix juste, argu
 
 ### Services intégrés (auto-hébergés)
 - **OpenVidu 3.5+** : Visioconférence WebRTC
-- **Invoice Ninja v5** : Facturation & devis
 - **Cal.com** : Prise de rendez-vous
 
+### Services SaaS
+- **Pennylane** : Facturation, devis, abonnements, comptabilité (API v2). Conformité facturation électronique sept. 2026 native. Synchronisation par polling (Edge Function cron 5min).
+
 ### Paiements & conformité
-- **Stripe** (via Invoice Ninja)
-- **Facturation électronique** : Conformité loi française (sept. 2026)
+- **Stripe** connecté à Pennylane (paiements CB) + virement IBAN (Compte Pro Pennylane) + SEPA optionnel
+- **Facturation électronique** : Conformité loi française (sept. 2026) — gérée nativement par Pennylane
 - **RGPD** : Données hébergées en France
 
 ### Hébergement
 - **Hub** : 1 instance Vercel + 1 projet Supabase (Foxeo)
 - **Lab** : 1 instance Vercel + 1 projet Supabase partagé (multi-tenant Foxeo)
 - **One** : 1 instance Vercel + 1 projet Supabase **par client** (propriété client)
-- **Services** : VPS avec Docker Compose (OpenVidu, Invoice Ninja, Cal.com)
+- **Services** : VPS avec Docker Compose (OpenVidu, Cal.com)
 - **Coût par client One** : ~5-7€/mois sur tiers gratuits
 
 ---
@@ -578,7 +580,7 @@ Le devis Foxeo n'est **pas un forfait générique**. C'est un **prix juste, argu
 - **Lab 199€ déduit** si le client passe sur One
 - **Propriété client** : Le code One appartient au client, pas à Foxeo. Le Lab reste propriété Foxeo.
 - **Déploiement** : Hub unique + Lab multi-tenant + One instance par client (~5-7€/mois)
-- **Stack** : Next.js 16, Supabase, DeepSeek V3.2, OpenVidu, Invoice Ninja, Cal.com, Deepgram
+- **Stack** : Next.js 16, Supabase, DeepSeek V3.2, OpenVidu, Pennylane, Cal.com, Deepgram
 - **Couleurs** : Minimal Futuriste dark mode — Hub=Cyan/Turquoise, Lab=Violet/Purple, One=Vert ou Orange
 - **Typo** : Poppins (titres) + Inter (corps)
 - **Tonalité** : Professionnelle mais chaleureuse, jamais corporate, toujours accessible
@@ -618,7 +620,7 @@ Le devis Foxeo n'est **pas un forfait générique**. C'est un **prix juste, argu
 - Foxeo-Hub core + Lab pour cas d'étude association
 - Élio Lab configuré pour le premier client
 - Visio + transcription + brief automatique
-- Facturation Invoice Ninja intégrée
+- Facturation Pennylane intégrée
 
 ### Phase 2 — Croissance
 - Activation des modules One

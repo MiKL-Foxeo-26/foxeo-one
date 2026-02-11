@@ -41,7 +41,7 @@ Les clients etablis accedent a un dashboard personnalise **deploye sur leur inst
 **FRs couverts:** FR38, FR39, FR40, FR41, FR42, FR43, FR139, **FR154**
 
 ## Epic 11 : Facturation & Abonnements
-MiKL et les clients gerent devis, factures et abonnements via Stripe et Invoice Ninja avec suivi complet des paiements. Inclut le forfait Lab a 199€ (paiement unique, deduction setup One).
+MiKL et les clients gerent devis, factures et abonnements via Pennylane API v2 (SaaS) avec Stripe connecte pour les paiements CB. Synchronisation par polling intelligent (Edge Function cron 5min). Inclut le forfait Lab a 199€ (paiement unique, deduction setup One). Conformite facturation electronique sept. 2026 geree nativement par Pennylane.
 **FRs couverts:** FR77, FR78, FR94, FR95, FR96, FR97, FR98, **FR169, FR170**
 
 ## Epic 12 : Administration, Analytics, Templates & Monitoring Instances

@@ -393,14 +393,14 @@
 - **3 patterns data fetching stricts** : Server Components RSC (lecture), Server Actions (mutation), API Routes (webhooks externes uniquement). Aucun cas gris autorise
 - **Pattern reponse unique** : { data, error } partout (style Supabase), jamais de throw dans Server Actions
 - **TanStack Query** = source de verite donnees serveur. Zustand = etat UI uniquement. Realtime invalide le cache TanStack Query
-- **Deploiement** : Vercel auto-deploy (frontend) + VPS Docker Compose (OpenVidu, Invoice Ninja, Cal.com). 3 environnements : dev local, preview Vercel, production
+- **Deploiement** : Vercel auto-deploy (frontend) + VPS Docker Compose (OpenVidu, Cal.com) + Pennylane API v2 (SaaS facturation/compta). 3 environnements : dev local, preview Vercel, production
 - **15 migrations Supabase** planifiees : operators, clients, client_configs, module_manifests, messages, documents, notifications, meetings, parcours, validation_requests, elio_conversations, activity_logs, consents, rls_policies, rls_functions
 - **5 quality gates CI** bloquants : tests RLS isolation, contract tests modules, lint + TypeScript strict, tests unitaires >80%, build successful
 - **Tests co-localises** : *.test.ts a cote du fichier source, pas de dossier __tests__ separe
 - **Skeleton loaders obligatoires** par module (loading.tsx), jamais de spinners
 - **Conventions nommage** : DB=snake_case, API/JSON=camelCase, fichiers=kebab-case, composants=PascalCase
 - **Transformation snake_case<->camelCase** a la frontiere DB/API via helper @foxeo/utils
-- **Services self-hosted des le MVP** : OpenVidu (visio+enregistrement+transcription), Invoice Ninja (facturation PDP), Cal.com (prise de RDV)
+- **Services des le MVP** : OpenVidu self-hosted (visio+enregistrement+transcription), Cal.com self-hosted (prise de RDV), Pennylane SaaS (facturation, devis, abonnements, compta, conformite facturation electronique sept. 2026)
 - **Monitoring** : Vercel Analytics + Supabase Dashboard + Sentry
 - **Premiere priorite implementation** : 1) Setup monorepo (packages/supabase, packages/types, turbo tasks) 2) Migrations Supabase 3) Module core-dashboard + shell 4) Auth flow 5) Premier module metier
 

@@ -239,7 +239,7 @@ La couverture est **quasi-complete** a 98.8%. Les 2 gaps identifies (FR154 et FR
 | A. UX ↔ PRD | 8/10 | Quelques divergences (dashboard unifie vs separe, canaux) |
 | B. UX ↔ Architecture | 9/10 | Tres bon alignement, details UX temps reel manquants |
 | C. Palette et Design System | 9/10 | Minimal Futuriste bien aligne, anciennes palettes a nettoyer |
-| D. Technologies et Services | 10/10 | Alignement parfait (OpenVidu, Supabase Storage, Invoice Ninja, Cal.com) |
+| D. Technologies et Services | 10/10 | Alignement parfait (OpenVidu, Supabase Storage, Pennylane, Cal.com) |
 | E. Elements manquants/Contradictions | 7/10 | Lacunes a11y, responsive, pipeline doc |
 | **Score global** | **8.6/10** | **MOSTLY ALIGNED** |
 

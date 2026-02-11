@@ -50,17 +50,21 @@ Quand Orpheus crée quelque chose de significatif :
 
 **Destination** : File d'attente Élio Hub pour validation MiKL.
 
-### 2. Facturation projet
+### 2. Facturation projet (via Pennylane)
 Orpheus détermine la facturation pour un projet client :
 - Prestations réalisées
-- Tarifs appliqués
+- Tarifs appliqués (TJM 550€, coefficients urgence/complexité)
 - Éléments à facturer
 
 **Format de sortie** :
 - Document structuré (JSON ou Markdown)
 - OU prompt texte avec toutes les infos
 
-**Destination** : Élio Hub → Page "Nouvelle Facture" qui met en forme automatiquement.
+**Destination** : Élio Hub → Page "Nouveau Devis" qui met en forme automatiquement.
+Le devis est ensuite créé dans **Pennylane** via `POST /api/external/v2/quotes` (Server Action proxy).
+La facture est gérée entièrement par Pennylane (création, envoi email, PDF, réconciliation paiement).
+
+**Note** : Pennylane remplace Invoice Ninja (décision 11/02/2026). Pas de webhooks Pennylane disponibles — synchronisation par polling Edge Function cron 5min.
 
 ### 3. Suivi projet (Timeline ONE)
 Orpheus doit pouvoir alimenter la timeline de suivi projet visible par le client dans FOXEO-ONE.
@@ -128,7 +132,8 @@ ELIO_HUB_WEBHOOK=https://api.foxeo-hub.com/webhooks/orpheus
 
 - (2026-02-03) Orpheus doit pouvoir générer des données de facturation transmissibles à Élio Hub pour création automatique de factures
 - (2026-02-03) Le suivi projet ONE sera alimenté par Orpheus via Élio Hub avec validation MiKL systématique
+- (2026-02-11) **PIVOT FACTURATION** : Invoice Ninja remplacé par Pennylane API v2 (SaaS). Raisons : conformité facturation électronique obligatoire sept. 2026, expert-comptable MiKL utilise Pennylane, API plus riche (compta, FEC, balance, abonnements). Le flux Orpheus → Élio Hub reste identique, seul l'adaptateur API change (billing-proxy.ts → Pennylane au lieu d'Invoice Ninja). Paiements : Stripe connecté à Pennylane + virement IBAN + SEPA optionnel. Pas de webhooks Pennylane → polling intelligent Edge Function cron 5min.
 
 ---
 
-*Dernière mise à jour : 2026-02-03*
+*Dernière mise à jour : 2026-02-11*

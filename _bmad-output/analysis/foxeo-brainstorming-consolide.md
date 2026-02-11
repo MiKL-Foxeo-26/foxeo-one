@@ -434,7 +434,7 @@ PHASE 5: CLIENT ÉTABLI
 | **Transcription** | Retranscription auto des visios via API | P1 |
 | **Chat Direct** | Communication MiKL ↔ Client | P1 |
 | **Validation Hub** | File de validations en attente, workflow validation | P1 |
-| **Facturation** | Devis, factures, paiements (via Invoice Ninja) | P1 |
+| **Facturation** | Devis, factures, paiements, compta (via Pennylane API v2) | P1 |
 | **Documents** | Stockage, partage, versionnage, système de tags | P1 |
 | **Orpheus** | Agent IA assistant MiKL | P1 |
 | **Audit & Logs** | Historique des actions, debug support client | P1 |
@@ -513,7 +513,7 @@ PHASE 5: CLIENT ÉTABLI
 - Historique décisions MiKL (pour aligner Élio)
 
 #### Facturation
-- Génération devis / factures (Invoice Ninja)
+- Génération devis / factures (Pennylane)
 - Suivi paiements
 - Intégration Stripe
 - Dépôt documents comptables (côté client)
@@ -662,11 +662,11 @@ PHASE 5: CLIENT ÉTABLI
 | **Realtime / Chat** | Supabase Realtime |
 | **Visio** | OpenVidu (self-hosted) |
 | **Transcription** | Vosk (MVP) → Deepgram API (prod) |
-| **Facturation** | Invoice Ninja (self-hosted) |
-| **Paiements** | Stripe (via Invoice Ninja) |
+| **Facturation** | Pennylane (self-hosted) |
+| **Paiements** | Stripe (via Pennylane) |
 | **Agents IA** | Claude API (Anthropic) |
 | **Hosting Front** | Vercel |
-| **Hosting Services** | VPS (OpenVidu, Invoice Ninja) |
+| **Hosting Services** | VPS (OpenVidu, Pennylane) |
 
 ### Stratégie de Développement
 
@@ -682,7 +682,7 @@ PHASE 5: CLIENT ÉTABLI
 2. **Notifications Configurables** - L'utilisateur configure ses préférences
 3. **Documents Unifiés avec Tags** - Un seul module Documents avec système de tags
 4. **Visio Open Source** - OpenVidu self-hosted (pas de coûts récurrents)
-5. **Facturation via Invoice Ninja** - Open source, API complète, Stripe intégré
+5. **Facturation via Pennylane** - Open source, API complète, Stripe intégré
 
 ---
 
@@ -781,7 +781,7 @@ Viser ceux qui ont un **panier moyen élevé** et un **besoin de structure** :
 | 23/01/2026 | Architecture 3 dashboards, Agent Élio, Validation Hub, 25 fondamentaux |
 | 25/01/2026 | Nomenclature officielle (Hub/Lab/One), Agents (Orpheus/Élio Lab/Élio One) |
 | 25/01/2026 | Design System V1 (shadcn/ui, OKLCH, palettes par dashboard) |
-| 25/01/2026 | Stack technique validée (OpenVidu, Invoice Ninja, Supabase, Deepgram) |
+| 25/01/2026 | Stack technique validée (OpenVidu, Pennylane, Supabase, Deepgram) |
 | 25/01/2026 | Migration Lab→One avec mémoire persistante et Élio Lab désactivable |
 
 ---

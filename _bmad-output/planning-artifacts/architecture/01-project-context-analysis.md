@@ -43,8 +43,8 @@
 | **Développeur unique (MiKL + Cursor/BMAD)** | Architecture simple, conventions strictes, automatisation maximale |
 | **Budget progressif (0€ → 50€ → 150€/mois)** | Supabase cloud gratuit en V1, migration progressive vers VPS |
 | **MVP = Cas client réel complet** | Pas de raccourcis — chaque module doit être production-ready |
-| **Open source first** | OpenVidu, Invoice Ninja, Cal.com — orchestration VPS requise |
-| **PDP facturation sept. 2026** | Solution certifiée externe, pas de dev maison |
+| **Open source + SaaS stratégique** | OpenVidu, Cal.com (self-hosted VPS) + Pennylane (SaaS facturation/compta) |
+| **Facturation électronique sept. 2026** | Pennylane gère nativement la conformité — pas de dev maison, pas de certification PDP |
 | **Stack existante** | Next.js 16, React 19, Tailwind 4, TypeScript, Turborepo — non négociable |
 | **Supabase comme backend** | PostgreSQL, Auth, Storage, Realtime, Edge Functions — décision prise |
 
@@ -55,7 +55,7 @@
 | **Auth/RBAC + RLS** | Toutes les pages, toutes les requêtes DB | Haute — 2 rôles, feature-flagging par client, 4 niveaux de sécurité |
 | **Temps réel (Supabase Realtime)** | Chat, Notifications, Validation Hub, Présence | Haute — subscriptions multiples, gestion de connexion |
 | **Configuration client dynamique** | Modules actifs, thème, Élio config, parcours | Moyenne — table `client_config`, runtime feature flags |
-| **Système de webhooks** | Cal.com, Invoice Ninja, Stripe, OpenVidu | Haute — 4 sources, validation, idempotence, retry |
+| **Système de webhooks + polling** | Cal.com, OpenVidu (webhooks) + Pennylane (polling cron 5min, pas de webhooks publics) | Moyenne — 2 sources webhook + 1 source polling via Edge Function |
 | **Gestion fichiers hybride** | Documents, Visios, Factures, Assets | Moyenne — Supabase Storage V1, migration MinIO V2 |
 | **Agents IA (Élio x3)** | Hub, Lab, One — instances par client | Haute — injection contexte, sessions, coûts, rate limiting |
 | **Internationalisation (P3)** | UI, emails, documents | Basse (préparer structure, pas implémenter) |

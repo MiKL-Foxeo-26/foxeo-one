@@ -241,7 +241,7 @@ notifications_config:
 | **Transcription** | Retranscription auto des visios via API | P1 |
 | **Chat Direct** | Communication MiKL ↔ Client | P1 |
 | **Validation Hub** | File de validations en attente, workflow validation | P1 |
-| **Facturation** | Devis, factures, paiements (via Invoice Ninja intégré) | P1 |
+| **Facturation** | Devis, factures, paiements, compta (via Pennylane API v2) | P1 |
 | **Documents** | Stockage, partage, versionnage, système de tags | P1 |
 | **Audit & Logs** | Historique des actions, debug support client | P1 |
 | **Analytics** | Stats CA, clients actifs, temps passé, projets | P2 |
@@ -413,11 +413,11 @@ module_seances:
 │  AUTO-COMPLETE      │  API INSEE (gratuit)                 │
 │  VISIO              │  OpenVidu (self-hosted)              │
 │  TRANSCRIPTION      │  Deepgram API (~$0.63/h avec diarisation) │
-│  FACTURATION        │  Invoice Ninja (self-hosted)         │
-│  PAIEMENTS          │  Stripe (via Invoice Ninja)          │
+│  FACTURATION        │  Pennylane API v2 (SaaS cloud)       │
+│  PAIEMENTS          │  Stripe (connecté à Pennylane) + virement IBAN + SEPA │
 │  AGENTS IA          │  DeepSeek V3.2 (Élio) + Claude (Orpheus) │
 │  HOSTING FRONT      │  Vercel                              │
-│  HOSTING SERVICES   │  VPS (OpenVidu, Invoice Ninja, Cal.com) │
+│  HOSTING SERVICES   │  VPS (OpenVidu, Cal.com)             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -490,11 +490,13 @@ module_seances:
 
 **Évite :** Coûts récurrents Daily.co / liens externes type Zoom
 
-### 5. Facturation via Invoice Ninja
+### 5. Facturation via Pennylane (mise a jour 11/02/2026)
 
-**Décision :** Intégration Invoice Ninja (open source)
+**Décision :** Intégration Pennylane API v2 (SaaS cloud) — remplace Invoice Ninja
 
-**Gère :** Paiements Stripe + paiements manuels (virements, chèques)
+**Raisons du pivot :** Conformité facturation électronique sept. 2026 (native Pennylane), expert-comptable MiKL utilise Pennylane (source de vérité comptable unique), API plus riche (compta, FEC, balance, abonnements).
+
+**Gère :** Devis, factures, abonnements récurrents, avoirs, comptabilité, export FEC. Paiements via Stripe (connecté à Pennylane) + virement IBAN Compte Pro + prélèvement SEPA. Synchronisation par polling Edge Function (cron 5min) — pas de webhooks publics.
 
 ### 6. Transcription API à l'Usage
 
@@ -966,10 +968,15 @@ const transcript = results.channels[0].alternatives[0].transcript;
 
 ---
 
-### Invoice Ninja - Facturation (Documentation Complète)
+### ~~Invoice Ninja~~ → Pennylane - Facturation (Mis a jour 11/02/2026)
 
-**Site :** https://invoiceninja.com/
-**Version :** v5 (API-first)
+> **PIVOT** : Invoice Ninja (self-hosted Docker) a ete remplace par Pennylane API v2 (SaaS cloud) le 11/02/2026.
+> Raisons : conformite facturation electronique sept. 2026, expert-comptable MiKL sur Pennylane, API plus riche.
+> La documentation Invoice Ninja ci-dessous est conservee a titre historique mais n'est plus applicable.
+
+**Site :** https://www.pennylane.com/
+**API :** https://pennylane.readme.io/docs/api-overview
+**Version :** API v2 (recommandee, v1 deprecee)
 **GitHub :** https://github.com/invoiceninja/invoiceninja
 **Documentation API :** https://api-docs.invoicing.co/
 

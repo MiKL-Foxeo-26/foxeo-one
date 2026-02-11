@@ -84,7 +84,7 @@ foxeo-dash/
 │   ├── tsconfig/               # @foxeo/tsconfig
 │   └── modules/                # Catalogue: core-dashboard, chat, elio, documents, visio, crm, etc.
 ├── supabase/                   # Migrations, seed, config
-├── docker/                     # OpenVidu, Invoice Ninja, Cal.com
+├── docker/                     # OpenVidu, Cal.com
 └── tests/                      # RLS tests, contract tests, e2e (Playwright)
 ```
 

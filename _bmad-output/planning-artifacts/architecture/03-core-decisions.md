@@ -8,7 +8,7 @@ _Décisions validées après revue Party Mode (Winston, Amelia, John, Murat, Sal
 
 ### Decision Priority Analysis
 
-**Philosophie de développement :** Pas de contrainte de temps. Chaque brique est construite correctement dès le départ. Pas de raccourcis, pas de dette technique. Tous les services self-hosted (OpenVidu, Invoice Ninja, Cal.com) sont intégrés dès le MVP.
+**Philosophie de développement :** Pas de contrainte de temps. Chaque brique est construite correctement dès le départ. Pas de raccourcis, pas de dette technique. Les services self-hosted (OpenVidu, Cal.com) et les services SaaS (Pennylane) sont intégrés dès le MVP.
 
 ### Data Architecture
 
@@ -40,7 +40,7 @@ _Décisions validées après revue Party Mode (Winston, Amelia, John, Murat, Sal
 |----------|-------|-----------|
 | **Lecture initiale** | Server Components (RSC) | Performance, pas de waterfall client |
 | **Mutation utilisateur** | Server Actions | Moins de boilerplate que les API Routes |
-| **Callback externe** | API Routes (`app/api/webhooks/[service]/route.ts`) | Nécessaire pour les webhooks Cal.com, Invoice Ninja, Stripe, OpenVidu |
+| **Callback externe** | API Routes (`app/api/webhooks/[service]/route.ts`) | Nécessaire pour les webhooks Cal.com, OpenVidu |
 | **Gestion d'erreurs** | Pattern `{ data, error }` (style Supabase) | Cohérent avec l'API Supabase, pas d'exceptions non gérées |
 | **Temps réel** | Supabase Realtime (Channels + Presence) | Chat, notifications, présence — un seul provider |
 
@@ -77,7 +77,8 @@ Aucun cas gris autorisé.
 | **Déploiement Lab** | Instance unique Vercel → `lab.foxeo.io` | Multi-tenant, DB partagée, RLS inter-client |
 | **Déploiement One** | Instance Vercel par client → `{slug}.foxeo.io` | Instance dédiée, DB propre, propriété client |
 | **Déploiement Hub** | Instance unique Vercel → `hub.foxeo.io` | Communique avec Lab et instances One via API/webhooks |
-| **VPS services** | Docker Compose sur VPS unique (Scaleway/OVH) | OpenVidu + Invoice Ninja + Cal.com. Intégrés dès le MVP |
+| **VPS services** | Docker Compose sur VPS unique (Scaleway/OVH) | OpenVidu + Cal.com. Intégrés dès le MVP |
+| **Facturation SaaS** | Pennylane API v2 (Cloud) | Facturation, devis, abonnements, comptabilité, conformité facturation électronique sept. 2026. Synchronisation par polling (Edge Function cron 5min) — pas de webhooks publics disponibles |
 | **Monitoring usage** | Supabase Edge Function (cron) + alertes seuils | Surveillance capacité par instance One (60%/80%/95%) |
 | **Monitoring app** | Vercel Analytics + Supabase Dashboard + Sentry | 3 outils gratuits/low-cost, couvrent l'essentiel |
 | **Env variables** | .env.local (dev) + Vercel Env (prod) + Supabase Vault (secrets) | Jamais de secrets dans le code |

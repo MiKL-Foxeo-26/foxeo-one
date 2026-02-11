@@ -35,7 +35,7 @@ foxeo-dash/
 ├── packages/tsconfig/ # @foxeo/tsconfig — Configs TypeScript
 ├── packages/modules/  # CATALOGUE DE MODULES (plug & play)
 ├── supabase/          # Migrations + seed + config
-├── docker/            # Services self-hosted (OpenVidu, Invoice Ninja, Cal.com)
+├── docker/            # Services self-hosted (OpenVidu, Cal.com)
 └── tests/             # Tests cross-app (RLS, contracts, e2e)
 ```
 
@@ -210,12 +210,14 @@ Pas de code conditionnel pour les couleurs — override CSS variables uniquement
 |---------|-------|-------------|
 | Supabase | DB, Auth, Storage, Realtime | Direct via @foxeo/supabase |
 | OpenVidu | Visio | Server Actions + webhooks |
-| Invoice Ninja | Facturation | Server Actions proxy API |
+| Pennylane | Facturation, devis, abonnements, comptabilité | Server Actions proxy API v2 + Edge Function polling (cron 5min) |
 | Cal.com | Prise de RDV | Webhook entrant |
 | Deepgram | Transcription | Edge Function post-recording |
-| Stripe | Paiements | Via Invoice Ninja + webhooks |
+| Stripe | Paiements CB | Connecté à Pennylane (réconciliation gérée par Pennylane) |
 
-Tous les services self-hosted (OpenVidu, Invoice Ninja, Cal.com) sont sur Docker Compose VPS dès le MVP.
+Services self-hosted (VPS Docker Compose) : OpenVidu, Cal.com.
+Service SaaS : Pennylane (facturation/compta — conformité facturation électronique sept. 2026).
+Pennylane n'a pas de webhooks publics → synchronisation par polling intelligent (Edge Function cron 5min → table miroir `billing_sync` → Supabase Realtime → invalidation TanStack Query).
 
 ---
 
