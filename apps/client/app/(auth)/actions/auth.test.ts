@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { loginSchema, signupSchema } from './auth'
+import { loginSchema, signupSchema } from './schemas'
 
 // --- Schema Validation Tests (pure, no mocking needed) ---
 

@@ -185,6 +185,37 @@ npm run lint          # Lint all (turbo lint)
 npm run clean         # Clean builds (turbo clean)
 ```
 
+## Model Routing — BMAD Agents & Workflows (MUST follow)
+
+When a BMAD agent (`/bmad:bmm:agents:*`) or workflow (`/bmad:bmm:workflows:*`) is invoked, **check the recommended model below BEFORE proceeding**. If your current model doesn't match, warn the user in French:
+
+> **Recommandation modele :** Ce {agent/workflow} fonctionne de maniere optimale avec **{model}**. Vous etes actuellement sur **{current_model}**. Tapez `/model` pour changer, ou continuez si vous preferez rester sur ce modele.
+
+Full config: `_bmad/_config/model-routing.yaml`
+
+### Quick Reference
+
+| Tier | Model | Usage |
+|------|-------|-------|
+| **opus** | Claude Opus 4.6 | Architecture, revue adversariale, decisions complexes |
+| **sonnet** | Claude Sonnet 4.5 | Dev quotidien, stories, tests, UX, analyse (DEFAULT) |
+| **haiku** | Claude Haiku 4.5 | Status, scaffolding, diagrammes, docs simples |
+
+### Opus (raisonnement complexe)
+
+- **Agents**: architect
+- **Workflows**: prd, create-architecture, create-epics-and-stories, check-implementation-readiness, code-review, correct-course, testarch-nfr
+
+### Sonnet (defaut — bon equilibre)
+
+- **Agents**: analyst, dev, pm, sm, ux-designer, tea, quick-flow-solo-dev, bmad-master
+- **Workflows**: dev-story, create-story, retrospective, quick-dev, quick-spec, create-product-brief, research, create-ux-design, document-project, generate-project-context, testarch-atdd, testarch-automate, testarch-test-design, testarch-test-review, testarch-trace, brainstorming, party-mode
+
+### Haiku (rapide & economique)
+
+- **Agents**: tech-writer
+- **Workflows**: sprint-planning, sprint-status, workflow-init, workflow-status, testarch-ci, testarch-framework, create-excalidraw-*
+
 ## Detailed Documentation
 
 | Document | Path |

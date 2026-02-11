@@ -11,6 +11,7 @@ type DashboardShellProps = {
   density?: 'compact' | 'comfortable' | 'spacious'
   sidebar?: ReactNode
   header?: ReactNode
+  breadcrumb?: ReactNode
   children?: ReactNode
 }
 
@@ -24,6 +25,7 @@ export function DashboardShell({
   density = 'comfortable',
   sidebar,
   header,
+  breadcrumb,
   children,
 }: DashboardShellProps) {
   const isMobile = useIsMobile()
@@ -87,6 +89,11 @@ export function DashboardShell({
           id="main-content"
           className={cn('flex-1 overflow-y-auto', densityClasses[density])}
         >
+          {breadcrumb && (
+            <div className="mb-4">
+              {breadcrumb}
+            </div>
+          )}
           {children}
         </main>
       </div>

@@ -2,9 +2,12 @@
 description: 'Generate and manage the sprint status tracking file for Phase 4 implementation, extracting all epics and stories from epic files and tracking their status through the development lifecycle'
 ---
 
+<recommended-model>haiku</recommended-model>
+
 IT IS CRITICAL THAT YOU FOLLOW THESE STEPS - while staying in character as the current agent persona you may have loaded:
 
 <steps CRITICAL="TRUE">
+0. CHECK your current model against the recommended model above. If mismatch, warn the user in French before proceeding (see CLAUDE.md "Model Routing" section).
 1. Always LOAD the FULL @_bmad/core/tasks/workflow.xml
 2. READ its entire contents - this is the CORE OS for EXECUTING the specific workflow-config @_bmad/bmm/workflows/4-implementation/sprint-planning/workflow.yaml
 3. Pass the yaml path _bmad/bmm/workflows/4-implementation/sprint-planning/workflow.yaml as 'workflow-config' parameter to the workflow.xml instructions

@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button, Input, Alert, AlertDescription } from '@foxeo/ui'
-import { signupAction, signupSchema } from '../actions/auth'
+import { signupAction } from '../actions/auth'
+import { signupSchema } from '../actions/schemas'
 
 type SignupFormData = z.infer<typeof signupSchema>
 

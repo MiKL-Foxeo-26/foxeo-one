@@ -47,7 +47,7 @@ development_status:
   1-5-rls-isolation-donnees-multi-tenant: done
   1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: done
   1-7-design-system-fondation-dark-mode-palettes-responsive-accessibilite: review
-  1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: backlog
+  1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: ready-for-dev
   1-9-consentements-legal-cgu-traitement-ia-traces-notification-maj: backlog
   1-10-structure-multi-langue-p3-preparation-i18n: backlog
   epic-1-retrospective: optional

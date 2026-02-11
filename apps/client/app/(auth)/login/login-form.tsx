@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button, Input, Alert, AlertDescription } from '@foxeo/ui'
-import { loginAction, loginSchema } from '../actions/auth'
+import { loginAction } from '../actions/auth'
+import { loginSchema } from '../actions/schemas'
 
 type LoginFormData = z.infer<typeof loginSchema>
 

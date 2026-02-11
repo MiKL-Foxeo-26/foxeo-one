@@ -8,7 +8,7 @@ export function jwtDecode(token: string): { session_id?: string; sub?: string; [
     const parts = token.split('.')
     if (parts.length !== 3) return null
 
-    const payload = parts[1]
+    const payload = parts[1]!
     // Base64url → Base64 → decode
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
     const json = Buffer.from(base64, 'base64').toString('utf-8')

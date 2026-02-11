@@ -2,9 +2,12 @@
 description: 'Lightweight status checker - answers ""what should I do now?"" for any agent. Reads YAML status file for workflow tracking. Use workflow-init for new projects.'
 ---
 
+<recommended-model>haiku</recommended-model>
+
 IT IS CRITICAL THAT YOU FOLLOW THESE STEPS - while staying in character as the current agent persona you may have loaded:
 
 <steps CRITICAL="TRUE">
+0. CHECK your current model against the recommended model above. If mismatch, warn the user in French before proceeding (see CLAUDE.md "Model Routing" section).
 1. Always LOAD the FULL @_bmad/core/tasks/workflow.xml
 2. READ its entire contents - this is the CORE OS for EXECUTING the specific workflow-config @_bmad/bmm/workflows/workflow-status/workflow.yaml
 3. Pass the yaml path _bmad/bmm/workflows/workflow-status/workflow.yaml as 'workflow-config' parameter to the workflow.xml instructions

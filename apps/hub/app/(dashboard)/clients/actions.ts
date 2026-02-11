@@ -29,7 +29,7 @@ export async function forceDisconnectClientAction(
     .from('clients')
     .select('auth_user_id')
     .eq('id', clientId)
-    .single()
+    .single() as { data: { auth_user_id: string | null } | null; error: unknown }
 
   if (clientError || !client) {
     return errorResponse('Client non trouve', 'NOT_FOUND')

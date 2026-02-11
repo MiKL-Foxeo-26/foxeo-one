@@ -1,7 +1,6 @@
 'use server'
 
 import { headers } from 'next/headers'
-import { z } from 'zod'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import {
   type ActionResponse,
@@ -9,23 +8,7 @@ import {
   successResponse,
   errorResponse,
 } from '@foxeo/types'
-import { emailSchema, passwordSchema } from '@foxeo/utils'
-
-// --- Validation Schemas ---
-
-export const loginSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1, 'Mot de passe requis'),
-})
-
-export const signupSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  confirmPassword: z.string().min(1, 'Confirmation requise'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Les mots de passe ne correspondent pas',
-  path: ['confirmPassword'],
-})
+import { loginSchema, signupSchema } from './schemas'
 
 // --- Server Actions ---
 
@@ -52,7 +35,7 @@ export async function loginAction(
   // Check brute force protection via SECURITY DEFINER function
   const { data: lockout } = await supabase.rpc('fn_check_login_attempts', {
     p_email: email,
-  }) as { data: { blocked: boolean; remainingSeconds: number } | null }
+  } as never) as { data: { blocked: boolean; remainingSeconds: number } | null }
 
   if (lockout?.blocked) {
     const minutes = Math.ceil(lockout.remainingSeconds / 60)
@@ -82,7 +65,7 @@ export async function loginAction(
       p_email: email,
       p_ip_address: ip,
       p_success: false,
-    })
+    } as never)
     return errorResponse(
       'Email ou mot de passe incorrect',
       'AUTH_ERROR'
@@ -94,7 +77,7 @@ export async function loginAction(
     p_email: email,
     p_ip_address: ip,
     p_success: true,
-  })
+  } as never)
 
   // Fetch client record to build session
   const { data: client } = await supabase
@@ -172,7 +155,7 @@ export async function signupAction(
   const { data: linked } = await supabase.rpc('fn_link_auth_user', {
     p_auth_user_id: authData.user.id,
     p_email: email,
-  }) as { data: { clientId: string; name: string } | null }
+  } as never) as { data: { clientId: string; name: string } | null }
 
   const session: UserSession = {
     id: authData.user.id,

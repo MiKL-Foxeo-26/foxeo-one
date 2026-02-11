@@ -5,6 +5,8 @@
 
 // Hooks
 export * from './use-mobile'
+export { useOnline } from './hooks/use-online'
+export { useConfirmDialog } from './hooks/use-confirm-dialog'
 
 // Composants
 export * from './alert'
@@ -28,4 +30,21 @@ export { DashboardShell } from './components/dashboard-shell'
 export { ShellSkeleton } from './components/shell-skeleton'
 export { ModuleSkeleton } from './components/module-skeleton'
 export { EmptyState } from './components/empty-state'
+export { EMPTY_SEARCH, EMPTY_LIST, EMPTY_ERROR } from './components/empty-state-presets'
 export { ThemeToggle } from './components/theme-toggle'
+
+// Breadcrumb
+export * from './components/breadcrumb'
+
+// Error display
+export { ErrorDisplay, type ErrorDisplayProps } from './components/error-display'
+
+// Offline banner
+export { OfflineBanner } from './components/offline-banner'
+
+// Browser warning
+export { BrowserWarning } from './components/browser-warning'
+
+// Toast
+export { Toaster } from './components/sonner'
+export * from './components/toast-utils'

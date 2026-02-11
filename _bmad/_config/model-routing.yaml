@@ -1,0 +1,170 @@
+# Model Routing Configuration for BMAD Agents & Workflows
+# Foxeo One — Cost/quality optimization
+#
+# Available models in Claude Code:
+#   opus   — Claude Opus 4.6: Deep reasoning, complex analysis (most expensive)
+#   sonnet — Claude Sonnet 4.5: Great code quality, fast (recommended default)
+#   haiku  — Claude Haiku 4.5: Ultra-fast, cheap (simple/mechanical tasks)
+#
+# Usage: When invoking a BMAD agent or workflow, check this config.
+# If current model != recommended model, warn user to switch via /model.
+
+default_model: sonnet
+
+agents:
+  # Opus — Complex reasoning required
+  architect:
+    model: opus
+    reason: "Decisions architecture multi-contraintes, trade-offs complexes"
+
+  # Sonnet — Good balance for most work
+  analyst:
+    model: sonnet
+    reason: "Analyse business et requirements"
+  dev:
+    model: sonnet
+    reason: "Implementation stories, code generation"
+  pm:
+    model: sonnet
+    reason: "Product management, PRD"
+  sm:
+    model: sonnet
+    reason: "Story preparation, sprint management"
+  ux-designer:
+    model: sonnet
+    reason: "UX design et patterns"
+  tea:
+    model: sonnet
+    reason: "Test architecture et planning"
+  quick-flow-solo-dev:
+    model: sonnet
+    reason: "Quick dev tasks"
+  bmad-master:
+    model: sonnet
+    reason: "Orchestration et routing"
+
+  # Haiku — Simple, mechanical tasks
+  tech-writer:
+    model: haiku
+    reason: "Documentation, taches redactionnelles simples"
+
+workflows:
+  # === Phase 1 — Analysis ===
+  create-product-brief:
+    model: sonnet
+    reason: "Decouverte collaborative"
+  research:
+    model: sonnet
+    reason: "Recherche web et analyse"
+
+  # === Phase 2 — Planning ===
+  prd:
+    model: opus
+    reason: "Creation PRD necessite raisonnement produit profond"
+  create-ux-design:
+    model: sonnet
+    reason: "Design UX patterns"
+
+  # === Phase 3 — Solutioning ===
+  create-architecture:
+    model: opus
+    reason: "Decisions architecture, raisonnement maximum"
+  create-epics-and-stories:
+    model: opus
+    reason: "Decomposition requirements en stories, analyse soignee"
+  check-implementation-readiness:
+    model: opus
+    reason: "Revue adversariale, raisonnement profond"
+
+  # === Phase 4 — Implementation ===
+  dev-story:
+    model: sonnet
+    reason: "Implementation story standard"
+  create-story:
+    model: sonnet
+    reason: "Creation story depuis epics existants"
+  code-review:
+    model: opus
+    reason: "Revue code adversariale, analyse profonde requise"
+  correct-course:
+    model: opus
+    reason: "Correction de trajectoire, analyse impact complexe"
+  sprint-planning:
+    model: haiku
+    reason: "Tracking status, mecanique"
+  sprint-status:
+    model: haiku
+    reason: "Check status leger"
+  retrospective:
+    model: sonnet
+    reason: "Analyse retrospective sprint"
+
+  # === Quick Flow ===
+  quick-dev:
+    model: sonnet
+    reason: "Dev rapide"
+  quick-spec:
+    model: sonnet
+    reason: "Spec engineering"
+
+  # === TestArch ===
+  testarch-atdd:
+    model: sonnet
+    reason: "Generation tests"
+  testarch-automate:
+    model: sonnet
+    reason: "Automation tests"
+  testarch-ci:
+    model: haiku
+    reason: "Scaffolding CI/CD, mecanique"
+  testarch-framework:
+    model: haiku
+    reason: "Setup framework, mecanique"
+  testarch-nfr:
+    model: opus
+    reason: "Evaluation NFR necessite analyse profonde"
+  testarch-test-design:
+    model: sonnet
+    reason: "Design test planning"
+  testarch-test-review:
+    model: sonnet
+    reason: "Revue qualite tests"
+  testarch-trace:
+    model: sonnet
+    reason: "Matrice tracabilite"
+
+  # === Excalidraw Diagrams ===
+  create-excalidraw-diagram:
+    model: haiku
+    reason: "Generation diagramme, template-based"
+  create-excalidraw-dataflow:
+    model: haiku
+    reason: "Generation dataflow"
+  create-excalidraw-flowchart:
+    model: haiku
+    reason: "Generation flowchart"
+  create-excalidraw-wireframe:
+    model: haiku
+    reason: "Generation wireframe"
+
+  # === Other ===
+  document-project:
+    model: sonnet
+    reason: "Analyse codebase et documentation"
+  generate-project-context:
+    model: sonnet
+    reason: "Extraction contexte"
+  workflow-init:
+    model: haiku
+    reason: "Initialisation simple"
+  workflow-status:
+    model: haiku
+    reason: "Check status leger"
+
+  # === Core ===
+  brainstorming:
+    model: sonnet
+    reason: "Brainstorming creatif"
+  party-mode:
+    model: sonnet
+    reason: "Discussion multi-agents"
