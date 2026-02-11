@@ -26,6 +26,7 @@ const MIGRATION_FILES = [
   '00010_operators_auth_user_id.sql',
   '00011_rls_functions.sql',
   '00012_rls_policies.sql',
+  '00013_session_management.sql',
 ]
 
 describe('Supabase project structure', () => {
@@ -309,6 +310,76 @@ describe('Migration 00012: RLS policies', () => {
   it('has exactly 13 policies total', () => {
     const policyMatches = sql.match(/CREATE POLICY/g)
     expect(policyMatches).toHaveLength(13)
+  })
+})
+
+describe('Migration 00013: session management functions', () => {
+  const sql = readFileSync(join(MIGRATIONS_DIR, '00013_session_management.sql'), 'utf-8')
+
+  it('creates fn_get_user_sessions(UUID) SECURITY DEFINER function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_get_user_sessions(p_user_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+    expect(sql).toContain('STABLE')
+    expect(sql).toContain('SET search_path = public')
+    expect(sql).toContain('RETURNS JSON')
+  })
+
+  it('fn_get_user_sessions has auth guard (own sessions or admin)', () => {
+    expect(sql).toContain('p_user_id != auth.uid() AND NOT is_admin()')
+  })
+
+  it('fn_get_user_sessions queries auth.sessions with active filter', () => {
+    expect(sql).toContain('FROM auth.sessions')
+    expect(sql).toContain('not_after IS NULL OR not_after > NOW()')
+  })
+
+  it('creates fn_revoke_session(UUID) SECURITY DEFINER function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_revoke_session(p_session_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+    expect(sql).toContain('RETURNS JSON')
+  })
+
+  it('fn_revoke_session has auth guard and deletes from auth.sessions', () => {
+    expect(sql).toContain('DELETE FROM auth.sessions WHERE id = p_session_id')
+  })
+
+  it('creates fn_revoke_other_sessions(UUID) SECURITY DEFINER function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_revoke_other_sessions(p_keep_session_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+    expect(sql).toContain('RETURNS JSON')
+  })
+
+  it('fn_revoke_other_sessions deletes all except kept session', () => {
+    expect(sql).toContain('AND id != p_keep_session_id')
+    expect(sql).toContain('GET DIAGNOSTICS v_deleted_count = ROW_COUNT')
+  })
+
+  it('creates fn_admin_revoke_all_sessions(UUID) SECURITY DEFINER function', () => {
+    expect(sql).toContain('CREATE OR REPLACE FUNCTION fn_admin_revoke_all_sessions(p_user_id UUID)')
+    expect(sql).toContain('SECURITY DEFINER')
+    expect(sql).toContain('RETURNS JSON')
+  })
+
+  it('fn_admin_revoke_all_sessions has admin-only guard', () => {
+    expect(sql).toContain('NOT is_admin()')
+    expect(sql).toContain("'Unauthorized - admin only'")
+  })
+
+  it('grants execute to authenticated role for all 4 functions', () => {
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_get_user_sessions(UUID) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_revoke_session(UUID) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_revoke_other_sessions(UUID) TO authenticated')
+    expect(sql).toContain('GRANT EXECUTE ON FUNCTION fn_admin_revoke_all_sessions(UUID) TO authenticated')
+  })
+
+  it('has exactly 4 SECURITY DEFINER functions', () => {
+    const fnMatches = sql.match(/CREATE OR REPLACE FUNCTION/g)
+    expect(fnMatches).toHaveLength(4)
+  })
+
+  it('has exactly 4 GRANT EXECUTE statements', () => {
+    const grantMatches = sql.match(/GRANT EXECUTE/g)
+    expect(grantMatches).toHaveLength(4)
   })
 })
 

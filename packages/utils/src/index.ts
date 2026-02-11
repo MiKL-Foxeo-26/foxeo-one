@@ -21,3 +21,10 @@ export {
   getModulesForTarget,
   clearRegistry,
 } from './module-registry'
+export {
+  parseUserAgent,
+  maskIpAddress,
+  type ParsedUserAgent,
+  type DeviceType,
+  type SessionInfo,
+} from './parse-user-agent'

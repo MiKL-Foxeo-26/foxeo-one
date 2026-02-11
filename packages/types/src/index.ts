@@ -12,7 +12,7 @@ export type {
   ModuleManifest,
 } from './module-manifest'
 
-export type { UserRole, DashboardType, UserSession } from './auth.types'
+export type { UserRole, DashboardType, DeviceType, UserSession, SessionInfo } from './auth.types'
 
 export type {
   ElioTier,

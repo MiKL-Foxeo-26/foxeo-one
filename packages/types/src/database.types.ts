@@ -331,6 +331,40 @@ export type Database = {
         }
         Returns: { id: string; name: string } | null
       }
+      /** Story 1.6 — Session management functions */
+      fn_get_user_sessions: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          created_at: string
+          updated_at: string
+          refreshed_at: string | null
+          user_agent: string | null
+          ip: string | null
+          aal: string | null
+          not_after: string | null
+        }[] | null
+      }
+      fn_revoke_session: {
+        Args: {
+          p_session_id: string
+        }
+        Returns: { success: boolean; error?: string }
+      }
+      fn_revoke_other_sessions: {
+        Args: {
+          p_keep_session_id: string
+        }
+        Returns: { success: boolean; revokedCount?: number; error?: string }
+      }
+      fn_admin_revoke_all_sessions: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: { success: boolean; revokedCount?: number; error?: string }
+      }
     }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>

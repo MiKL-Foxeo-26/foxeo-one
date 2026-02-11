@@ -45,7 +45,7 @@ development_status:
   1-3-authentification-client-inscription-login-sessions: done
   1-4-authentification-mikl-login-2fa-middleware-hub-admin: done
   1-5-rls-isolation-donnees-multi-tenant: done
-  1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: backlog
+  1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: done
   1-7-design-system-fondation-dark-mode-palettes-responsive-accessibilite: backlog
   1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: backlog
   1-9-consentements-legal-cgu-traitement-ia-traces-notification-maj: backlog
@@ -154,13 +154,14 @@ development_status:
   10-4-personnalisation-branding-dashboard-one-par-client: backlog
   epic-10-retrospective: optional
 
-  # Epic 11: Facturation & Abonnements (5 stories)
+  # Epic 11: Facturation & Abonnements — Pennylane (6 stories, réécrit 11/02/2026)
   epic-11: backlog
-  11-1-module-facturation-structure-integration-invoice-ninja-types: backlog
-  11-2-creation-envoi-de-devis-par-mikl: backlog
-  11-3-abonnements-recurrents-stripe-gestion-des-echecs-de-paiement: backlog
-  11-4-historique-facturation-client-avoirs-informations-de-paiement: backlog
-  11-5-facturation-lab-199-paiement-forfait-deduction-setup-one: backlog
+  11-1-module-facturation-structure-integration-pennylane-types: backlog
+  11-2-edge-function-billing-sync-polling-pennylane: backlog
+  11-3-creation-envoi-de-devis-par-mikl-pennylane: backlog
+  11-4-abonnements-recurrents-pennylane-billing-subscriptions: backlog
+  11-5-historique-facturation-client-avoirs-vue-financiere: backlog
+  11-6-facturation-lab-199-paiement-forfait-deduction-setup-one: backlog
   epic-11-retrospective: optional
 
   # Epic 12: Administration, Analytics & Templates (8 stories)
