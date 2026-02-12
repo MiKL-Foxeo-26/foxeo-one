@@ -1,10 +1,18 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createMiddlewareSupabaseClient } from '@foxeo/supabase'
+import { checkConsentVersion } from './middleware-consent'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
+export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api']
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  )
+}
+
+export function isConsentExcluded(pathname: string): boolean {
+  return CONSENT_EXCLUDED_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   )
 }
@@ -37,6 +45,24 @@ export async function middleware(request: NextRequest) {
   // Authenticated user on login/signup → redirect to dashboard
   if (user && isPublic) {
     return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // Check CGU consent version for authenticated users (exclude specific paths)
+  if (user && !isConsentExcluded(request.nextUrl.pathname)) {
+    // Get client_id from clients table
+    const { supabase } = await createMiddlewareSupabaseClient(request)
+    const { data: client } = (await supabase
+      .from('clients')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .maybeSingle()) as { data: { id: string } | null }
+
+    if (client?.id) {
+      const consentRedirect = await checkConsentVersion(request, client.id)
+      if (consentRedirect) {
+        return consentRedirect
+      }
+    }
   }
 
   return response

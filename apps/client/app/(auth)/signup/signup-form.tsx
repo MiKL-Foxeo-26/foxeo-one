@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Button, Input, Alert, AlertDescription } from '@foxeo/ui'
+import { Button, Input, Alert, AlertDescription, ConsentCheckbox } from '@foxeo/ui'
 import { signupAction } from '../actions/auth'
 import { signupSchema } from '../actions/schemas'
 
@@ -15,14 +15,31 @@ export function SignupForm() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [serverError, setServerError] = useState<string | null>(null)
+  const [acceptCgu, setAcceptCgu] = useState(false)
+  const [acceptIaProcessing, setAcceptIaProcessing] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    defaultValues: {
+      acceptCgu: false,
+      acceptIaProcessing: false,
+    },
   })
+
+  function handleCguChange(checked: boolean) {
+    setAcceptCgu(checked)
+    setValue('acceptCgu', checked, { shouldValidate: true })
+  }
+
+  function handleIaProcessingChange(checked: boolean) {
+    setAcceptIaProcessing(checked)
+    setValue('acceptIaProcessing', checked, { shouldValidate: true })
+  }
 
   function onSubmit(data: SignupFormData) {
     setServerError(null)
@@ -31,6 +48,8 @@ export function SignupForm() {
       formData.set('email', data.email)
       formData.set('password', data.password)
       formData.set('confirmPassword', data.confirmPassword)
+      formData.set('acceptCgu', data.acceptCgu.toString())
+      formData.set('acceptIaProcessing', data.acceptIaProcessing.toString())
 
       const result = await signupAction(formData)
 
@@ -108,7 +127,34 @@ export function SignupForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isPending}>
+      {/* Consentements */}
+      <div className="space-y-4 pt-4 border-t border-border">
+        <ConsentCheckbox
+          id="acceptCgu"
+          checked={acceptCgu}
+          onCheckedChange={handleCguChange}
+          label="J'accepte les Conditions Générales d'Utilisation"
+          link="/legal/cgu"
+          linkText="Consulter les CGU"
+          tooltip="Vous devez accepter les CGU pour créer un compte Foxeo. Les CGU définissent les règles d'utilisation de la plateforme."
+          required
+        />
+        {errors.acceptCgu && (
+          <p className="text-sm text-destructive">{errors.acceptCgu.message}</p>
+        )}
+
+        <ConsentCheckbox
+          id="acceptIaProcessing"
+          checked={acceptIaProcessing}
+          onCheckedChange={handleIaProcessingChange}
+          label="J'accepte le traitement de mes données par l'IA Élio"
+          link="/legal/ia-processing"
+          linkText="En savoir plus sur Élio"
+          tooltip="Optionnel : Élio est l'assistant IA de Foxeo. Si vous refusez, vous pourrez utiliser la plateforme sans Élio. Vous pourrez modifier ce choix à tout moment dans vos paramètres."
+        />
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isPending || !acceptCgu}>
         {isPending ? 'Creation...' : 'Creer mon compte'}
       </Button>
     </form>

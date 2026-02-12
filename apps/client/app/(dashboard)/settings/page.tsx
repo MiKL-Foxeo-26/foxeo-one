@@ -15,6 +15,19 @@ export default function SettingsPage() {
         </div>
         <span className="text-muted-foreground">&rarr;</span>
       </Link>
+
+      <Link
+        href="/settings/consents"
+        className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent"
+      >
+        <div>
+          <h2 className="text-base font-medium text-foreground">Consentements</h2>
+          <p className="text-sm text-muted-foreground">
+            Gérez vos consentements CGU et traitement IA
+          </p>
+        </div>
+        <span className="text-muted-foreground">&rarr;</span>
+      </Link>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-# generated: 2026-02-10
+# generated: 2026-02-11
 # project: foxeo-dash
 # tracking_system: file-system
 # story_location: _bmad-output/implementation-artifacts
@@ -32,7 +32,7 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: 2026-02-10
+generated: 2026-02-11
 project: foxeo-dash
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
@@ -47,16 +47,16 @@ development_status:
   1-5-rls-isolation-donnees-multi-tenant: done
   1-6-gestion-sessions-avancee-multi-device-voir-revoquer-forcer-deconnexion: done
   1-7-design-system-fondation-dark-mode-palettes-responsive-accessibilite: review
-  1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: ready-for-dev
-  1-9-consentements-legal-cgu-traitement-ia-traces-notification-maj: backlog
-  1-10-structure-multi-langue-p3-preparation-i18n: backlog
+  1-8-ux-transversale-fil-ariane-etats-vides-messages-confirmation-erreurs-robustesse: done
+  1-9-consentements-legal-cgu-traitement-ia-traces-notification-maj: review
+  1-10-structure-multi-langue-p3-preparation-i18n: ready-for-dev
   epic-1-retrospective: optional
 
   # Epic 2: Gestion de la Relation Client — CRM Hub (12 stories)
-  epic-2: backlog
-  2-1-module-crm-liste-clients-filtres-recherche-rapide: backlog
-  2-2-creation-edition-de-fiche-client: backlog
-  2-3-fiche-client-complete-vue-detaillee-multi-onglets: backlog
+  epic-2: in-progress
+  2-1-module-crm-liste-clients-filtres-recherche-rapide: ready-for-dev
+  2-2-creation-edition-de-fiche-client: ready-for-dev
+  2-3-fiche-client-complete-vue-detaillee-multi-onglets: ready-for-dev
   2-4-assignation-parcours-lab-gestion-des-acces: backlog
   2-5-integration-cursor-ouverture-dossier-bmad-client: backlog
   2-6-notes-privees-epinglage-a-traiter-plus-tard: backlog
@@ -154,17 +154,17 @@ development_status:
   10-4-personnalisation-branding-dashboard-one-par-client: backlog
   epic-10-retrospective: optional
 
-  # Epic 11: Facturation & Abonnements — Pennylane (6 stories, réécrit 11/02/2026)
+  # Epic 11: Facturation & Abonnements — Pennylane (6 stories)
   epic-11: backlog
   11-1-module-facturation-structure-integration-pennylane-types: backlog
-  11-2-edge-function-billing-sync-polling-pennylane: backlog
+  11-2-edge-function-billing-sync-polling-intelligent-pennylane: backlog
   11-3-creation-envoi-de-devis-par-mikl-pennylane: backlog
-  11-4-abonnements-recurrents-pennylane-billing-subscriptions: backlog
-  11-5-historique-facturation-client-avoirs-vue-financiere: backlog
+  11-4-abonnements-recurrents-pennylane-gestion-des-echecs-de-paiement: backlog
+  11-5-historique-facturation-client-avoirs-vue-financiere-hub: backlog
   11-6-facturation-lab-199-paiement-forfait-deduction-setup-one: backlog
   epic-11-retrospective: optional
 
-  # Epic 12: Administration, Analytics & Templates (8 stories)
+  # Epic 12: Administration, Analytics & Templates (9 stories)
   epic-12: backlog
   12-1-module-admin-logs-activite-par-client-mode-maintenance: backlog
   12-2-export-complet-donnees-client-backups-automatiques: backlog

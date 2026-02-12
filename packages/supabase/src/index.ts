@@ -18,3 +18,6 @@ export {
 export { QueryProvider } from './providers/query-provider'
 export { RealtimeProvider, useRealtime } from './providers/realtime-provider'
 export { ThemeProvider, useTheme } from './providers/theme-provider'
+
+// Queries
+export { hasIaConsent, getLatestConsents } from './queries/get-consent'

@@ -28,3 +28,11 @@ export {
   type DeviceType,
   type SessionInfo,
 } from './parse-user-agent'
+export {
+  CURRENT_CGU_VERSION,
+  CURRENT_IA_POLICY_VERSION,
+  CGU_LAST_UPDATED,
+  IA_POLICY_LAST_UPDATED,
+  CONSENT_TYPES,
+  type ConsentType,
+} from './constants/legal-versions'

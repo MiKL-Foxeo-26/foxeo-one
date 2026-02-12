@@ -115,6 +115,8 @@ export async function signupAction(
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
+    acceptCgu: formData.get('acceptCgu') === 'true',
+    acceptIaProcessing: formData.get('acceptIaProcessing') === 'true',
   }
 
   const parsed = signupSchema.safeParse(raw)
@@ -126,7 +128,7 @@ export async function signupAction(
     )
   }
 
-  const { email, password } = parsed.data
+  const { email, password, acceptCgu, acceptIaProcessing } = parsed.data
   const supabase = await createServerSupabaseClient()
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -156,6 +158,54 @@ export async function signupAction(
     p_auth_user_id: authData.user.id,
     p_email: email,
   } as never) as { data: { clientId: string; name: string } | null }
+
+  // Get IP and user-agent for consent tracking
+  const headersList = await headers()
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    headersList.get('x-real-ip') ??
+    'unknown'
+  const userAgent = headersList.get('user-agent') ?? 'unknown'
+
+  // Insert CGU consent (mandatory)
+  const { error: cguError } = await supabase.from('consents').insert({
+    client_id: linked?.clientId ?? authData.user.id,
+    consent_type: 'cgu',
+    accepted: acceptCgu,
+    version: 'v1.0',
+    ip_address: ip,
+    user_agent: userAgent,
+  } as any)
+
+  if (cguError) {
+    // Rollback: delete auth user
+    await supabase.auth.admin.deleteUser(authData.user.id)
+    return errorResponse(
+      'Erreur lors de l\'enregistrement des consentements',
+      'CONSENT_ERROR',
+      { details: cguError.message }
+    )
+  }
+
+  // Insert IA consent (optional)
+  const { error: iaError } = await supabase.from('consents').insert({
+    client_id: linked?.clientId ?? authData.user.id,
+    consent_type: 'ia_processing',
+    accepted: acceptIaProcessing,
+    version: 'v1.0',
+    ip_address: ip,
+    user_agent: userAgent,
+  } as any)
+
+  if (iaError) {
+    // Rollback: delete auth user and CGU consent
+    await supabase.auth.admin.deleteUser(authData.user.id)
+    return errorResponse(
+      'Erreur lors de l\'enregistrement des consentements',
+      'CONSENT_ERROR',
+      { details: iaError.message }
+    )
+  }
 
   const session: UserSession = {
     id: authData.user.id,

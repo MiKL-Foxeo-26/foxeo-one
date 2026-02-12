@@ -14,6 +14,7 @@ export * from './alert-dialog'
 export * from './badge'
 export * from './button'
 export * from './card'
+export * from './checkbox'
 export * from './dialog'
 export * from './input'
 export * from './select'
@@ -48,3 +49,6 @@ export { BrowserWarning } from './components/browser-warning'
 // Toast
 export { Toaster } from './components/sonner'
 export * from './components/toast-utils'
+
+// Consent
+export { ConsentCheckbox } from './components/consent-checkbox'

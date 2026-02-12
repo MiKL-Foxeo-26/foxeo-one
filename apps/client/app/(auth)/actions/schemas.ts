@@ -10,6 +10,10 @@ export const signupSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   confirmPassword: z.string().min(1, 'Confirmation requise'),
+  acceptCgu: z.boolean().refine((val) => val === true, {
+    message: 'Vous devez accepter les CGU pour créer un compte',
+  }),
+  acceptIaProcessing: z.boolean(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Les mots de passe ne correspondent pas',
   path: ['confirmPassword'],
