@@ -59,7 +59,36 @@ Les filtres sont combinables entre eux et avec la recherche.
 
 Cliquez sur une ligne pour accéder à la fiche complète du client.
 
+### Consulter la fiche d'un client
+
+La fiche client offre une vue 360° avec 4 onglets :
+
+**Onglet Informations (par défaut)**
+- Coordonnées complètes : nom, email, téléphone, entreprise, secteur, site web
+- Configuration : type de client (badge), statut (badge), date de création, dernière activité
+- Parcours Lab : nom du parcours et progression (si applicable)
+- Modules One : liste des modules actifs (si applicable)
+- Bouton "Modifier" pour éditer les informations
+
+**Onglet Historique**
+- Timeline chronologique de tous les événements du client
+- Types d'événements : création, changements de statut, validations, visios, graduation
+- Affichage avec icônes et dates relatives ("il y a 2 jours")
+
+**Onglet Documents**
+- Liste des documents partagés avec le client (briefs, livrables, rapports)
+- Chaque document affiche : nom, type, date, visibilité client
+- Lien vers le module Documents pour la visualisation complète
+
+**Onglet Échanges**
+- Historique des échanges récents : messages, notifications, résumés Élio
+- Aperçu du contenu (100 premiers caractères)
+- Bouton "Ouvrir le chat complet" pour accéder au module Chat
+
+**Partage de lien**
+L'onglet actif est synchronisé avec l'URL (`?tab=historique`). Vous pouvez partager un lien direct vers un onglet spécifique.
+
 ## Prochaines fonctionnalités
 
-- Vue détaillée multi-onglets (Story 2.3)
 - Notes privées et rappels (Stories 2.6-2.7)
+- Statistiques temps passé par client (Story 2.8)

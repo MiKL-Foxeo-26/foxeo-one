@@ -56,7 +56,7 @@ development_status:
   epic-2: in-progress
   2-1-module-crm-liste-clients-filtres-recherche-rapide: done
   2-2-creation-edition-de-fiche-client: done
-  2-3-fiche-client-complete-vue-detaillee-multi-onglets: ready-for-dev
+  2-3-fiche-client-complete-vue-detaillee-multi-onglets: done
   2-4-assignation-parcours-lab-gestion-des-acces: ready-for-dev
   2-5-integration-cursor-ouverture-dossier-bmad-client: ready-for-dev
   2-6-notes-privees-epinglage-a-traiter-plus-tard: ready-for-dev
@@ -81,58 +81,58 @@ development_status:
 
   # Epic 4: Gestion Documentaire (7 stories)
   epic-4: backlog
-  4-1-module-documents-migration-structure-upload-avec-validation: backlog
-  4-2-visualisation-documents-viewer-html-telechargement-pdf: backlog
-  4-3-partage-de-documents-mikl-client-visibilite: backlog
-  4-4-organisation-en-dossiers-recherche-dans-les-documents: backlog
-  4-5-synchronisation-documents-vers-dossier-bmad-local: backlog
-  4-6-autosave-brouillons-undo-actions-recentes: backlog
-  4-7-export-documents-en-formats-standards: backlog
+  4-1-module-documents-migration-structure-upload-avec-validation: ready-for-dev
+  4-2-visualisation-documents-viewer-html-telechargement-pdf: ready-for-dev
+  4-3-partage-de-documents-mikl-client-visibilite: ready-for-dev
+  4-4-organisation-en-dossiers-recherche-dans-les-documents: ready-for-dev
+  4-5-synchronisation-documents-vers-dossier-bmad-local: ready-for-dev
+  4-6-autosave-brouillons-undo-actions-recentes: ready-for-dev
+  4-7-export-documents-en-formats-standards: ready-for-dev
   epic-4-retrospective: optional
 
   # Epic 5: Visioconference & Onboarding Prospect (6 stories)
-  epic-5: backlog
-  5-1-module-visio-migration-meetings-salle-de-visio-openvidu: backlog
-  5-2-enregistrement-visio-transcription-automatique-historique: backlog
-  5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: backlog
-  5-4-flux-post-visio-onboarding-prospect: backlog
-  5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: backlog
-  5-6-ecran-de-graduation-lab-vers-one: backlog
+  epic-5: in-progress
+  5-1-module-visio-migration-meetings-salle-de-visio-openvidu: ready-for-dev
+  5-2-enregistrement-visio-transcription-automatique-historique: ready-for-dev
+  5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: ready-for-dev
+  5-4-flux-post-visio-onboarding-prospect: ready-for-dev
+  5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: ready-for-dev
+  5-6-ecran-de-graduation-lab-vers-one: ready-for-dev
   epic-5-retrospective: optional
 
   # Epic 6: Parcours Lab — Accompagnement Creation (6 stories)
-  epic-6: backlog
-  6-1-module-parcours-lab-migration-structure-vue-parcours-progression: backlog
-  6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: backlog
-  6-3-soumission-de-brief-pour-validation-notifications: backlog
-  6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: backlog
-  6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: backlog
-  6-6-elio-lab-configuration-orpheus-personnalisation-agent: backlog
+  epic-6: in-progress
+  6-1-module-parcours-lab-migration-structure-vue-parcours-progression: ready-for-dev
+  6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: ready-for-dev
+  6-3-soumission-de-brief-pour-validation-notifications: ready-for-dev
+  6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: ready-for-dev
+  6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: ready-for-dev
+  6-6-elio-lab-configuration-orpheus-personnalisation-agent: ready-for-dev
   epic-6-retrospective: optional
 
   # Epic 7: Validation Hub (6 stories)
-  epic-7: backlog
-  7-1-module-validation-hub-structure-types-file-attente-des-demandes: backlog
-  7-2-vue-detaillee-dune-demande-avec-contexte-complet: backlog
-  7-3-validation-refus-de-demande-avec-commentaire: backlog
-  7-4-demande-de-precisions-sur-une-soumission: backlog
-  7-5-actions-de-traitement-workflows-post-decision: backlog
-  7-6-temps-reel-compteur-de-demandes-abonnement-realtime: backlog
+  epic-7: in-progress
+  7-1-module-validation-hub-structure-types-file-attente-des-demandes: ready-for-dev
+  7-2-vue-detaillee-dune-demande-avec-contexte-complet: ready-for-dev
+  7-3-validation-refus-de-demande-avec-commentaire: ready-for-dev
+  7-4-demande-de-precisions-sur-une-soumission: ready-for-dev
+  7-5-actions-de-traitement-workflows-post-decision: ready-for-dev
+  7-6-temps-reel-compteur-de-demandes-abonnement-realtime: ready-for-dev
   epic-7-retrospective: optional
 
   # Epic 8: Agents IA Elio — Hub, Lab, One (11 stories)
-  epic-8: backlog
-  8-1-consolidation-infrastructure-elio-module-unifie-composants-partages-gestion-des-erreurs: backlog
-  8-2-conversations-elio-liste-commutation-historique-persistant-complet: backlog
-  8-3-feedback-reponses-elio-documents-dans-le-chat-historique-configs: backlog
-  8-4-profil-de-communication-stockage-affinement-transmission-graduation: backlog
-  8-5-elio-hub-interface-chat-mikl-aide-fonctionnalites-recherche-client: backlog
-  8-6-elio-hub-correction-redaction-generation-de-brouillons: backlog
-  8-7-elio-one-chat-faq-guidance-dashboard-heritage-lab: backlog
-  8-8-elio-one-collecte-devolutions-soumission-validation-hub: backlog
-  8-9a-elio-one-plus-systeme-de-tiers-actions-modules: backlog
-  8-9b-elio-one-plus-generation-de-documents: backlog
-  8-9c-elio-one-plus-alertes-proactives: backlog
+  epic-8: in-progress
+  8-1-consolidation-infrastructure-elio-module-unifie-composants-partages-gestion-des-erreurs: ready-for-dev
+  8-2-conversations-elio-liste-commutation-historique-persistant-complet: ready-for-dev
+  8-3-feedback-reponses-elio-documents-dans-le-chat-historique-configs: ready-for-dev
+  8-4-profil-de-communication-stockage-affinement-transmission-graduation: ready-for-dev
+  8-5-elio-hub-interface-chat-mikl-aide-fonctionnalites-recherche-client: ready-for-dev
+  8-6-elio-hub-correction-redaction-generation-de-brouillons: ready-for-dev
+  8-7-elio-one-chat-faq-guidance-dashboard-heritage-lab: ready-for-dev
+  8-8-elio-one-collecte-devolutions-soumission-validation-hub: ready-for-dev
+  8-9a-elio-one-plus-systeme-de-tiers-actions-modules: ready-for-dev
+  8-9b-elio-one-plus-generation-de-documents: ready-for-dev
+  8-9c-elio-one-plus-alertes-proactives: ready-for-dev
   epic-8-retrospective: optional
 
   # Epic 9: Graduation Lab vers One & Cycle de Vie Client (7 stories)

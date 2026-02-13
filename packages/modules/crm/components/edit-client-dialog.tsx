@@ -20,10 +20,23 @@ import type { Client, UpdateClientInput } from '../types/crm.types'
 interface EditClientDialogProps {
   client: Client
   onClientUpdated?: () => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  trigger?: React.ReactNode
 }
 
-export function EditClientDialog({ client, onClientUpdated }: EditClientDialogProps) {
-  const [open, setOpen] = useState(false)
+export function EditClientDialog({
+  client,
+  onClientUpdated,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  trigger,
+}: EditClientDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  // Use controlled state if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = controlledOnOpenChange || setInternalOpen
   const [isPending, startTransition] = useTransition()
   const [serverError, setServerError] = useState<{ field: string; message: string } | null>(null)
   const queryClient = useQueryClient()
@@ -55,9 +68,16 @@ export function EditClientDialog({ client, onClientUpdated }: EditClientDialogPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Modifier</Button>
-      </DialogTrigger>
+      {trigger && (
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+      )}
+      {!trigger && controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">Modifier</Button>
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Modifier le client</DialogTitle>

@@ -5,6 +5,16 @@ import { createClientSchema, updateClientSchema } from '@foxeo/utils'
 export const ClientTypeEnum = z.enum(['complet', 'direct-one', 'ponctuel'])
 export const ClientStatusEnum = z.enum(['lab-actif', 'one-actif', 'inactif', 'suspendu'])
 
+// Client Config types (from client_configs table)
+export const ClientConfig = z.object({
+  activeModules: z.array(z.string()),
+  dashboardType: z.enum(['one', 'lab']),
+  themeVariant: z.string().nullable().optional(),
+  parcoursConfig: z.record(z.unknown()).optional(),
+})
+
+export type ClientConfig = z.infer<typeof ClientConfig>
+
 // Full Client schema (for detailed views and operations)
 export const Client = z.object({
   id: z.string().uuid(),
@@ -19,7 +29,8 @@ export const Client = z.object({
   website: z.string().url().optional().or(z.literal('')),
   notes: z.string().optional(),
   createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime()
+  updatedAt: z.string().datetime(),
+  config: ClientConfig.optional(),
 })
 
 export type Client = z.infer<typeof Client>
@@ -73,3 +84,53 @@ export type ClientDB = {
   created_at: string
   updated_at: string
 }
+
+// Activity Log types (for client timeline/history)
+export const ActivityLogTypeEnum = z.enum([
+  'client_created',
+  'status_changed',
+  'validation_submitted',
+  'validation_approved',
+  'validation_rejected',
+  'visio_completed',
+  'graduated_to_one',
+  'document_shared',
+  'message_sent'
+])
+
+export const ActivityLog = z.object({
+  id: z.string().uuid(),
+  clientId: z.string().uuid(),
+  eventType: ActivityLogTypeEnum,
+  eventData: z.record(z.unknown()).optional(),
+  description: z.string(),
+  createdAt: z.string().datetime()
+})
+
+export type ActivityLog = z.infer<typeof ActivityLog>
+export type ActivityLogType = z.infer<typeof ActivityLogTypeEnum>
+
+// Client Document types (stub for Epic 4)
+export const ClientDocument = z.object({
+  id: z.string().uuid(),
+  clientId: z.string().uuid(),
+  name: z.string(),
+  type: z.enum(['brief', 'livrable', 'rapport', 'autre']),
+  url: z.string().url().optional(),
+  visibleToClient: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime()
+})
+
+export type ClientDocument = z.infer<typeof ClientDocument>
+
+// Client Exchange types (stub for Epic 3)
+export const ClientExchange = z.object({
+  id: z.string().uuid(),
+  clientId: z.string().uuid(),
+  type: z.enum(['message', 'notification', 'elio_summary']),
+  content: z.string(),
+  createdAt: z.string().datetime()
+})
+
+export type ClientExchange = z.infer<typeof ClientExchange>

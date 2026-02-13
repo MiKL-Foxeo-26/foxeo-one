@@ -43,6 +43,20 @@ R: La liste supporte des milliers de clients. La pagination et la recherche inte
 **Q: Pourquoi la recherche est-elle parfois plus lente ?**
 R: Si vous avez plus de 500 clients, la recherche utilise une requête serveur optimisée. Cela peut prendre jusqu'à 1 seconde, mais garantit des résultats précis même avec un grand volume.
 
+### Fiche client
+
+**Q: Comment voir l'historique d'un client ?**
+R: Ouvrez la fiche du client en cliquant dessus dans la liste, puis cliquez sur l'onglet **"Historique"**. Vous verrez une timeline chronologique de tous les événements : création, changements de statut, validations, visios, etc.
+
+**Q: Où trouver les documents partagés avec un client ?**
+R: Dans la fiche du client, cliquez sur l'onglet **"Documents"**. Vous y verrez la liste de tous les documents partagés (briefs, livrables, rapports) avec leur statut de visibilité.
+
+**Q: Comment partager un lien vers un onglet spécifique de la fiche client ?**
+R: L'onglet actif est automatiquement reflété dans l'URL (ex: `?tab=historique`). Copiez simplement l'URL du navigateur et partagez-la. Le destinataire arrivera directement sur le bon onglet.
+
+**Q: Pourquoi certains onglets affichent "Aucun document" ou "Aucun échange" ?**
+R: Les onglets Documents et Échanges afficheront du contenu une fois que les modules correspondants (Documents et Chat) seront activés et que des données auront été créées pour ce client.
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

@@ -134,9 +134,52 @@ flowchart TD
     CloseDialog --> End([Fin])
 ```
 
+## Flux : Navigation fiche client multi-onglets
+
+```mermaid
+flowchart TD
+    Start([MiKL clique sur un client]) --> FetchClient[Server Component: getClient]
+    FetchClient --> CheckResult{Client trouvé ?}
+
+    CheckResult -->|Non / Erreur| NotFound[Afficher page 404]
+    CheckResult -->|Oui| RenderPage[Afficher ClientDetailContent]
+
+    RenderPage --> Header[ClientHeader: nom, badges, date, bouton Modifier]
+    RenderPage --> Tabs[ClientTabs: 4 onglets]
+
+    Tabs --> TabInfo[Informations - défaut]
+    Tabs --> TabHist[Historique]
+    Tabs --> TabDocs[Documents]
+    Tabs --> TabExch[Échanges]
+
+    TabInfo --> LazyInfo[useClient → Coordonnées, Config, Lab, One]
+    TabHist --> LazyHist[useClientActivityLogs → Timeline]
+    TabDocs --> LazyDocs[useClientDocuments → Liste docs]
+    TabExch --> LazyExch[useClientExchanges → Messages récents]
+
+    Header --> ClickEdit[Clic Modifier]
+    LazyInfo --> ClickEdit
+    ClickEdit --> OpenDialog[Ouvrir EditClientDialog]
+    OpenDialog --> SubmitEdit[Soumettre modifications]
+    SubmitEdit --> InvalidateCache[Invalider cache TanStack Query]
+    InvalidateCache --> RefreshData[Rafraîchir données header + onglet Info]
+    RefreshData --> RenderPage
+```
+
+```mermaid
+flowchart LR
+    URL[URL: ?tab=historique] --> ParseParam[Lire searchParams]
+    ParseParam --> SetActive[Activer onglet correspondant]
+    SetActive --> UserSwitch[MiKL change d'onglet]
+    UserSwitch --> UpdateURL[router.push avec nouveau tab]
+    UpdateURL --> URL
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives
 - Le seuil de 500 clients détermine si le filtrage est client-side ou server-side
 - RLS garantit l'isolation des données même si le front-end est compromis
 - TanStack Query met en cache les résultats pour améliorer les performances
+- Les onglets utilisent le lazy-loading : les données ne sont fetchées qu'au premier clic
+- L'onglet actif est synchronisé avec l'URL query param pour le partage de liens
