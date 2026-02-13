@@ -1,0 +1,26 @@
+import type { ModuleManifest } from '@foxeo/types'
+
+export const manifest: ModuleManifest = {
+  id: 'crm',
+  name: 'CRM',
+  description: 'Gestion de la relation client — liste, filtres, recherche et fiches clients',
+  version: '1.0.0',
+  targets: ['hub'],
+  navigation: {
+    label: 'CRM',
+    icon: 'users',
+    position: 10
+  },
+  routes: [
+    {
+      path: '/modules/crm',
+      component: 'ClientList'
+    },
+    {
+      path: '/modules/crm/clients/:clientId',
+      component: 'ClientDetail'
+    }
+  ],
+  requiredTables: ['clients', 'client_configs'],
+  dependencies: []
+}

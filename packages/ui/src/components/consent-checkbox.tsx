@@ -8,28 +8,39 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../tooltip'
+import { t } from '@foxeo/utils'
+import '../messages/init'
 
 interface ConsentCheckboxProps {
   id: string
   checked: boolean
   onCheckedChange: (checked: boolean) => void
-  label: string
-  link: string
-  linkText: string
+  label?: string
+  link?: string
+  linkText?: string
   tooltip?: string
   required?: boolean
+  /** Translation key for default values (e.g., 'consent.cgu') */
+  translationKey?: string
 }
 
 export function ConsentCheckbox({
   id,
   checked,
   onCheckedChange,
-  label,
-  link,
-  linkText,
-  tooltip,
+  label: labelProp,
+  link: linkProp,
+  linkText: linkTextProp,
+  tooltip: tooltipProp,
   required = false,
+  translationKey,
 }: ConsentCheckboxProps) {
+  // Use defaults from translation if translationKey provided
+  const label = labelProp ?? (translationKey ? t(`${translationKey}.label`) : '')
+  const link = linkProp ?? (translationKey ? t(`${translationKey}.link`) : '#')
+  const linkText = linkTextProp ?? (translationKey ? t(`${translationKey}.linkText`) : '')
+  const tooltip = tooltipProp ?? (translationKey ? t(`${translationKey}.tooltip`) : undefined)
+
   return (
     <div className="flex items-start space-x-2">
       <Checkbox

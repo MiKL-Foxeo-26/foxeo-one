@@ -7,6 +7,10 @@
 export * from './use-mobile'
 export { useOnline } from './hooks/use-online'
 export { useConfirmDialog } from './hooks/use-confirm-dialog'
+export { useTranslations } from './hooks/use-translations'
+
+// Providers
+export { LocaleProvider } from './providers/locale-provider'
 
 // Composants
 export * from './alert'
@@ -30,9 +34,11 @@ export * from './tooltip'
 export { DashboardShell } from './components/dashboard-shell'
 export { ShellSkeleton } from './components/shell-skeleton'
 export { ModuleSkeleton } from './components/module-skeleton'
+export { ModuleSidebar } from './components/module-sidebar'
 export { EmptyState } from './components/empty-state'
 export { EMPTY_SEARCH, EMPTY_LIST, EMPTY_ERROR } from './components/empty-state-presets'
 export { ThemeToggle } from './components/theme-toggle'
+export { DataTable, type ColumnDef, type DataTableProps } from './components/data-table'
 
 // Breadcrumb
 export * from './components/breadcrumb'

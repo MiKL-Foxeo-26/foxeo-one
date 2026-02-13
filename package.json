@@ -16,6 +16,7 @@
     "gen:types": "supabase gen types typescript --local > packages/types/src/database.types.ts"
   },
   "devDependencies": {
+    "happy-dom": "^20.6.1",
     "supabase": "^2.76.7",
     "turbo": "^2.3.0",
     "vitest": "^3.0.0"

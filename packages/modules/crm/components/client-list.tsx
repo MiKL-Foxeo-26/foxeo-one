@@ -1,0 +1,101 @@
+'use client'
+
+import { DataTable, type ColumnDef } from '@foxeo/ui'
+import { Badge } from '@foxeo/ui'
+import { CreateClientDialog } from './create-client-dialog'
+import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
+
+interface ClientListProps {
+  clients: ClientListItem[]
+  onRowClick?: (client: ClientListItem) => void
+  showCreateButton?: boolean
+}
+
+// Type badge variants and labels
+const clientTypeConfig: Record<ClientType, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
+  'complet': { label: 'Complet', variant: 'default' },
+  'direct-one': { label: 'Direct One', variant: 'secondary' },
+  'ponctuel': { label: 'Ponctuel', variant: 'outline' }
+}
+
+// Status badge variants and labels
+const clientStatusConfig: Record<ClientStatus, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
+  'lab-actif': { label: 'Lab actif', variant: 'default' },
+  'one-actif': { label: 'One actif', variant: 'secondary' },
+  'inactif': { label: 'Inactif', variant: 'outline' },
+  'suspendu': { label: 'Suspendu', variant: 'destructive' }
+}
+
+// Format date to FR locale
+const formatDate = (isoDate: string): string => {
+  const date = new Date(isoDate)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+export function ClientList({ clients, onRowClick, showCreateButton = true }: ClientListProps) {
+  const columns: ColumnDef<ClientListItem>[] = [
+    {
+      id: 'name',
+      header: 'Nom',
+      accessorKey: 'name',
+      sortable: true,
+    },
+    {
+      id: 'company',
+      header: 'Entreprise',
+      accessorKey: 'company',
+      sortable: true,
+    },
+    {
+      id: 'type',
+      header: 'Type',
+      accessorKey: 'clientType',
+      cell: (client) => {
+        const config = clientTypeConfig[client.clientType]
+        return <Badge variant={config.variant}>{config.label}</Badge>
+      },
+      sortable: true,
+    },
+    {
+      id: 'status',
+      header: 'Statut',
+      accessorKey: 'status',
+      cell: (client) => {
+        const config = clientStatusConfig[client.status]
+        return <Badge variant={config.variant}>{config.label}</Badge>
+      },
+      sortable: true,
+    },
+    {
+      id: 'createdAt',
+      header: 'Créé le',
+      accessorKey: 'createdAt',
+      cell: (client) => formatDate(client.createdAt),
+      sortable: true,
+    }
+  ]
+
+  return (
+    <div className="space-y-4">
+      {showCreateButton && (
+        <div className="flex justify-end">
+          <CreateClientDialog />
+        </div>
+      )}
+      <DataTable
+        data={clients}
+        columns={columns}
+        emptyMessage="Aucun client trouvé"
+        onRowClick={onRowClick}
+        pageSize={20}
+        className="data-density-compact"
+      />
+    </div>
+  )
+}
+
+ClientList.displayName = 'ClientList'

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Poppins, Inter } from 'next/font/google'
-import { QueryProvider, ThemeProvider } from '@foxeo/supabase'
-import { Toaster, OfflineBanner, BrowserWarning } from '@foxeo/ui'
+import { QueryProvider, ThemeProvider, RealtimeProvider } from '@foxeo/supabase'
+import { Toaster, OfflineBanner, BrowserWarning, LocaleProvider } from '@foxeo/ui'
 import './globals.css'
 
 const poppins = Poppins({
@@ -45,12 +45,16 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider defaultTheme="dark" dashboardTheme="lab">
-          <QueryProvider>
-            <BrowserWarning />
-            <OfflineBanner />
-            {children}
-            <Toaster />
-          </QueryProvider>
+          <LocaleProvider>
+            <QueryProvider>
+              <RealtimeProvider>
+                <BrowserWarning />
+                <OfflineBanner />
+                {children}
+                <Toaster />
+              </RealtimeProvider>
+            </QueryProvider>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

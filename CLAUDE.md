@@ -229,3 +229,4 @@ Full config: `_bmad/_config/model-routing.yaml`
 | Design System Themes CSS | `_bmad-output/planning-artifacts/design-system-themes.css` |
 | Project Overview (existing code) | `docs/project-overview.md` |
 | Existing Architecture (code) | `docs/architecture.md` |
+| Internationalization (i18n) | `docs/i18n.md` |

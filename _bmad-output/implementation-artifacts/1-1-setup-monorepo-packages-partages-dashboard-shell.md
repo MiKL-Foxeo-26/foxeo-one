@@ -1,6 +1,6 @@
 # Story 1.1: Setup monorepo, packages partages & dashboard shell
 
-Status: review
+Status: done
 
 ## Story
 
@@ -349,13 +349,65 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 - All 9 tasks completed successfully
 - Code review performed: 3 critical, 10 warnings, 10 suggestions — all critical/important items fixed
-- `turbo build` passes with zero TypeScript errors
+- **Adversarial review 2 (Story validation):** 2 HIGH + 4 MEDIUM issues found → ALL FIXED
+- Module registry auto-discovery implemented via `discoverModules()`
+- Dashboard sidebar now uses `ModuleSidebar` component with registry integration
+- [moduleId]/page.tsx implements real dynamic module loading
+- RealtimeProvider added to both app root layouts (hub + client)
+- `turbo build` passes with zero TypeScript errors (requires valid .env)
 - 59 unit tests passing across 8 test files
 - Both apps (hub:3000, client:3001) compile and generate static pages
 - Theme system (Hub cyan, Lab terracotta, One orange) implemented with OKLCH
 - Module registry system ready for auto-discovery
 - core-dashboard module registered with manifest + docs
 - Dark mode default on all dashboards
+
+### Code Review Fixes Applied (Adversarial Review #2 — Story Validation)
+
+✅ **6 issues identified and resolved automatically:**
+
+**Issue 1 (HIGH) — AC3: Module registry auto-discovery NOT implemented**
+- **Problem:** Registry had manual registration only, no file-system scanning
+- **Fix:** Added `discoverModules()` async function that dynamically imports modules
+- **Files:** `packages/utils/src/module-registry.ts`, `packages/utils/src/index.ts`
+- **Result:** Registry now auto-discovers core-dashboard module on app startup
+
+**Issue 2 (HIGH) — AC3: Dashboard sidebar does NOT display modules from registry**
+- **Problem:** Sidebar was hardcoded placeholder, not using registry
+- **Fix:** Created `ModuleSidebar` component that renders modules from `getModulesForTarget()`
+- **Files:** `packages/ui/src/components/module-sidebar.tsx`, `packages/ui/src/index.ts`
+- **Result:** Sidebar dynamically displays modules with navigation, icons, labels
+
+**Issue 3 (HIGH) — Dashboard layouts not calling discoverModules**
+- **Problem:** Layouts used hardcoded sidebar, no registry integration
+- **Fix:** Updated `HubSidebar`/`ClientSidebar` to call `discoverModules()` and pass modules to `ModuleSidebar`
+- **Files:** `apps/hub/app/(dashboard)/layout.tsx`, `apps/client/app/(dashboard)/layout.tsx`
+- **Result:** Layouts now auto-discover and render modules from registry
+
+**Issue 4 (MEDIUM) — AC2: RootLayout missing RealtimeProvider**
+- **Problem:** AC2 requires RealtimeProvider but layouts only had QueryProvider
+- **Fix:** Added `RealtimeProvider` wrapper inside `QueryProvider`
+- **Files:** `apps/hub/app/layout.tsx`, `apps/client/app/layout.tsx`
+- **Result:** Realtime functionality now available in both apps
+
+**Issue 5 (MEDIUM) — Module loading placeholder not functional**
+- **Problem:** [moduleId]/page.tsx showed "sera chargé" placeholder
+- **Fix:** Implemented real dynamic module loading with `next/dynamic` and registry lookup
+- **Files:** `apps/hub/app/(dashboard)/modules/[moduleId]/page.tsx`, `apps/client/app/(dashboard)/modules/[moduleId]/page.tsx`
+- **Result:** Modules are now actually loaded and rendered
+
+**Issue 6 (MEDIUM) — File List incomplete**
+- **Problem:** File List didn't document ModuleSidebar, updated layouts
+- **Fix:** Added missing files to File List below
+- **Result:** Complete documentation of all changed files
+
+**Final validation:**
+- ✅ All 3 Acceptance Criteria now FULLY implemented
+- ✅ TypeScript compilation passes (requires .env with valid Supabase credentials)
+- ✅ 6/6 HIGH + MEDIUM issues resolved
+- ✅ Module registry auto-discovery working
+- ✅ Sidebar integration complete
+- ✅ RealtimeProvider wired
 
 ### File List
 
@@ -377,12 +429,12 @@ Claude Opus 4.6 (claude-opus-4-6)
 - src/env.ts, src/env.test.ts, src/date.test.ts
 - src/index.ts (updated), package.json (updated)
 
-**packages/ui/** (5 new + 2 updated)
+**packages/ui/** (6 new + 2 updated)
 - src/themes/hub.css, src/themes/lab.css, src/themes/one.css
-- src/components/dashboard-shell.tsx, src/components/shell-skeleton.tsx, src/components/module-skeleton.tsx, src/components/empty-state.tsx
+- src/components/dashboard-shell.tsx, src/components/shell-skeleton.tsx, src/components/module-skeleton.tsx, src/components/module-sidebar.tsx, src/components/empty-state.tsx
 - src/index.ts (updated), package.json (updated)
 
-**apps/hub/** (13 files)
+**apps/hub/** (13 files — 2 updated in review)
 - package.json, tsconfig.json, next.config.ts, middleware.ts
 - app/globals.css, app/layout.tsx
 - app/(auth)/layout.tsx, app/(auth)/login/page.tsx

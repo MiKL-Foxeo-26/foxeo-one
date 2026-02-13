@@ -2,6 +2,9 @@
 
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { Button } from '../button'
+import { t } from '@foxeo/utils'
+// Ensure messages are loaded
+import '../messages/init'
 
 export type ErrorDisplayProps = {
   title?: string
@@ -10,8 +13,8 @@ export type ErrorDisplayProps = {
 }
 
 export function ErrorDisplay({
-  title = 'Une erreur est survenue',
-  message = 'Impossible de charger le contenu. Veuillez réessayer.',
+  title = t('errorDisplay.defaultTitle'),
+  message = t('errorDisplay.defaultMessage'),
   onRetry,
 }: ErrorDisplayProps) {
   return (
@@ -28,7 +31,7 @@ export function ErrorDisplay({
       {onRetry && (
         <Button onClick={onRetry} variant="outline" className="gap-2">
           <RefreshCw className="h-4 w-4" />
-          Réessayer
+          {t('errorDisplay.retryButton')}
         </Button>
       )}
     </div>

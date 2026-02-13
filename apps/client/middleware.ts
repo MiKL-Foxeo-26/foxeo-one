@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createMiddlewareSupabaseClient } from '@foxeo/supabase'
 import { checkConsentVersion } from './middleware-consent'
+import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
 export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api']
@@ -31,7 +32,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // 1. Detect and set locale (before auth check)
+  const locale = detectLocale(request)
+
   const { user, response } = await createMiddlewareSupabaseClient(request)
+
+  // Set locale cookie on response
+  setLocaleCookie(response, locale)
 
   const isPublic = isPublicPath(request.nextUrl.pathname)
 
@@ -39,12 +46,16 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublic) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    setLocaleCookie(redirectResponse, locale)
+    return redirectResponse
   }
 
   // Authenticated user on login/signup → redirect to dashboard
   if (user && isPublic) {
-    return NextResponse.redirect(new URL('/', request.url))
+    const redirectResponse = NextResponse.redirect(new URL('/', request.url))
+    setLocaleCookie(redirectResponse, locale)
+    return redirectResponse
   }
 
   // Check CGU consent version for authenticated users (exclude specific paths)

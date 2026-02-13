@@ -46,6 +46,8 @@ describe('signupSchema', () => {
       email: 'new@foxeo.io',
       password: 'Password1',
       confirmPassword: 'Password1',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(true)
   })
@@ -55,6 +57,8 @@ describe('signupSchema', () => {
       email: 'new@foxeo.io',
       password: 'Password1',
       confirmPassword: 'Password2',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(false)
     if (!result.success) {
@@ -67,6 +71,8 @@ describe('signupSchema', () => {
       email: 'new@foxeo.io',
       password: 'password1',
       confirmPassword: 'password1',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(false)
   })
@@ -76,6 +82,8 @@ describe('signupSchema', () => {
       email: 'new@foxeo.io',
       password: 'Passwordd',
       confirmPassword: 'Passwordd',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(false)
   })
@@ -85,6 +93,8 @@ describe('signupSchema', () => {
       email: 'new@foxeo.io',
       password: 'Pass1',
       confirmPassword: 'Pass1',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(false)
   })
@@ -94,6 +104,8 @@ describe('signupSchema', () => {
       email: 'bad',
       password: 'Password1',
       confirmPassword: 'Password1',
+      acceptCgu: true,
+      acceptIaProcessing: false,
     })
     expect(result.success).toBe(false)
   })

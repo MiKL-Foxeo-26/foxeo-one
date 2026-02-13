@@ -35,8 +35,11 @@
   },
   "devDependencies": {
     "@foxeo/tsconfig": "*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "happy-dom": "^20.6.1",
     "typescript": "^5.7.3"
   }
 }

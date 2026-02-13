@@ -1,6 +1,6 @@
 # Story 1.7: Design system fondation (dark mode, palettes, responsive, accessibilite)
 
-Status: review
+Status: done
 
 ## Story
 

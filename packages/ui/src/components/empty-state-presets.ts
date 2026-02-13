@@ -1,23 +1,30 @@
 /**
  * Presets pour EmptyState — états vides réutilisables
+ * Uses i18n translations
+ * NOTE: Presets are getter functions to avoid race conditions with message loading
  */
 
-type EmptyStatePreset = {
+import { t } from '@foxeo/utils'
+// Ensure messages are loaded
+import '../messages/init'
+
+export type EmptyStatePreset = {
   title: string
   description?: string
 }
 
-export const EMPTY_SEARCH: EmptyStatePreset = {
-  title: 'Aucun résultat trouvé',
-  description: 'Essayez de modifier vos critères de recherche ou d\'ajuster les filtres.',
-}
+// Use getters to evaluate translations lazily and avoid race conditions
+export const EMPTY_SEARCH = (): EmptyStatePreset => ({
+  title: t('emptyState.search.title'),
+  description: t('emptyState.search.description'),
+})
 
-export const EMPTY_LIST: EmptyStatePreset = {
-  title: 'Aucun élément',
-  description: 'Cette liste est vide pour le moment.',
-}
+export const EMPTY_LIST = (): EmptyStatePreset => ({
+  title: t('emptyState.list.title'),
+  description: t('emptyState.list.description'),
+})
 
-export const EMPTY_ERROR: EmptyStatePreset = {
-  title: 'Impossible de charger le contenu',
-  description: 'Une erreur s\'est produite. Veuillez réessayer.',
-}
+export const EMPTY_ERROR = (): EmptyStatePreset => ({
+  title: t('emptyState.error.title'),
+  description: t('emptyState.error.description'),
+})

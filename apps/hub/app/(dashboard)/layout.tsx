@@ -1,24 +1,13 @@
-import Link from 'next/link'
-import { DashboardShell, ThemeToggle } from '@foxeo/ui'
+import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
+import { discoverModules, getModulesForTarget } from '@foxeo/utils'
 import { LogoutButton } from './logout-button'
 
-function HubSidebar() {
-  return (
-    <div className="flex flex-col h-full p-4">
-      <div className="mb-6">
-        <h2 className="text-lg font-bold text-sidebar-foreground">Foxeo Hub</h2>
-      </div>
-      <nav className="flex-1 space-y-1">
-        {/* Module navigation populated by registry — Story 1.1 placeholder */}
-        <Link
-          href="/modules/core-dashboard"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent"
-        >
-          Dashboard
-        </Link>
-      </nav>
-    </div>
-  )
+async function HubSidebar() {
+  // Auto-discover modules from packages/modules/
+  await discoverModules()
+  const modules = getModulesForTarget('hub')
+
+  return <ModuleSidebar target="hub" modules={modules} />
 }
 
 function HubHeader() {

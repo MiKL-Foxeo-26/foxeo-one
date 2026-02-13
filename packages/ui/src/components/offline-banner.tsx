@@ -2,6 +2,9 @@
 
 import { useOnline } from '../hooks/use-online'
 import { WifiOff } from 'lucide-react'
+import { t } from '@foxeo/utils'
+// Ensure messages are loaded
+import '../messages/init'
 
 export function OfflineBanner() {
   const isOnline = useOnline()
@@ -14,7 +17,7 @@ export function OfflineBanner() {
     <div className="fixed top-0 left-0 right-0 z-40 bg-destructive px-4 py-2 text-center text-sm text-destructive-foreground">
       <div className="flex items-center justify-center gap-2">
         <WifiOff className="h-4 w-4" />
-        <span>Connexion perdue — Reconnexion en cours...</span>
+        <span>{t('offlineBanner.message')}</span>
       </div>
     </div>
   )

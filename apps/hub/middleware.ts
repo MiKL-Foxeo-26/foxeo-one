@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createMiddlewareSupabaseClient } from '@foxeo/supabase'
+import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/setup-mfa', '/auth/callback']
 
@@ -23,28 +24,38 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // 1. Detect and set locale (before auth check)
+  const locale = detectLocale(request)
+
   const { supabase, user, response } = await createMiddlewareSupabaseClient(request)
+
+  // Set locale cookie on response
+  setLocaleCookie(response, locale)
 
   const isPublic = isPublicPath(request.nextUrl.pathname)
 
-  // 1. Unauthenticated user on protected route → login
+  // 2. Unauthenticated user on protected route → login
   if (!user && !isPublic) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    setLocaleCookie(redirectResponse, locale)
+    return redirectResponse
   }
 
-  // 2. Authenticated user on public auth page → redirect to dashboard if already aal2
+  // 3. Authenticated user on public auth page → redirect to dashboard if already aal2
   if (user && isPublic) {
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
     if (aal?.currentLevel === 'aal2') {
-      return NextResponse.redirect(new URL('/', request.url))
+      const redirectResponse = NextResponse.redirect(new URL('/', request.url))
+      setLocaleCookie(redirectResponse, locale)
+      return redirectResponse
     }
     // Not AAL2 yet — let them proceed to MFA verification/setup pages
     return response
   }
 
-  // 3. Authenticated user on protected route → verify operator + AAL2
+  // 4. Authenticated user on protected route → verify operator + AAL2
   // TODO: Optimize — consider caching operator role in JWT custom claims
   // to avoid a DB query on every protected route navigation.
   if (user && !isPublic) {
@@ -61,7 +72,9 @@ export async function middleware(request: NextRequest) {
       await supabase.auth.signOut()
       const redirectUrl = new URL('/login', request.url)
       redirectUrl.searchParams.set('error', 'unauthorized')
-      return NextResponse.redirect(redirectUrl)
+      const redirectResponse = NextResponse.redirect(redirectUrl)
+      setLocaleCookie(redirectResponse, locale)
+      return redirectResponse
     }
 
     // Check AAL (Authentication Assurance Level)
@@ -70,10 +83,14 @@ export async function middleware(request: NextRequest) {
     if (aal?.currentLevel !== 'aal2') {
       // 2FA not yet setup → redirect to setup
       if (!operator.twoFactorEnabled) {
-        return NextResponse.redirect(new URL('/setup-mfa', request.url))
+        const redirectResponse = NextResponse.redirect(new URL('/setup-mfa', request.url))
+        setLocaleCookie(redirectResponse, locale)
+        return redirectResponse
       }
       // 2FA setup but not verified this session → redirect to verify
-      return NextResponse.redirect(new URL('/login/verify-mfa', request.url))
+      const redirectResponse = NextResponse.redirect(new URL('/login/verify-mfa', request.url))
+      setLocaleCookie(redirectResponse, locale)
+      return redirectResponse
     }
   }
 

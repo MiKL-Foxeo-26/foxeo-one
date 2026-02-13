@@ -1,0 +1,49 @@
+{
+  "emptyState": {
+    "search": {
+      "title": "Aucun résultat trouvé",
+      "description": "Essayez de modifier vos critères de recherche ou d'ajuster les filtres."
+    },
+    "list": {
+      "title": "Aucun élément",
+      "description": "Cette liste est vide pour le moment."
+    },
+    "error": {
+      "title": "Impossible de charger le contenu",
+      "description": "Une erreur s'est produite. Veuillez réessayer."
+    }
+  },
+  "errorDisplay": {
+    "defaultTitle": "Une erreur est survenue",
+    "defaultMessage": "Impossible de charger le contenu. Veuillez réessayer.",
+    "retryButton": "Réessayer"
+  },
+  "offlineBanner": {
+    "message": "Connexion perdue — Reconnexion en cours..."
+  },
+  "browserWarning": {
+    "message": "Votre navigateur n'est pas entièrement supporté. Pour une expérience optimale, veuillez utiliser Chrome, Firefox, Safari ou Edge dans leur version récente.",
+    "dismissButton": "Fermer"
+  },
+  "breadcrumb": {
+    "ariaLabel": "Fil d'ariane",
+    "ellipsisLabel": "Plus d'éléments"
+  },
+  "consent": {
+    "cgu": {
+      "label": "J'accepte les Conditions Générales d'Utilisation",
+      "linkText": "Lire les CGU",
+      "tooltip": "En acceptant, vous reconnaissez avoir lu et accepté les conditions d'utilisation de la plateforme."
+    },
+    "aiProcessing": {
+      "label": "J'accepte le traitement par IA de mes données",
+      "linkText": "En savoir plus sur le traitement IA",
+      "tooltip": "Vos données seront analysées par des systèmes d'IA pour améliorer votre expérience. Toutes les données sont traitées de manière confidentielle."
+    },
+    "activityLogs": {
+      "label": "J'accepte la conservation des traces d'activité",
+      "linkText": "Politique de conservation des données",
+      "tooltip": "Vos actions sur la plateforme sont enregistrées pour assurer la sécurité et améliorer nos services."
+    }
+  }
+}

@@ -1,13 +1,15 @@
 import * as React from 'react'
 import { ChevronRight, MoreHorizontal } from 'lucide-react'
-import { cn } from '@foxeo/utils'
+import { cn, t } from '@foxeo/utils'
+// Ensure messages are loaded
+import '../messages/init'
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
   React.ComponentPropsWithoutRef<'nav'> & {
     separator?: React.ReactNode
   }
->(({ ...props }, ref) => <nav ref={ref} aria-label="Fil d'ariane" {...props} />)
+>(({ ...props }, ref) => <nav ref={ref} aria-label={t('breadcrumb.ariaLabel')} {...props} />)
 Breadcrumb.displayName = 'Breadcrumb'
 
 const BreadcrumbList = React.forwardRef<
@@ -91,7 +93,7 @@ const BreadcrumbEllipsis = ({
     {...props}
   >
     <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">Plus d'éléments</span>
+    <span className="sr-only">{t('breadcrumb.ellipsisLabel')}</span>
   </span>
 )
 BreadcrumbEllipsis.displayName = 'BreadcrumbElipssis'

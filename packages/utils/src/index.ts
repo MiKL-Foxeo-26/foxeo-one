@@ -13,9 +13,13 @@ export {
   uuidSchema,
   slugSchema,
   phoneSchema,
+  clientTypeSchema,
+  createClientSchema,
+  updateClientSchema,
 } from './validation-schemas'
 export {
   registerModule,
+  discoverModules,
   getModuleRegistry,
   getModule,
   getModulesForTarget,
@@ -36,3 +40,9 @@ export {
   CONSENT_TYPES,
   type ConsentType,
 } from './constants/legal-versions'
+export {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  type Locale,
+} from './constants/i18n'
+export { t, loadMessages } from './i18n/translate'
