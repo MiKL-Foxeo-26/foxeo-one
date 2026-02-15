@@ -125,6 +125,38 @@ R: Si le client a une entreprise renseignée, le slug est basé sur le nom de l'
 **Q: Les caractères spéciaux et accents sont-ils gérés ?**
 R: Oui, le slug est normalisé automatiquement : les accents sont retirés, les caractères spéciaux sont remplacés par des tirets, tout est en minuscules (ex: "Café & Restaurant" → `cafe-restaurant`).
 
+### Rappels et calendrier
+
+**Q: Les rappels sont-ils partagés avec les clients ?**
+R: Non, les rappels sont strictement personnels. Seul l'opérateur peut les voir et les gérer. C'est un outil de planification interne.
+
+**Q: Puis-je créer un rappel sans l'associer à un client ?**
+R: Oui, le champ "Client associé" est optionnel. Vous pouvez créer des rappels généraux non liés à un client spécifique.
+
+**Q: Que se passe-t-il si je supprime un client qui a des rappels associés ?**
+R: Les rappels restent dans votre liste mais ne sont plus liés à un client (client_id devient null). Vous ne perdez pas vos rappels.
+
+**Q: Comment voir rapidement combien de rappels j'ai en retard ?**
+R: Cliquez sur l'onglet "En retard" dans la vue Rappels. Tous les rappels non complétés avec une date passée s'affichent.
+
+**Q: Le calendrier affiche-t-il seulement le mois en cours ?**
+R: Non, vous pouvez naviguer librement entre les mois avec les flèches ← →. Le système charge automatiquement les rappels du mois affiché.
+
+**Q: Y a-t-il une limite au nombre de rappels ?**
+R: Non, vous pouvez créer autant de rappels que nécessaire. L'affichage du calendrier reste performant même avec des centaines de rappels.
+
+**Q: Puis-je modifier la date d'échéance d'un rappel après sa création ?**
+R: Oui, via le menu actions (⋮) → Modifier, vous pouvez changer le titre, la description et la date d'échéance.
+
+**Q: Que signifie "marquer comme complété" ?**
+R: C'est une action qui indique que la tâche du rappel est terminée. Le rappel reste visible (en grisé) mais n'apparaît plus dans "À venir" ou "En retard".
+
+**Q: Les rappels complétés sont-ils automatiquement supprimés ?**
+R: Non, ils restent dans votre historique. Vous devez les supprimer manuellement si vous souhaitez les retirer définitivement.
+
+**Q: Puis-je "décocher" un rappel complété ?**
+R: Oui, cliquez à nouveau sur la checkbox pour le marquer comme non complété. Le rappel redeviendra actif.
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

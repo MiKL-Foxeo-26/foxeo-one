@@ -187,8 +187,54 @@ Par défaut : `/Users/mikl/bmad`
 | Suspendu | Parcours mis en pause (accès Lab désactivé) |
 | Terminé | Toutes les étapes sont complétées |
 
+## Rappels personnels & Calendrier
+
+### Accès
+
+Navigation : **CRM → Rappels** (lien dans le menu de navigation CRM)
+
+### Vue calendrier
+
+Le calendrier mensuel affiche tous vos rappels sous forme d'indicateurs colorés par jour :
+- **Point bleu** : Rappels à venir
+- **Point rouge** : Rappels en retard (non complétés et date passée)
+- **Point gris** : Rappels complétés
+
+Cliquez sur un jour pour voir la liste détaillée des rappels de cette date.
+
+### Créer un rappel
+
+1. Cliquez sur le bouton **"Nouveau rappel"**
+2. Remplissez le formulaire :
+   - **Titre** (obligatoire, max 200 caractères)
+   - **Description** (optionnel, max 1000 caractères)
+   - **Date d'échéance** (obligatoire)
+   - **Client associé** (optionnel, auto-rempli si créé depuis une fiche client)
+3. Cliquez sur **"Créer"**
+
+**Astuce** : Vous pouvez aussi créer un rappel directement depuis une fiche client via le bouton "Nouveau rappel" dans le header.
+
+### Gérer les rappels
+
+Pour chaque rappel, vous pouvez :
+- ✅ **Marquer comme complété** : Cochez la case à gauche du rappel
+- ✏️ **Modifier** : Menu actions (⋮) → Modifier
+- 🗑️ **Supprimer** : Menu actions (⋮) → Supprimer (confirmation requise)
+
+### Filtrer les rappels
+
+Utilisez les onglets en haut de la page :
+- **À venir** : Rappels non complétés avec date future (défaut)
+- **En retard** : Rappels non complétés avec date passée
+- **Complétés** : Rappels marqués comme terminés
+- **Tous** : Afficher tous les rappels
+
+### Navigation par mois
+
+Utilisez les flèches **← →** pour naviguer entre les mois. Le jour actuel est mis en évidence par un contour bleu.
+
 ## Prochaines fonctionnalités
 
-- Rappels personnels et calendrier deadlines (Story 2.7)
 - Statistiques temps passé par client (Story 2.8)
 - Suspendre/réactiver/clôturer un client (Stories 2.9a-2.9c)
+- Alertes inactivité Lab & import clients CSV (Story 2.10)

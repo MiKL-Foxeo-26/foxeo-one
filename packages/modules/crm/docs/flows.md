@@ -293,6 +293,50 @@ flowchart TD
     CloseDialog --> End([Fin])
 ```
 
+## Flux : Gestion des rappels
+
+```mermaid
+flowchart TD
+    Start([MiKL accède aux Rappels]) --> LoadReminders[Charger rappels du mois]
+    LoadReminders --> ShowCalendar[Afficher calendrier mensuel]
+    ShowCalendar --> ApplyFilter[Appliquer filtre par défaut: À venir]
+
+    ApplyFilter --> UserAction{Action utilisateur ?}
+
+    UserAction -->|Créer rappel| OpenDialog[Ouvrir dialog création]
+    OpenDialog --> FillForm[Remplir titre, description, date]
+    FillForm --> SubmitForm[Server Action createReminder]
+    SubmitForm --> InvalidateCache[Invalider cache reminders]
+    InvalidateCache --> Toast[Toast "Rappel créé"]
+    Toast --> CloseDialog[Fermer dialog]
+    CloseDialog --> RefreshCalendar[Rafraîchir calendrier]
+
+    UserAction -->|Changer filtre| UpdateFilter[Filtre: all/upcoming/overdue/completed]
+    UpdateFilter --> FilterLogic[Filtrage côté client]
+    FilterLogic --> RefreshCalendar
+
+    UserAction -->|Navigation mois| ChangeMonth[Clic ← ou →]
+    ChangeMonth --> UpdateMonth[Calculer nouveau mois/année]
+    UpdateMonth --> LoadReminders
+
+    UserAction -->|Clic sur jour| SelectDay[Sélectionner date]
+    SelectDay --> ShowDayList[Afficher liste rappels du jour]
+    ShowDayList --> DayAction{Action sur rappel ?}
+
+    DayAction -->|Toggle complété| ToggleAction[Server Action toggleReminderComplete]
+    ToggleAction --> InvalidateCache
+
+    DayAction -->|Modifier| EditDialog[Ouvrir dialog édition]
+    EditDialog --> UpdateAction[Server Action updateReminder]
+    UpdateAction --> InvalidateCache
+
+    DayAction -->|Supprimer| ConfirmDelete[AlertDialog confirmation]
+    ConfirmDelete --> DeleteAction[Server Action deleteReminder]
+    DeleteAction --> InvalidateCache
+
+    RefreshCalendar --> ShowCalendar
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives

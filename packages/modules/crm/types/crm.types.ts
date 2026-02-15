@@ -295,3 +295,64 @@ export type ClientNoteDB = {
   created_at: string
   updated_at: string
 }
+
+// ============================================================
+// Reminders types (Story 2.7)
+// ============================================================
+
+// Reminder filter enum
+export const ReminderFilterEnum = z.enum(['all', 'upcoming', 'overdue', 'completed'])
+export type ReminderFilter = z.infer<typeof ReminderFilterEnum>
+
+// Reminder schema
+export const Reminder = z.object({
+  id: z.string().uuid(),
+  operatorId: z.string().uuid(),
+  clientId: z.string().uuid().nullable(),
+  title: z.string().min(1, 'Le titre est requis'),
+  description: z.string().nullable(),
+  dueDate: z.string().datetime(),
+  completed: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+
+export type Reminder = z.infer<typeof Reminder>
+
+// Input schemas
+export const CreateReminderInput = z.object({
+  clientId: z.string().uuid().nullable().optional(),
+  title: z.string().min(1, 'Le titre est requis').max(200, 'Le titre ne peut pas dépasser 200 caractères'),
+  description: z.string().max(1000, 'La description ne peut pas dépasser 1000 caractères').nullable().optional(),
+  dueDate: z.string().datetime(),
+})
+
+export type CreateReminderInput = z.infer<typeof CreateReminderInput>
+
+export const UpdateReminderInput = z.object({
+  reminderId: z.string().uuid(),
+  title: z.string().min(1, 'Le titre est requis').max(200, 'Le titre ne peut pas dépasser 200 caractères').optional(),
+  description: z.string().max(1000, 'La description ne peut pas dépasser 1000 caractères').nullable().optional(),
+  dueDate: z.string().datetime().optional(),
+})
+
+export type UpdateReminderInput = z.infer<typeof UpdateReminderInput>
+
+export const ToggleReminderCompleteInput = z.object({
+  reminderId: z.string().uuid(),
+})
+
+export type ToggleReminderCompleteInput = z.infer<typeof ToggleReminderCompleteInput>
+
+// DB type (snake_case)
+export type ReminderDB = {
+  id: string
+  operator_id: string
+  client_id: string | null
+  title: string
+  description: string | null
+  due_date: string
+  completed: boolean
+  created_at: string
+  updated_at: string
+}

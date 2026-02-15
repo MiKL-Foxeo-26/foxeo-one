@@ -60,7 +60,7 @@ development_status:
   2-4-assignation-parcours-lab-gestion-des-acces: review
   2-5-integration-cursor-ouverture-dossier-bmad-client: review
   2-6-notes-privees-epinglage-a-traiter-plus-tard: review
-  2-7-rappels-personnels-calendrier-deadlines: ready-for-dev
+  2-7-rappels-personnels-calendrier-deadlines: done
   2-8-statistiques-globales-temps-passe-par-client: ready-for-dev
   2-9a-suspendre-reactiver-un-client: ready-for-dev
   2-9b-cloturer-un-client-archiver-les-donnees: ready-for-dev

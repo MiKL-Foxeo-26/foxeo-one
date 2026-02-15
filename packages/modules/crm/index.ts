@@ -25,6 +25,12 @@ export { ClientNotesSection } from './components/client-notes-section'
 export { ClientNoteCard } from './components/client-note-card'
 export { PinButton } from './components/pin-button'
 export { DeferDialog } from './components/defer-dialog'
+export { ReminderCard } from './components/reminder-card'
+export { RemindersFilter } from './components/reminders-filter'
+export { ReminderDayList } from './components/reminder-day-list'
+export { CreateReminderDialog } from './components/create-reminder-dialog'
+export { RemindersCalendar } from './components/reminders-calendar'
+export { EditReminderDialog } from './components/edit-reminder-dialog'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -35,6 +41,7 @@ export { useClientExchanges } from './hooks/use-client-exchanges'
 export { useParcourTemplates } from './hooks/use-parcours-templates'
 export { useClientParcours } from './hooks/use-client-parcours'
 export { useClientNotes } from './hooks/use-client-notes'
+export { useReminders, useCreateReminder, useUpdateReminder, useToggleReminderComplete, useDeleteReminder } from './hooks/use-reminders'
 
 // Actions
 export { getClients } from './actions/get-clients'
@@ -55,6 +62,11 @@ export { updateClientNote } from './actions/update-client-note'
 export { deleteClientNote } from './actions/delete-client-note'
 export { togglePinClient } from './actions/toggle-pin-client'
 export { deferClient } from './actions/defer-client'
+export { getReminders } from './actions/get-reminders'
+export { createReminder } from './actions/create-reminder'
+export { updateReminder } from './actions/update-reminder'
+export { toggleReminderComplete } from './actions/toggle-reminder-complete'
+export { deleteReminder } from './actions/delete-reminder'
 
 // Utils
 export {
@@ -95,4 +107,10 @@ export type {
   UpdateClientNoteInput,
   DeferClientInput,
   ClientNoteDB,
+  Reminder,
+  ReminderFilter,
+  CreateReminderInput,
+  UpdateReminderInput,
+  ToggleReminderCompleteInput,
+  ReminderDB,
 } from './types/crm.types'
