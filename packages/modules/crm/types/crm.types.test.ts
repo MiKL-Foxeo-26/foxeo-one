@@ -195,3 +195,129 @@ describe('CRM Types', () => {
     expect(() => ClientFilters.parse({ status: ['lab-actif', 'one-actif'] })).not.toThrow()
   })
 })
+
+// ============================================================
+// Parcours Types (Story 2.4)
+// ============================================================
+
+describe('Parcours Types', () => {
+  const now = new Date().toISOString()
+
+  it('should validate ParcoursTypeEnum correctly', async () => {
+    const { ParcoursTypeEnum } = await import('./crm.types')
+
+    expect(ParcoursTypeEnum.parse('complet')).toBe('complet')
+    expect(ParcoursTypeEnum.parse('partiel')).toBe('partiel')
+    expect(ParcoursTypeEnum.parse('ponctuel')).toBe('ponctuel')
+    expect(() => ParcoursTypeEnum.parse('invalid')).toThrow()
+  })
+
+  it('should validate ParcoursStatusEnum correctly', async () => {
+    const { ParcoursStatusEnum } = await import('./crm.types')
+
+    expect(ParcoursStatusEnum.parse('en_cours')).toBe('en_cours')
+    expect(ParcoursStatusEnum.parse('suspendu')).toBe('suspendu')
+    expect(ParcoursStatusEnum.parse('termine')).toBe('termine')
+    expect(() => ParcoursStatusEnum.parse('invalid')).toThrow()
+  })
+
+  it('should validate ParcoursStage schema', async () => {
+    const { ParcoursStage } = await import('./crm.types')
+
+    const validStage = {
+      key: 'vision',
+      name: 'Vision',
+      description: 'Definir la vision business',
+      order: 1,
+    }
+
+    expect(ParcoursStage.parse(validStage)).toEqual(validStage)
+
+    // Invalid: empty key
+    expect(() => ParcoursStage.parse({ ...validStage, key: '' })).toThrow()
+    // Invalid: negative order
+    expect(() => ParcoursStage.parse({ ...validStage, order: -1 })).toThrow()
+  })
+
+  it('should validate ActiveStage schema', async () => {
+    const { ActiveStage } = await import('./crm.types')
+
+    expect(ActiveStage.parse({ key: 'vision', active: true, status: 'pending' })).toBeDefined()
+    expect(ActiveStage.parse({ key: 'offre', active: false, status: 'skipped' })).toBeDefined()
+    expect(() => ActiveStage.parse({ key: 'vision', active: true, status: 'invalid' })).toThrow()
+  })
+
+  it('should validate ParcoursTemplate schema', async () => {
+    const { ParcoursTemplate } = await import('./crm.types')
+
+    const validTemplate = {
+      id: testUuid1,
+      operatorId: testUuid2,
+      name: 'Parcours Complet',
+      description: 'Description du parcours',
+      parcoursType: 'complet',
+      stages: [
+        { key: 'vision', name: 'Vision', description: 'Definir la vision', order: 1 },
+        { key: 'offre', name: 'Offre', description: 'Structurer l offre', order: 2 },
+      ],
+      isActive: true,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    expect(ParcoursTemplate.parse(validTemplate)).toBeDefined()
+    expect(ParcoursTemplate.parse({ ...validTemplate, description: null })).toBeDefined()
+  })
+
+  it('should validate Parcours schema', async () => {
+    const { Parcours } = await import('./crm.types')
+
+    const validParcours = {
+      id: testUuid1,
+      clientId: testUuid2,
+      templateId: testUuid1,
+      operatorId: testUuid2,
+      activeStages: [
+        { key: 'vision', active: true, status: 'pending' },
+        { key: 'offre', active: false, status: 'skipped' },
+      ],
+      status: 'en_cours',
+      startedAt: now,
+      suspendedAt: null,
+      completedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    expect(Parcours.parse(validParcours)).toBeDefined()
+
+    // With suspended
+    expect(Parcours.parse({ ...validParcours, status: 'suspendu', suspendedAt: now })).toBeDefined()
+  })
+
+  it('should validate AssignParcoursInput schema', async () => {
+    const { AssignParcoursInput } = await import('./crm.types')
+
+    const validInput = {
+      clientId: testUuid1,
+      templateId: testUuid2,
+      activeStages: [
+        { key: 'vision', active: true },
+        { key: 'offre', active: false },
+      ],
+    }
+
+    expect(AssignParcoursInput.parse(validInput)).toBeDefined()
+
+    // Invalid: missing clientId
+    expect(() => AssignParcoursInput.parse({ templateId: testUuid2, activeStages: [] })).toThrow()
+  })
+
+  it('should validate ToggleAccessInput schema', async () => {
+    const { ToggleAccessInput } = await import('./crm.types')
+
+    expect(ToggleAccessInput.parse({ clientId: testUuid1, accessType: 'lab', enabled: true })).toBeDefined()
+    expect(ToggleAccessInput.parse({ clientId: testUuid1, accessType: 'one', enabled: false })).toBeDefined()
+    expect(() => ToggleAccessInput.parse({ clientId: testUuid1, accessType: 'invalid', enabled: true })).toThrow()
+  })
+})

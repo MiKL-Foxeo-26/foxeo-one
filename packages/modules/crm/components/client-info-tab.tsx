@@ -1,7 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Badge, Separator, Button, Skeleton } from '@foxeo/ui'
 import { useClient } from '../hooks/use-client'
+import { useClientParcours } from '../hooks/use-client-parcours'
+import { AssignParcoursDialog } from './assign-parcours-dialog'
+import { AccessToggles } from './access-toggles'
+import { ParcoursStatusBadge } from './parcours-status-badge'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
@@ -25,6 +30,8 @@ const statusLabels: Record<string, string> = {
 
 export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
   const { data: client, isPending, error } = useClient(clientId)
+  const { data: parcours } = useClientParcours(clientId)
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false)
 
   if (isPending) {
     return (
@@ -154,33 +161,59 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
         </CardContent>
       </Card>
 
-      {/* Parcours Lab */}
-      {client.config && client.config.parcoursConfig && Object.keys(client.config.parcoursConfig).length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Parcours Lab</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {(client.config.parcoursConfig as Record<string, unknown>).name && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-muted-foreground">Parcours</span>
-                  <span className="text-sm">{String((client.config.parcoursConfig as Record<string, unknown>).name)}</span>
-                </div>
-              )}
-              {(client.config.parcoursConfig as Record<string, unknown>).progression !== undefined && (
-                <>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted-foreground">Progression</span>
-                    <span className="text-sm">{String((client.config.parcoursConfig as Record<string, unknown>).progression)}%</span>
-                  </div>
-                </>
-              )}
+      {/* Parcours & Accès */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Parcours & Accès</CardTitle>
+          {!parcours && (
+            <Button variant="outline" size="sm" onClick={() => setAssignDialogOpen(true)}>
+              Assigner un parcours Lab
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {parcours ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Statut</span>
+                <ParcoursStatusBadge status={parcours.status} />
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Étapes actives</span>
+                <span className="text-sm">
+                  {parcours.activeStages.filter((s) => s.active).length} / {parcours.activeStages.length}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Démarré le</span>
+                <span className="text-sm">
+                  {format(new Date(parcours.startedAt), 'd MMMM yyyy', { locale: fr })}
+                </span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            <p className="text-sm text-muted-foreground">Aucun parcours Lab assigné.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Accès toggles */}
+      {client.config && (
+        <AccessToggles
+          clientId={clientId}
+          dashboardType={client.config.dashboardType}
+          hasActiveParcours={parcours?.status === 'en_cours'}
+        />
       )}
+
+      {/* Dialog assignation */}
+      <AssignParcoursDialog
+        clientId={clientId}
+        open={assignDialogOpen}
+        onOpenChange={setAssignDialogOpen}
+      />
 
       {/* Modules One */}
       {client.config && client.config.activeModules.length > 0 && (

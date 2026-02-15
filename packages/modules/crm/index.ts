@@ -16,6 +16,10 @@ export { ClientTimeline } from './components/client-timeline'
 export { ClientDocumentsTab } from './components/client-documents-tab'
 export { ClientExchangesTab } from './components/client-exchanges-tab'
 export { ClientDetailContent } from './components/client-detail-content'
+export { AssignParcoursDialog } from './components/assign-parcours-dialog'
+export { ParcoursStageList } from './components/parcours-stage-list'
+export { AccessToggles } from './components/access-toggles'
+export { ParcoursStatusBadge } from './components/parcours-status-badge'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -23,6 +27,8 @@ export { useClient } from './hooks/use-client'
 export { useClientActivityLogs } from './hooks/use-client-activity-logs'
 export { useClientDocuments } from './hooks/use-client-documents'
 export { useClientExchanges } from './hooks/use-client-exchanges'
+export { useParcourTemplates } from './hooks/use-parcours-templates'
+export { useClientParcours } from './hooks/use-client-parcours'
 
 // Actions
 export { getClients } from './actions/get-clients'
@@ -32,6 +38,11 @@ export { getClient } from './actions/get-client'
 export { getActivityLogs } from './actions/get-activity-logs'
 export { getClientDocuments } from './actions/get-client-documents'
 export { getClientExchanges } from './actions/get-client-exchanges'
+export { getParcoursTemplates } from './actions/get-parcours-templates'
+export { assignParcours } from './actions/assign-parcours'
+export { getClientParcours } from './actions/get-client-parcours'
+export { toggleAccess } from './actions/toggle-access'
+export { suspendParcours } from './actions/suspend-parcours'
 
 // Types
 export type {
@@ -48,4 +59,14 @@ export type {
   ClientConfig,
   ClientDocument,
   ClientExchange,
+  ParcoursTemplate,
+  Parcours,
+  ParcoursStage,
+  ParcoursType,
+  ParcoursStatus,
+  ActiveStage,
+  AssignParcoursInput,
+  ToggleAccessInput,
+  ParcoursTemplateDB,
+  ParcoursDB,
 } from './types/crm.types'

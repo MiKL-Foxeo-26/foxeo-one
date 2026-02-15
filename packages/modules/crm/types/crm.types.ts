@@ -134,3 +134,114 @@ export const ClientExchange = z.object({
 })
 
 export type ClientExchange = z.infer<typeof ClientExchange>
+
+// ============================================================
+// Parcours types (Story 2.4)
+// ============================================================
+
+// Enums
+export const ParcoursTypeEnum = z.enum(['complet', 'partiel', 'ponctuel'])
+export type ParcoursType = z.infer<typeof ParcoursTypeEnum>
+
+export const ParcoursStatusEnum = z.enum(['en_cours', 'suspendu', 'termine'])
+export type ParcoursStatus = z.infer<typeof ParcoursStatusEnum>
+
+export const StageStatusEnum = z.enum(['pending', 'in_progress', 'completed', 'skipped'])
+
+// Stage definition (in parcours_templates.stages)
+export const ParcoursStage = z.object({
+  key: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string(),
+  order: z.number().int().positive(),
+})
+
+export type ParcoursStage = z.infer<typeof ParcoursStage>
+
+// Active stage (in parcours.active_stages)
+export const ActiveStage = z.object({
+  key: z.string().min(1),
+  active: z.boolean(),
+  status: StageStatusEnum,
+})
+
+export type ActiveStage = z.infer<typeof ActiveStage>
+
+// ParcoursTemplate schema
+export const ParcoursTemplate = z.object({
+  id: z.string().uuid(),
+  operatorId: z.string().uuid(),
+  name: z.string().min(1),
+  description: z.string().nullable(),
+  parcoursType: ParcoursTypeEnum,
+  stages: z.array(ParcoursStage),
+  isActive: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+
+export type ParcoursTemplate = z.infer<typeof ParcoursTemplate>
+
+// Parcours schema
+export const Parcours = z.object({
+  id: z.string().uuid(),
+  clientId: z.string().uuid(),
+  templateId: z.string().uuid().nullable(),
+  operatorId: z.string().uuid(),
+  activeStages: z.array(ActiveStage),
+  status: ParcoursStatusEnum,
+  startedAt: z.string().datetime(),
+  suspendedAt: z.string().datetime().nullable(),
+  completedAt: z.string().datetime().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+
+export type Parcours = z.infer<typeof Parcours>
+
+// Input schemas
+export const AssignParcoursInput = z.object({
+  clientId: z.string().uuid(),
+  templateId: z.string().uuid(),
+  activeStages: z.array(z.object({
+    key: z.string().min(1),
+    active: z.boolean(),
+  })),
+})
+
+export type AssignParcoursInput = z.infer<typeof AssignParcoursInput>
+
+export const ToggleAccessInput = z.object({
+  clientId: z.string().uuid(),
+  accessType: z.enum(['lab', 'one']),
+  enabled: z.boolean(),
+})
+
+export type ToggleAccessInput = z.infer<typeof ToggleAccessInput>
+
+// DB types (snake_case)
+export type ParcoursTemplateDB = {
+  id: string
+  operator_id: string
+  name: string
+  description: string | null
+  parcours_type: 'complet' | 'partiel' | 'ponctuel'
+  stages: ParcoursStage[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type ParcoursDB = {
+  id: string
+  client_id: string
+  template_id: string | null
+  operator_id: string
+  active_stages: ActiveStage[]
+  status: 'en_cours' | 'suspendu' | 'termine'
+  started_at: string
+  suspended_at: string | null
+  completed_at: string | null
+  created_at: string
+  updated_at: string
+}

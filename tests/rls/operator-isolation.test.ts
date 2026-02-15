@@ -170,6 +170,76 @@ describe.skipIf(!isSupabaseAvailable)('RLS: Operator-to-Operator Isolation', () 
     })
   })
 
+  // --- TABLE: parcours_templates ---
+
+  describe('parcours_templates table', () => {
+    it('operator A sees only their own templates', async () => {
+      const { data, error } = await operatorASupabase
+        .from('parcours_templates')
+        .select('*')
+
+      expect(error).toBeNull()
+      const templateIds = data!.map((t: { id: string }) => t.id)
+      expect(templateIds).toContain(TEST_IDS.parcoursTemplateA)
+      expect(templateIds).not.toContain(TEST_IDS.parcoursTemplateB)
+    })
+
+    it('operator A cannot read template of operator B', async () => {
+      const { data, error } = await operatorASupabase
+        .from('parcours_templates')
+        .select('*')
+        .eq('id', TEST_IDS.parcoursTemplateB)
+
+      expect(error).toBeNull()
+      expect(data).toEqual([])
+    })
+  })
+
+  // --- TABLE: parcours ---
+
+  describe('parcours table', () => {
+    it('operator A sees only parcours of their own clients', async () => {
+      const { data, error } = await operatorASupabase
+        .from('parcours')
+        .select('*')
+
+      expect(error).toBeNull()
+      const parcoursIds = data!.map((p: { id: string }) => p.id)
+      expect(parcoursIds).toContain(TEST_IDS.parcoursA)
+      expect(parcoursIds).not.toContain(TEST_IDS.parcoursB)
+    })
+
+    it('operator A cannot read parcours of client B', async () => {
+      const { data, error } = await operatorASupabase
+        .from('parcours')
+        .select('*')
+        .eq('id', TEST_IDS.parcoursB)
+
+      expect(error).toBeNull()
+      expect(data).toEqual([])
+    })
+
+    it('operator A cannot insert parcours for client B', async () => {
+      const { data, error } = await operatorASupabase
+        .from('parcours')
+        .insert({
+          client_id: TEST_IDS.clientB,
+          template_id: TEST_IDS.parcoursTemplateA,
+          operator_id: TEST_IDS.operatorA,
+          active_stages: [{ key: 'vision', active: true, status: 'pending' }],
+          status: 'en_cours',
+        })
+        .select()
+
+      // RLS should block this — either error or empty result
+      if (error) {
+        expect(error).toBeTruthy()
+      } else {
+        expect(data).toEqual([])
+      }
+    })
+  })
+
   // --- TABLE: consents ---
 
   describe('consents table', () => {

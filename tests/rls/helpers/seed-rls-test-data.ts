@@ -17,6 +17,10 @@ export const TEST_IDS = {
   operatorB: '10000000-0000-0000-0000-000000000002',
   clientA: '20000000-0000-0000-0000-000000000001',
   clientB: '20000000-0000-0000-0000-000000000002',
+  parcoursTemplateA: '30000000-0000-0000-0000-000000000001',
+  parcoursTemplateB: '30000000-0000-0000-0000-000000000002',
+  parcoursA: '40000000-0000-0000-0000-000000000001',
+  parcoursB: '40000000-0000-0000-0000-000000000002',
 } as const
 
 export const TEST_EMAILS = {
@@ -126,6 +130,48 @@ export async function seedRlsTestData(): Promise<TestAuthUsers> {
     },
   ])
 
+  // 6. Insert parcours_templates (one per operator)
+  await adminClient.from('parcours_templates').upsert([
+    {
+      id: TEST_IDS.parcoursTemplateA,
+      operator_id: TEST_IDS.operatorA,
+      name: 'RLS Test Template A',
+      description: 'Template for operator A',
+      parcours_type: 'complet',
+      stages: [{ key: 'vision', name: 'Vision', description: 'Step 1', order: 1 }],
+      is_active: true,
+    },
+    {
+      id: TEST_IDS.parcoursTemplateB,
+      operator_id: TEST_IDS.operatorB,
+      name: 'RLS Test Template B',
+      description: 'Template for operator B',
+      parcours_type: 'complet',
+      stages: [{ key: 'vision', name: 'Vision', description: 'Step 1', order: 1 }],
+      is_active: true,
+    },
+  ], { onConflict: 'id' })
+
+  // 7. Insert parcours (one per client)
+  await adminClient.from('parcours').upsert([
+    {
+      id: TEST_IDS.parcoursA,
+      client_id: TEST_IDS.clientA,
+      template_id: TEST_IDS.parcoursTemplateA,
+      operator_id: TEST_IDS.operatorA,
+      active_stages: [{ key: 'vision', active: true, status: 'pending' }],
+      status: 'en_cours',
+    },
+    {
+      id: TEST_IDS.parcoursB,
+      client_id: TEST_IDS.clientB,
+      template_id: TEST_IDS.parcoursTemplateB,
+      operator_id: TEST_IDS.operatorB,
+      active_stages: [{ key: 'vision', active: true, status: 'pending' }],
+      status: 'en_cours',
+    },
+  ], { onConflict: 'id' })
+
   return {
     clientAUserId: clientAAuth,
     clientBUserId: clientBAuth,
@@ -186,6 +232,8 @@ export async function cleanupRlsTestData(): Promise<void> {
   })
 
   // Delete in reverse dependency order
+  await adminClient.from('parcours').delete().in('id', [TEST_IDS.parcoursA, TEST_IDS.parcoursB])
+  await adminClient.from('parcours_templates').delete().in('id', [TEST_IDS.parcoursTemplateA, TEST_IDS.parcoursTemplateB])
   await adminClient.from('consents').delete().in('client_id', [TEST_IDS.clientA, TEST_IDS.clientB])
   await adminClient.from('client_configs').delete().in('client_id', [TEST_IDS.clientA, TEST_IDS.clientB])
   await adminClient.from('clients').delete().in('id', [TEST_IDS.clientA, TEST_IDS.clientB])

@@ -57,6 +57,23 @@ R: L'onglet actif est automatiquement reflété dans l'URL (ex: `?tab=historique
 **Q: Pourquoi certains onglets affichent "Aucun document" ou "Aucun échange" ?**
 R: Les onglets Documents et Échanges afficheront du contenu une fois que les modules correspondants (Documents et Chat) seront activés et que des données auront été créées pour ce client.
 
+### Parcours et accès
+
+**Q: Comment assigner un parcours Lab à un client ?**
+R: Ouvrez la fiche du client, onglet Informations. Dans la section "Parcours & Accès", cliquez sur "Assigner un parcours Lab". Sélectionnez un template et configurez les étapes actives.
+
+**Q: Que se passe-t-il si je désactive l'accès Lab d'un client en parcours ?**
+R: Le parcours est suspendu (pas supprimé). L'état courant est préservé. Si vous réactivez l'accès Lab, le parcours reprend exactement là où il en était.
+
+**Q: Puis-je modifier les étapes d'un parcours après l'assignation ?**
+R: Dans cette version, les étapes sont configurées lors de l'assignation. La modification post-assignation sera disponible dans une future story.
+
+**Q: Pourquoi je ne vois pas de templates de parcours ?**
+R: Les templates sont créés par l'opérateur. Un template "Parcours Complet" est disponible par défaut. Le CRUD complet des templates sera disponible via le module Templates (Epic 12).
+
+**Q: Quel est l'effet de la désactivation de l'accès One ?**
+R: Le client perd l'accès à son dashboard One. Le dashboard_type est modifié en conséquence. L'action est tracée dans les logs d'activité.
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

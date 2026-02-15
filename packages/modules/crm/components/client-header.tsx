@@ -53,11 +53,13 @@ export function ClientHeader({ client, onEdit }: ClientHeaderProps) {
           </p>
         </div>
 
-        {onEdit && (
-          <Button onClick={onEdit} variant="outline">
-            Modifier
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {onEdit && (
+            <Button onClick={onEdit} variant="outline">
+              Modifier
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

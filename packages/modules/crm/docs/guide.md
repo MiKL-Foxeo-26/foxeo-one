@@ -88,7 +88,32 @@ La fiche client offre une vue 360° avec 4 onglets :
 **Partage de lien**
 L'onglet actif est synchronisé avec l'URL (`?tab=historique`). Vous pouvez partager un lien direct vers un onglet spécifique.
 
+### Assigner un parcours Lab
+
+1. Accédez à la fiche d'un client (onglet Informations)
+2. Dans la section **"Parcours & Accès"**, cliquez sur **"Assigner un parcours Lab"**
+3. Sélectionnez un template de parcours (ex: "Parcours Complet")
+4. Activez/désactivez les étapes individuelles selon les besoins du client
+5. Cliquez sur **"Assigner"**
+6. Le dashboard du client passe automatiquement en mode **Lab**
+
+### Gérer les accès Lab/One
+
+Dans la section **"Accès dashboards"** de la fiche client :
+- **Accès Lab** : Active/désactive le dashboard d'incubation. Si désactivé avec un parcours en cours, celui-ci est suspendu (pas supprimé). À la réactivation, le parcours reprend.
+- **Accès One** : Active/désactive le dashboard business.
+- La désactivation déclenche un dialog de confirmation.
+
+### Statuts parcours
+
+| Statut | Description |
+|--------|-------------|
+| En cours | Parcours actif, le client progresse |
+| Suspendu | Parcours mis en pause (accès Lab désactivé) |
+| Terminé | Toutes les étapes sont complétées |
+
 ## Prochaines fonctionnalités
 
+- Assignation/modification curseur client (Story 2.5)
 - Notes privées et rappels (Stories 2.6-2.7)
 - Statistiques temps passé par client (Story 2.8)

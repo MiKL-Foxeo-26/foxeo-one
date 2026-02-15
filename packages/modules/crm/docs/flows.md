@@ -175,6 +175,62 @@ flowchart LR
     UpdateURL --> URL
 ```
 
+## Flux : Assignation parcours Lab
+
+```mermaid
+flowchart TD
+    Start([MiKL clique "Assigner un parcours Lab"]) --> OpenDialog[Ouvrir AssignParcoursDialog]
+    OpenDialog --> LoadTemplates[useParcoursTemplates]
+
+    LoadTemplates --> CheckTemplates{Templates disponibles ?}
+    CheckTemplates -->|Non| EmptyState[Afficher état vide + mention Epic 12]
+    CheckTemplates -->|Oui| ShowTemplates[Lister templates]
+
+    ShowTemplates --> SelectTemplate[MiKL sélectionne un template]
+    SelectTemplate --> ShowStages[Afficher étapes avec toggles]
+    ShowStages --> ConfigStages[MiKL active/désactive étapes]
+    ConfigStages --> ClickAssign[Cliquer "Assigner"]
+
+    ClickAssign --> ServerAction[Server Action assignParcours]
+    ServerAction --> InsertParcours[INSERT parcours]
+    InsertParcours --> UpdateConfig[UPDATE client_configs dashboard_type=lab]
+    UpdateConfig --> LogActivity[INSERT activity_logs]
+    LogActivity --> InvalidateCache[Invalider caches TanStack Query]
+    InvalidateCache --> Toast[Toast "Parcours Lab assigné avec succès"]
+    Toast --> CloseDialog[Fermer dialog]
+    CloseDialog --> End([Fin])
+```
+
+## Flux : Toggle accès Lab/One
+
+```mermaid
+flowchart TD
+    Start([MiKL toggle accès Lab ou One]) --> CheckDisable{Désactivation ?}
+
+    CheckDisable -->|Non - activation| ExecuteToggle[Server Action toggleAccess]
+    CheckDisable -->|Oui| ShowConfirm[Dialog confirmation]
+
+    ShowConfirm --> UserDecision{MiKL confirme ?}
+    UserDecision -->|Non| Cancel[Fermer dialog]
+    UserDecision -->|Oui| ExecuteToggle
+
+    ExecuteToggle --> UpdateDashboardType[UPDATE client_configs.dashboard_type]
+    UpdateDashboardType --> CheckLabOff{Lab désactivé + parcours en cours ?}
+
+    CheckLabOff -->|Oui| SuspendParcours[UPDATE parcours status=suspendu]
+    CheckLabOff -->|Non| CheckLabOn{Lab activé + parcours suspendu ?}
+
+    CheckLabOn -->|Oui| ReactivateParcours[UPDATE parcours status=en_cours]
+    CheckLabOn -->|Non| LogActivity
+
+    SuspendParcours --> LogActivity[INSERT activity_logs]
+    ReactivateParcours --> LogActivity
+
+    LogActivity --> InvalidateCache[Invalider caches TanStack Query]
+    InvalidateCache --> Toast[Toast confirmation]
+    Toast --> End([Fin])
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives
