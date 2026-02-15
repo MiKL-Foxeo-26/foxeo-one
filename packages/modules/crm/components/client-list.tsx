@@ -3,6 +3,7 @@
 import { DataTable, type ColumnDef } from '@foxeo/ui'
 import { Badge } from '@foxeo/ui'
 import { CreateClientDialog } from './create-client-dialog'
+import { PinButton } from './pin-button'
 import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
 
 interface ClientListProps {
@@ -36,12 +37,34 @@ const formatDate = (isoDate: string): string => {
   })
 }
 
+// Check if a client is currently deferred
+const isDeferred = (client: ClientListItem): boolean =>
+  !!client.deferredUntil && new Date(client.deferredUntil) > new Date()
+
 export function ClientList({ clients, onRowClick, showCreateButton = true }: ClientListProps) {
   const columns: ColumnDef<ClientListItem>[] = [
+    {
+      id: 'pin',
+      header: '',
+      accessorKey: 'isPinned',
+      cell: (client) => (
+        <PinButton clientId={client.id} isPinned={client.isPinned ?? false} />
+      ),
+    },
     {
       id: 'name',
       header: 'Nom',
       accessorKey: 'name',
+      cell: (client) => (
+        <div className="flex items-center gap-2">
+          <span>{client.name}</span>
+          {isDeferred(client) && (
+            <Badge variant="outline" className="text-xs" data-testid={`deferred-badge-${client.id}`}>
+              Reporté
+            </Badge>
+          )}
+        </div>
+      ),
       sortable: true,
     },
     {

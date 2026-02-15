@@ -7,6 +7,7 @@ import { useClientParcours } from '../hooks/use-client-parcours'
 import { AssignParcoursDialog } from './assign-parcours-dialog'
 import { AccessToggles } from './access-toggles'
 import { ParcoursStatusBadge } from './parcours-status-badge'
+import { ClientNotesSection } from './client-notes-section'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
@@ -231,17 +232,8 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
         </Card>
       )}
 
-      {/* Notes */}
-      {client.notes && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Notes internes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{client.notes}</p>
-          </CardContent>
-        </Card>
-      )}
+      {/* Notes privées (Story 2.6) */}
+      <ClientNotesSection clientId={clientId} />
     </div>
   )
 }

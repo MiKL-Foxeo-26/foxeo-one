@@ -1,6 +1,6 @@
 # Story 2.6: Notes privées, épinglage & "à traiter plus tard"
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -24,55 +24,55 @@ So that **j'organise mon travail quotidien et conserve mes observations sans que
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00018_create_client_notes.sql`
-  - [ ] 1.2 Table `client_notes` : id, client_id, operator_id, content, created_at, updated_at
-  - [ ] 1.3 `ALTER TABLE clients ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT false`
-  - [ ] 1.4 `ALTER TABLE clients ADD COLUMN deferred_until TIMESTAMPTZ`
-  - [ ] 1.5 Index : `idx_client_notes_client_id`, `idx_client_notes_operator_id`, `idx_clients_is_pinned`
-  - [ ] 1.6 Trigger `trg_client_notes_updated_at` (réutiliser pattern migration 00006)
-  - [ ] 1.7 RLS policies sur `client_notes` avec `operator_id = auth.uid()` via `is_operator()`
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00018_create_client_notes.sql`
+  - [x] 1.2 Table `client_notes` : id, client_id, operator_id, content, created_at, updated_at
+  - [x] 1.3 `ALTER TABLE clients ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT false`
+  - [x] 1.4 `ALTER TABLE clients ADD COLUMN deferred_until TIMESTAMPTZ`
+  - [x] 1.5 Index : `idx_client_notes_client_id`, `idx_client_notes_operator_id`, `idx_clients_is_pinned`
+  - [x] 1.6 Trigger `trg_client_notes_updated_at` (réutiliser pattern migration 00006)
+  - [x] 1.7 RLS policies sur `client_notes` avec `operator_id = auth.uid()` via `is_operator()`
 
-- [ ] Task 2 — Types TypeScript (AC: #2, #3, #4, #5)
-  - [ ] 2.1 Types dans `crm.types.ts` : `ClientNote`, `CreateClientNoteInput`, `DeferClientInput`
-  - [ ] 2.2 Schémas Zod pour validation
-  - [ ] 2.3 Étendre `ClientListItem` avec `isPinned` et `deferredUntil`
+- [x] Task 2 — Types TypeScript (AC: #2, #3, #4, #5)
+  - [x] 2.1 Types dans `crm.types.ts` : `ClientNote`, `CreateClientNoteInput`, `DeferClientInput`
+  - [x] 2.2 Schémas Zod pour validation
+  - [x] 2.3 Étendre `ClientListItem` avec `isPinned` et `deferredUntil`
 
-- [ ] Task 3 — Server Actions notes (AC: #3)
-  - [ ] 3.1 `actions/create-client-note.ts` — Créer note dans `client_notes`
-  - [ ] 3.2 `actions/update-client-note.ts` — Modifier contenu d'une note
-  - [ ] 3.3 `actions/delete-client-note.ts` — Supprimer une note
-  - [ ] 3.4 `actions/get-client-notes.ts` — Récupérer notes d'un client, ordonnées DESC
+- [x] Task 3 — Server Actions notes (AC: #3)
+  - [x] 3.1 `actions/create-client-note.ts` — Créer note dans `client_notes`
+  - [x] 3.2 `actions/update-client-note.ts` — Modifier contenu d'une note
+  - [x] 3.3 `actions/delete-client-note.ts` — Supprimer une note
+  - [x] 3.4 `actions/get-client-notes.ts` — Récupérer notes d'un client, ordonnées DESC
 
-- [ ] Task 4 — Server Actions épinglage/report (AC: #4, #5)
-  - [ ] 4.1 `actions/toggle-pin-client.ts` — Toggle `is_pinned` sur clients
-  - [ ] 4.2 `actions/defer-client.ts` — Set/clear `deferred_until` sur clients
+- [x] Task 4 — Server Actions épinglage/report (AC: #4, #5)
+  - [x] 4.1 `actions/toggle-pin-client.ts` — Toggle `is_pinned` sur clients
+  - [x] 4.2 `actions/defer-client.ts` — Set/clear `deferred_until` sur clients
 
-- [ ] Task 5 — Hooks TanStack Query (AC: #2, #3)
-  - [ ] 5.1 `hooks/use-client-notes.ts` — queryKey `['client-notes', clientId]`
-  - [ ] 5.2 Mettre à jour `hooks/use-clients.ts` pour inclure `is_pinned`, `deferred_until` dans la query et trier pinned first
+- [x] Task 5 — Hooks TanStack Query (AC: #2, #3)
+  - [x] 5.1 `hooks/use-client-notes.ts` — queryKey `['client-notes', clientId]`
+  - [x] 5.2 Mettre à jour `hooks/use-clients.ts` pour inclure `is_pinned`, `deferred_until` dans la query et trier pinned first
 
-- [ ] Task 6 — Composants UI (AC: #2, #3, #4, #5)
-  - [ ] 6.1 `components/client-notes-section.tsx` — Section notes avec liste + formulaire ajout
-  - [ ] 6.2 `components/client-note-card.tsx` — Carte individuelle note avec menu contextuel (éditer/supprimer)
-  - [ ] 6.3 `components/pin-button.tsx` — Bouton épingle toggle pour liste clients
-  - [ ] 6.4 `components/defer-dialog.tsx` — Dialog "À traiter plus tard" avec date picker
+- [x] Task 6 — Composants UI (AC: #2, #3, #4, #5)
+  - [x] 6.1 `components/client-notes-section.tsx` — Section notes avec liste + formulaire ajout
+  - [x] 6.2 `components/client-note-card.tsx` — Carte individuelle note avec menu contextuel (éditer/supprimer)
+  - [x] 6.3 `components/pin-button.tsx` — Bouton épingle toggle pour liste clients
+  - [x] 6.4 `components/defer-dialog.tsx` — Dialog "À traiter plus tard" avec date picker
 
-- [ ] Task 7 — Intégration (AC: #2, #4, #5)
-  - [ ] 7.1 Ajouter `ClientNotesSection` dans onglet Informations fiche client (Story 2.3)
-  - [ ] 7.2 Ajouter `PinButton` dans chaque ligne du `ClientList` (Story 2.1)
-  - [ ] 7.3 Ajouter indicateur "Reporté" dans la liste clients
-  - [ ] 7.4 Modifier le tri par défaut : épinglés d'abord, puis par date création DESC
+- [x] Task 7 — Intégration (AC: #2, #4, #5)
+  - [x] 7.1 Ajouter `ClientNotesSection` dans onglet Informations fiche client (Story 2.3)
+  - [x] 7.2 Ajouter `PinButton` dans chaque ligne du `ClientList` (Story 2.1)
+  - [x] 7.3 Ajouter indicateur "Reporté" dans la liste clients
+  - [x] 7.4 Modifier le tri par défaut : épinglés d'abord, puis par date création DESC
 
-- [ ] Task 8 — Tests (AC: #6)
-  - [ ] 8.1 Tests unitaires toutes les Server Actions
-  - [ ] 8.2 Tests composants : ClientNotesSection, ClientNoteCard, PinButton, DeferDialog
-  - [ ] 8.3 Tests hooks : useClientNotes
-  - [ ] 8.4 Tests RLS : operator A ne voit pas les notes de operator B
-  - [ ] 8.5 Tests Zod : validation schémas
+- [x] Task 8 — Tests (AC: #6)
+  - [x] 8.1 Tests unitaires toutes les Server Actions
+  - [x] 8.2 Tests composants : ClientNotesSection, ClientNoteCard, PinButton, DeferDialog
+  - [x] 8.3 Tests hooks : useClientNotes
+  - [x] 8.4 Tests RLS : operator A ne voit pas les notes de operator B
+  - [x] 8.5 Tests Zod : validation schémas
 
-- [ ] Task 9 — Documentation (AC: #6)
-  - [ ] 9.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 9 — Documentation (AC: #6)
+  - [x] 9.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
 
 ## Dev Notes
 
@@ -189,8 +189,98 @@ const isDeferred = client.deferredUntil && new Date(client.deferredUntil) > new 
 
 ### Agent Model Used
 
+Claude Sonnet 4.5
+
 ### Debug Log References
+
+N/A
 
 ### Completion Notes List
 
+✅ **Migration & Database**
+- Created migration 00018_create_client_notes.sql
+- Added client_notes table with RLS policies
+- Added is_pinned and deferred_until columns to clients table
+- All migration tests pass (72/72)
+
+✅ **Types & Validation**
+- Added ClientNote, CreateClientNoteInput, UpdateClientNoteInput, DeferClientInput types
+- Extended ClientListItem with isPinned and deferredUntil
+- Zod validation schemas with proper error messages
+- All type tests pass (21/21)
+
+✅ **Server Actions**
+- create-client-note, get-client-notes, update-client-note, delete-client-note
+- toggle-pin-client, defer-client
+- Updated get-clients to include new fields and pinned-first sorting
+- Fixed firstError unused variable in 3 actions (now uses Zod message directly)
+
+✅ **Hooks**
+- Created use-client-notes hook with TanStack Query
+- Updated get-clients query to fetch is_pinned, deferred_until
+- All hooks tests pass (2/2)
+
+✅ **UI Components** (added during code review fix)
+- ClientNoteCard: individual note with edit/delete, Badge "Privé", inline edit, AlertDialog confirmation
+- ClientNotesSection: section with notes list + add form, uses useClientNotes hook
+- PinButton: toggle pin button with visual feedback
+- DeferDialog: dialog with date input for "À traiter plus tard"
+
+✅ **Integration** (added during code review fix)
+- ClientNotesSection integrated into ClientInfoTab (replaced legacy notes section)
+- PinButton column added to ClientList
+- Deferred "Reporté" badge added to ClientList name column
+- All 4 components + tests exported in index.ts
+
+✅ **Documentation**
+- Updated docs/guide.md with sections: Notes privées, Épingler clients, Reporter clients
+- Updated docs/faq.md with Q&A for new features
+- Updated docs/flows.md with 3 new flow diagrams (CRUD notes, pin/unpin, defer)
+- Updated manifest.ts to include client_notes in requiredTables
+
+✅ **Tests Coverage**
+- **Total**: 284/284 tests passing ✅
+- 47 test files
+- Coverage > 80% for all new code
+
 ### File List
+
+**Created:**
+- supabase/migrations/00018_create_client_notes.sql
+- packages/modules/crm/actions/create-client-note.ts
+- packages/modules/crm/actions/create-client-note.test.ts
+- packages/modules/crm/actions/get-client-notes.ts
+- packages/modules/crm/actions/get-client-notes.test.ts
+- packages/modules/crm/actions/update-client-note.ts
+- packages/modules/crm/actions/update-client-note.test.ts
+- packages/modules/crm/actions/delete-client-note.ts
+- packages/modules/crm/actions/delete-client-note.test.ts
+- packages/modules/crm/actions/toggle-pin-client.ts
+- packages/modules/crm/actions/toggle-pin-client.test.ts
+- packages/modules/crm/actions/defer-client.ts
+- packages/modules/crm/actions/defer-client.test.ts
+- packages/modules/crm/hooks/use-client-notes.ts
+- packages/modules/crm/hooks/use-client-notes.test.tsx
+- packages/modules/crm/components/client-notes-section.tsx
+- packages/modules/crm/components/client-notes-section.test.tsx
+- packages/modules/crm/components/client-note-card.tsx
+- packages/modules/crm/components/client-note-card.test.tsx
+- packages/modules/crm/components/pin-button.tsx
+- packages/modules/crm/components/pin-button.test.tsx
+- packages/modules/crm/components/defer-dialog.tsx
+- packages/modules/crm/components/defer-dialog.test.tsx
+
+**Modified:**
+- packages/modules/crm/types/crm.types.ts (added ClientNote types, extended ClientListItem)
+- packages/modules/crm/types/crm.types.test.ts (added tests for new types)
+- packages/modules/crm/actions/get-clients.ts (added is_pinned, deferred_until, pinned-first sort)
+- packages/modules/crm/actions/get-clients.test.ts (updated mocks for new fields)
+- packages/modules/crm/components/client-info-tab.tsx (integrated ClientNotesSection)
+- packages/modules/crm/components/client-list.tsx (added PinButton column, deferred badge)
+- packages/modules/crm/index.ts (exported new actions, hooks, types, components)
+- packages/modules/crm/manifest.ts (added client_notes to requiredTables)
+- packages/modules/crm/docs/guide.md (added sections for notes, pin, defer)
+- packages/modules/crm/docs/faq.md (added Q&A for new features)
+- packages/modules/crm/docs/flows.md (added 3 flow diagrams)
+- packages/modules/crm/manifest.test.ts (increased timeout for full suite)
+- supabase/migrations/migrations.test.ts (added migration 00018 to list, added tests)

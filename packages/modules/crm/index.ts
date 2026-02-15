@@ -21,6 +21,10 @@ export { ParcoursStageList } from './components/parcours-stage-list'
 export { AccessToggles } from './components/access-toggles'
 export { ParcoursStatusBadge } from './components/parcours-status-badge'
 export { CursorButton } from './components/cursor-button'
+export { ClientNotesSection } from './components/client-notes-section'
+export { ClientNoteCard } from './components/client-note-card'
+export { PinButton } from './components/pin-button'
+export { DeferDialog } from './components/defer-dialog'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -30,6 +34,7 @@ export { useClientDocuments } from './hooks/use-client-documents'
 export { useClientExchanges } from './hooks/use-client-exchanges'
 export { useParcourTemplates } from './hooks/use-parcours-templates'
 export { useClientParcours } from './hooks/use-client-parcours'
+export { useClientNotes } from './hooks/use-client-notes'
 
 // Actions
 export { getClients } from './actions/get-clients'
@@ -44,6 +49,12 @@ export { assignParcours } from './actions/assign-parcours'
 export { getClientParcours } from './actions/get-client-parcours'
 export { toggleAccess } from './actions/toggle-access'
 export { suspendParcours } from './actions/suspend-parcours'
+export { createClientNote } from './actions/create-client-note'
+export { getClientNotes } from './actions/get-client-notes'
+export { updateClientNote } from './actions/update-client-note'
+export { deleteClientNote } from './actions/delete-client-note'
+export { togglePinClient } from './actions/toggle-pin-client'
+export { deferClient } from './actions/defer-client'
 
 // Utils
 export {
@@ -79,4 +90,9 @@ export type {
   ToggleAccessInput,
   ParcoursTemplateDB,
   ParcoursDB,
+  ClientNote,
+  CreateClientNoteInput,
+  UpdateClientNoteInput,
+  DeferClientInput,
+  ClientNoteDB,
 } from './types/crm.types'

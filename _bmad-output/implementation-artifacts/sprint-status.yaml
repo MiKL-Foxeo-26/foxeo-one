@@ -58,8 +58,8 @@ development_status:
   2-2-creation-edition-de-fiche-client: done
   2-3-fiche-client-complete-vue-detaillee-multi-onglets: done
   2-4-assignation-parcours-lab-gestion-des-acces: review
-  2-5-integration-cursor-ouverture-dossier-bmad-client: in-progress
-  2-6-notes-privees-epinglage-a-traiter-plus-tard: ready-for-dev
+  2-5-integration-cursor-ouverture-dossier-bmad-client: review
+  2-6-notes-privees-epinglage-a-traiter-plus-tard: review
   2-7-rappels-personnels-calendrier-deadlines: ready-for-dev
   2-8-statistiques-globales-temps-passe-par-client: ready-for-dev
   2-9a-suspendre-reactiver-un-client: ready-for-dev

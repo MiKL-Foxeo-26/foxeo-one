@@ -321,3 +321,134 @@ describe('Parcours Types', () => {
     expect(() => ToggleAccessInput.parse({ clientId: testUuid1, accessType: 'invalid', enabled: true })).toThrow()
   })
 })
+
+// ============================================================
+// Client Notes Types (Story 2.6)
+// ============================================================
+
+describe('Client Notes Types', () => {
+  const now = new Date().toISOString()
+
+  it('should validate ClientNote schema', async () => {
+    const { ClientNote } = await import('./crm.types')
+
+    const validNote = {
+      id: testUuid1,
+      clientId: testUuid2,
+      operatorId: testUuid1,
+      content: 'Note importante sur ce client',
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    expect(ClientNote.parse(validNote)).toEqual(validNote)
+
+    // Invalid: empty content
+    expect(() => ClientNote.parse({ ...validNote, content: '' })).toThrow(/requis/)
+
+    // Invalid: invalid UUID
+    expect(() => ClientNote.parse({ ...validNote, id: 'not-a-uuid' })).toThrow()
+  })
+
+  it('should validate CreateClientNoteInput schema', async () => {
+    const { CreateClientNoteInput } = await import('./crm.types')
+
+    const validInput = {
+      clientId: testUuid1,
+      content: 'Nouvelle note privée',
+    }
+
+    expect(CreateClientNoteInput.parse(validInput)).toEqual(validInput)
+
+    // Invalid: empty content
+    expect(() => CreateClientNoteInput.parse({ ...validInput, content: '' })).toThrow(/requis/)
+
+    // Invalid: content too long
+    const longContent = 'a'.repeat(5001)
+    expect(() => CreateClientNoteInput.parse({ ...validInput, content: longContent })).toThrow(/5000/)
+
+    // Valid: exactly 5000 characters
+    const exactContent = 'a'.repeat(5000)
+    expect(() => CreateClientNoteInput.parse({ ...validInput, content: exactContent })).not.toThrow()
+  })
+
+  it('should validate UpdateClientNoteInput schema', async () => {
+    const { UpdateClientNoteInput } = await import('./crm.types')
+
+    const validInput = {
+      noteId: testUuid1,
+      content: 'Contenu mis à jour',
+    }
+
+    expect(UpdateClientNoteInput.parse(validInput)).toEqual(validInput)
+
+    // Invalid: empty content
+    expect(() => UpdateClientNoteInput.parse({ ...validInput, content: '' })).toThrow(/requis/)
+
+    // Invalid: content too long
+    const longContent = 'a'.repeat(5001)
+    expect(() => UpdateClientNoteInput.parse({ ...validInput, content: longContent })).toThrow(/5000/)
+  })
+
+  it('should validate DeferClientInput schema', async () => {
+    const { DeferClientInput } = await import('./crm.types')
+
+    // Valid: with date
+    const validInput = {
+      clientId: testUuid1,
+      deferredUntil: '2026-02-20T10:00:00Z',
+    }
+
+    expect(DeferClientInput.parse(validInput)).toEqual(validInput)
+
+    // Valid: clearing defer with null
+    const clearInput = {
+      clientId: testUuid1,
+      deferredUntil: null,
+    }
+
+    expect(DeferClientInput.parse(clearInput)).toEqual(clearInput)
+
+    // Invalid: bad date format
+    expect(() => DeferClientInput.parse({ clientId: testUuid1, deferredUntil: '2026-02-20' })).toThrow()
+  })
+
+  it('should validate ClientListItem with isPinned and deferredUntil', async () => {
+    const { ClientListItem } = await import('./crm.types')
+
+    // Valid: with both isPinned and deferredUntil
+    const pinnedClient = {
+      id: testUuid1,
+      name: 'Test Client',
+      company: 'Test Company',
+      clientType: 'complet' as const,
+      status: 'lab-actif' as const,
+      createdAt: now,
+      isPinned: true,
+      deferredUntil: '2026-02-20T10:00:00Z',
+    }
+
+    expect(ClientListItem.parse(pinnedClient)).toBeDefined()
+
+    // Valid: without optional fields
+    const simpleClient = {
+      id: testUuid1,
+      name: 'Test Client',
+      company: 'Test Company',
+      clientType: 'ponctuel' as const,
+      status: 'inactif' as const,
+      createdAt: now,
+    }
+
+    expect(ClientListItem.parse(simpleClient)).toBeDefined()
+
+    // Valid: with isPinned false and deferredUntil null
+    const unpinnedClient = {
+      ...simpleClient,
+      isPinned: false,
+      deferredUntil: null,
+    }
+
+    expect(ClientListItem.parse(unpinnedClient)).toBeDefined()
+  })
+})

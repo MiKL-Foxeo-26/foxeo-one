@@ -4,8 +4,9 @@ import type { ClientListItem } from '../types/crm.types'
 
 // Mock Supabase server client
 const mockLimit = vi.fn()
-const mockOrder = vi.fn(() => ({ limit: mockLimit }))
-const mockEq = vi.fn(() => ({ order: mockOrder }))
+const mockOrder2 = vi.fn(() => ({ limit: mockLimit }))
+const mockOrder1 = vi.fn(() => ({ order: mockOrder2 }))
+const mockEq = vi.fn(() => ({ order: mockOrder1 }))
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
 const mockFrom = vi.fn(() => ({ select: mockSelect }))
 const mockGetUser = vi.fn()
@@ -54,6 +55,8 @@ describe('getClients Server Action', () => {
           client_type: 'complet',
           status: 'lab-actif',
           created_at: '2024-01-15T10:00:00Z',
+          is_pinned: false,
+          deferred_until: null,
         },
       ],
       error: null,

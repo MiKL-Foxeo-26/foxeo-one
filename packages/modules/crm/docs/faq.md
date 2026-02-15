@@ -57,6 +57,37 @@ R: L'onglet actif est automatiquement reflété dans l'URL (ex: `?tab=historique
 **Q: Pourquoi certains onglets affichent "Aucun document" ou "Aucun échange" ?**
 R: Les onglets Documents et Échanges afficheront du contenu une fois que les modules correspondants (Documents et Chat) seront activés et que des données auront été créées pour ce client.
 
+### Notes privées
+
+**Q: Les notes privées sont-elles visibles par le client ?**
+R: Non, absolument pas. Les notes privées sont strictement réservées à votre usage interne. Le client ne peut ni les voir ni en être informé.
+
+**Q: Puis-je modifier ou supprimer une note après l'avoir créée ?**
+R: Oui, chaque note dispose d'un menu contextuel (trois points) permettant de la modifier ou de la supprimer. La suppression demande une confirmation.
+
+**Q: Y a-t-il une limite au nombre de notes par client ?**
+R: Non, vous pouvez ajouter autant de notes que nécessaire. Elles sont ordonnées de la plus récente à la plus ancienne pour faciliter la lecture.
+
+**Q: Les notes sont-elles limitées en taille ?**
+R: Chaque note peut contenir jusqu'à 5000 caractères, ce qui est largement suffisant pour des annotations détaillées.
+
+### Épinglage et report de clients
+
+**Q: Combien de clients puis-je épingler ?**
+R: Aucune limite. Cependant, pour que l'épinglage reste utile, il est recommandé de ne garder épinglés que vos clients actifs prioritaires.
+
+**Q: Que se passe-t-il quand j'épingle plusieurs clients ?**
+R: Tous les clients épinglés apparaissent en haut de la liste, triés par date de création (les plus récents en premier). Les clients non-épinglés apparaissent ensuite.
+
+**Q: Comment savoir quand un client reporté doit être traité ?**
+R: L'indicateur "Reporté" disparaît automatiquement une fois la date de rappel passée. Vous pouvez consulter votre liste de clients pour voir lesquels ne sont plus reportés.
+
+**Q: Puis-je modifier la date de report d'un client ?**
+R: Oui, cliquez à nouveau sur "À traiter plus tard" et choisissez une nouvelle date. Vous pouvez également annuler complètement le report.
+
+**Q: Le report d'un client affecte-t-il son parcours ou ses accès ?**
+R: Non, le report est uniquement un indicateur visuel pour votre organisation personnelle. Il n'a aucun impact sur le parcours, les accès ou les fonctionnalités du client.
+
 ### Parcours et accès
 
 **Q: Comment assigner un parcours Lab à un client ?**

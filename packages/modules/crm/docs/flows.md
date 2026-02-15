@@ -231,6 +231,68 @@ flowchart TD
     Toast --> End([Fin])
 ```
 
+## Flux : CRUD Notes privées
+
+```mermaid
+flowchart TD
+    Start([MiKL ouvre fiche client, onglet Infos]) --> ShowNotes[ClientNotesSection affichée]
+    ShowNotes --> LoadNotes[useClientNotes → getClientNotes]
+    LoadNotes --> HasNotes{Notes existantes ?}
+
+    HasNotes -->|Non| EmptyMsg[Afficher "Aucune note privée"]
+    HasNotes -->|Oui| NotesList[Liste notes DESC par date]
+
+    ShowNotes --> AddAction[MiKL saisit texte + clique "Ajouter"]
+    AddAction --> CreateNote[Server Action createClientNote]
+    CreateNote --> InvalidateNotes[Invalider cache client-notes]
+    InvalidateNotes --> Toast1[Toast "Note ajoutée"]
+    Toast1 --> LoadNotes
+
+    NotesList --> EditAction[MiKL clique Modifier sur une note]
+    EditAction --> InlineEdit[Textarea inline + Sauvegarder/Annuler]
+    InlineEdit --> UpdateNote[Server Action updateClientNote]
+    UpdateNote --> InvalidateNotes
+
+    NotesList --> DeleteAction[MiKL clique Supprimer sur une note]
+    DeleteAction --> ConfirmDialog[AlertDialog confirmation]
+    ConfirmDialog --> UserConfirm{Confirme ?}
+    UserConfirm -->|Non| NotesList
+    UserConfirm -->|Oui| DeleteNote[Server Action deleteClientNote]
+    DeleteNote --> InvalidateNotes
+```
+
+## Flux : Épingler / Désépingler un client
+
+```mermaid
+flowchart LR
+    List[Liste clients] --> ClickPin[MiKL clique icône épingle]
+    ClickPin --> TogglePin[Server Action togglePinClient]
+    TogglePin --> InvalidateClients[Invalider cache clients]
+    InvalidateClients --> Reload[Liste rechargée — épinglés en haut]
+    Reload --> List
+```
+
+## Flux : Reporter un client ("À traiter plus tard")
+
+```mermaid
+flowchart TD
+    Start([MiKL clique "À traiter plus tard"]) --> OpenDialog[Ouvrir DeferDialog]
+    OpenDialog --> SetDate[Choisir date de rappel]
+    SetDate --> ClickValider[Cliquer "Valider"]
+
+    ClickValider --> DeferAction[Server Action deferClient]
+    DeferAction --> InvalidateClients[Invalider cache clients]
+    InvalidateClients --> Toast[Toast "Client reporté"]
+    Toast --> CloseDialog[Fermer dialog]
+
+    OpenDialog --> HasExisting{Report existant ?}
+    HasExisting -->|Oui| ShowClear[Afficher bouton "Annuler le report"]
+    ShowClear --> ClearDefer[Server Action deferClient(null)]
+    ClearDefer --> InvalidateClients
+
+    CloseDialog --> End([Fin])
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives

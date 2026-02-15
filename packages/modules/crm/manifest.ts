@@ -21,6 +21,6 @@ export const manifest: ModuleManifest = {
       component: 'ClientDetail'
     }
   ],
-  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates'],
+  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates', 'client_notes'],
   dependencies: []
 }

@@ -1,0 +1,61 @@
+'use server'
+
+import { createServerSupabaseClient } from '@foxeo/supabase'
+import {
+  type ActionResponse,
+  successResponse,
+  errorResponse,
+} from '@foxeo/types'
+import { toCamelCase } from '@foxeo/utils'
+import type { ClientNote, ClientNoteDB } from '../types/crm.types'
+
+export async function getClientNotes(
+  clientId: string
+): Promise<ActionResponse<ClientNote[]>> {
+  try {
+    const supabase = await createServerSupabaseClient()
+
+    // Auth check
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return errorResponse('Non authentifié', 'UNAUTHORIZED')
+    }
+
+    const operatorId = user.id
+
+    // Fetch notes for this client and operator, ordered by most recent first
+    const { data: notesData, error: fetchError } = await supabase
+      .from('client_notes')
+      .select('*')
+      .eq('client_id', clientId)
+      .eq('operator_id', operatorId)
+      .order('created_at', { ascending: false })
+
+    if (fetchError) {
+      console.error('[CRM:GET_CLIENT_NOTES] Fetch error:', fetchError)
+      return errorResponse(
+        'Impossible de récupérer les notes',
+        'FETCH_FAILED',
+        fetchError
+      )
+    }
+
+    // Transform snake_case → camelCase
+    const notes = (notesData || []).map((note) =>
+      toCamelCase<ClientNoteDB, ClientNote>(note as ClientNoteDB)
+    )
+
+    return successResponse(notes)
+  } catch (error) {
+    console.error('[CRM:GET_CLIENT_NOTES] Unexpected error:', error)
+    return errorResponse(
+      'Erreur interne',
+      'INTERNAL_ERROR',
+      error
+    )
+  }
+}

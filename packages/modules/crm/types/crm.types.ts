@@ -46,7 +46,9 @@ export const ClientListItem = z.object({
   sector: z.string().optional(),
   clientType: ClientTypeEnum,
   status: ClientStatusEnum,
-  createdAt: z.string().datetime()
+  createdAt: z.string().datetime(),
+  isPinned: z.boolean().optional(),
+  deferredUntil: z.string().datetime().nullable().optional(),
 })
 
 export type ClientListItem = z.infer<typeof ClientListItem>
@@ -242,6 +244,54 @@ export type ParcoursDB = {
   started_at: string
   suspended_at: string | null
   completed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+// ============================================================
+// Client Notes types (Story 2.6)
+// ============================================================
+
+// ClientNote schema
+export const ClientNote = z.object({
+  id: z.string().uuid(),
+  clientId: z.string().uuid(),
+  operatorId: z.string().uuid(),
+  content: z.string().min(1, 'Le contenu de la note est requis'),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+})
+
+export type ClientNote = z.infer<typeof ClientNote>
+
+// Input schemas
+export const CreateClientNoteInput = z.object({
+  clientId: z.string().uuid(),
+  content: z.string().min(1, 'Le contenu de la note est requis').max(5000, 'La note ne peut pas dépasser 5000 caractères'),
+})
+
+export type CreateClientNoteInput = z.infer<typeof CreateClientNoteInput>
+
+export const UpdateClientNoteInput = z.object({
+  noteId: z.string().uuid(),
+  content: z.string().min(1, 'Le contenu de la note est requis').max(5000, 'La note ne peut pas dépasser 5000 caractères'),
+})
+
+export type UpdateClientNoteInput = z.infer<typeof UpdateClientNoteInput>
+
+export const DeferClientInput = z.object({
+  clientId: z.string().uuid(),
+  deferredUntil: z.string().datetime().nullable(), // null clears the defer
+})
+
+export type DeferClientInput = z.infer<typeof DeferClientInput>
+
+// DB type (snake_case)
+export type ClientNoteDB = {
+  id: string
+  client_id: string
+  operator_id: string
+  content: string
   created_at: string
   updated_at: string
 }

@@ -27,6 +27,9 @@ const MIGRATION_FILES = [
   '00011_rls_functions.sql',
   '00012_rls_policies.sql',
   '00013_session_management.sql',
+  '00016_consents_functions.sql',
+  '00017_create_parcours.sql',
+  '00018_create_client_notes.sql',
 ]
 
 describe('Supabase project structure', () => {
@@ -411,5 +414,71 @@ describe('Seed data', () => {
   it('inserts activity log entry', () => {
     expect(sql).toContain("'create_client'")
     expect(sql).toContain("'operator'")
+  })
+})
+
+describe('Migration 00018: client_notes table and pinning/deferring', () => {
+  const sql = readFileSync(join(MIGRATIONS_DIR, '00018_create_client_notes.sql'), 'utf-8')
+
+  it('creates client_notes table with correct columns', () => {
+    expect(sql).toContain('CREATE TABLE IF NOT EXISTS client_notes')
+    expect(sql).toContain('id UUID PRIMARY KEY DEFAULT gen_random_uuid()')
+    expect(sql).toContain('client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE')
+    expect(sql).toContain('operator_id UUID NOT NULL REFERENCES operators(id)')
+    expect(sql).toContain('content TEXT NOT NULL')
+    expect(sql).toContain('created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()')
+    expect(sql).toContain('updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()')
+  })
+
+  it('adds is_pinned and deferred_until columns to clients', () => {
+    expect(sql).toContain('ALTER TABLE clients ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN NOT NULL DEFAULT false')
+    expect(sql).toContain('ALTER TABLE clients ADD COLUMN IF NOT EXISTS deferred_until TIMESTAMPTZ')
+  })
+
+  it('creates indexes for performance', () => {
+    expect(sql).toContain('CREATE INDEX IF NOT EXISTS idx_client_notes_client_id ON client_notes(client_id)')
+    expect(sql).toContain('CREATE INDEX IF NOT EXISTS idx_client_notes_operator_id ON client_notes(operator_id)')
+    expect(sql).toContain('CREATE INDEX IF NOT EXISTS idx_clients_is_pinned ON clients(is_pinned)')
+  })
+
+  it('creates updated_at trigger using existing fn_update_updated_at function', () => {
+    expect(sql).toContain('CREATE TRIGGER trg_client_notes_updated_at')
+    expect(sql).toContain('BEFORE UPDATE ON client_notes')
+    expect(sql).toContain('FOR EACH ROW')
+    expect(sql).toContain('EXECUTE FUNCTION fn_update_updated_at()')
+  })
+
+  it('enables RLS on client_notes', () => {
+    expect(sql).toContain('ALTER TABLE client_notes ENABLE ROW LEVEL SECURITY')
+  })
+
+  it('creates RLS policy for SELECT (operator owns note)', () => {
+    expect(sql).toContain('CREATE POLICY client_notes_select_operator ON client_notes')
+    expect(sql).toContain('FOR SELECT')
+    expect(sql).toContain('operator_id = auth.uid() AND is_operator()')
+  })
+
+  it('creates RLS policy for INSERT (operator can insert own notes)', () => {
+    expect(sql).toContain('CREATE POLICY client_notes_insert_operator ON client_notes')
+    expect(sql).toContain('FOR INSERT')
+    expect(sql).toContain('WITH CHECK (operator_id = auth.uid() AND is_operator())')
+  })
+
+  it('creates RLS policy for UPDATE (operator owns note)', () => {
+    expect(sql).toContain('CREATE POLICY client_notes_update_operator ON client_notes')
+    expect(sql).toContain('FOR UPDATE')
+    expect(sql).toContain('USING (operator_id = auth.uid() AND is_operator())')
+    expect(sql).toContain('WITH CHECK (operator_id = auth.uid() AND is_operator())')
+  })
+
+  it('creates RLS policy for DELETE (operator owns note)', () => {
+    expect(sql).toContain('CREATE POLICY client_notes_delete_operator ON client_notes')
+    expect(sql).toContain('FOR DELETE')
+    expect(sql).toContain('USING (operator_id = auth.uid() AND is_operator())')
+  })
+
+  it('has exactly 4 RLS policies (SELECT, INSERT, UPDATE, DELETE)', () => {
+    const policyMatches = sql.match(/CREATE POLICY client_notes_/g)
+    expect(policyMatches).toHaveLength(4)
   })
 })

@@ -104,6 +104,54 @@ Dans la section **"Accès dashboards"** de la fiche client :
 - **Accès One** : Active/désactive le dashboard business.
 - La désactivation déclenche un dialog de confirmation.
 
+### Notes privées sur un client
+
+Dans la fiche client (onglet Informations), la section **"Notes privées"** vous permet d'ajouter des annotations personnelles sur le client. Ces notes ne sont jamais visibles par le client — elles sont strictement réservées à votre usage interne.
+
+**Ajouter une note :**
+1. Dans la section "Notes privées", saisissez votre note dans le champ de texte
+2. Cliquez sur "Ajouter"
+3. La note apparaît immédiatement dans la liste, ordonnée de la plus récente à la plus ancienne
+
+**Modifier ou supprimer une note :**
+- Cliquez sur le menu contextuel (trois points) d'une note
+- Choisissez "Modifier" pour éditer le contenu
+- Choisissez "Supprimer" (une confirmation sera demandée)
+
+Utilisez les notes pour :
+- Garder une trace de vos échanges informels
+- Noter des détails importants sur les besoins ou contraintes du client
+- Conserver des rappels personnels pour la relation client
+
+### Épingler un client prioritaire
+
+Pour accéder rapidement à vos clients les plus importants, épinglez-les en haut de la liste.
+
+**Comment épingler :**
+1. Sur la liste des clients, cliquez sur l'icône d'épingle à côté du nom du client
+2. Le client épinglé remonte automatiquement en haut de la liste
+3. Les clients épinglés ont un indicateur visuel distinctif
+
+**Pour désépingler :**
+- Cliquez à nouveau sur l'icône d'épingle
+
+**Tri automatique :** Les clients épinglés apparaissent toujours en haut de liste, avant les autres clients. Parmi les épinglés, le tri par date de création s'applique.
+
+### Reporter un client ("À traiter plus tard")
+
+Si vous devez temporairement mettre de côté un client, utilisez la fonction "À traiter plus tard".
+
+**Comment reporter :**
+1. Sur la fiche client ou depuis la liste, cliquez sur "À traiter plus tard"
+2. Choisissez une date de rappel
+3. Cliquez sur "Valider"
+4. Le client affiche un indicateur "Reporté" avec la date
+
+**Comportement automatique :**
+- L'indicateur "Reporté" disparaît automatiquement une fois la date passée
+- Aucune action manuelle n'est nécessaire
+- Vous pouvez annuler le report à tout moment en cliquant sur "Annuler le report"
+
 ### Ouvrir le dossier client dans Cursor
 
 Dans le header de la fiche client, le bouton **"Ouvrir dans Cursor"** vous permet d'accéder directement au dossier BMAD du client pour travailler avec Orpheus.
@@ -141,6 +189,6 @@ Par défaut : `/Users/mikl/bmad`
 
 ## Prochaines fonctionnalités
 
-- Notes privées et rappels (Stories 2.6-2.7)
+- Rappels personnels et calendrier deadlines (Story 2.7)
 - Statistiques temps passé par client (Story 2.8)
 - Suspendre/réactiver/clôturer un client (Stories 2.9a-2.9c)

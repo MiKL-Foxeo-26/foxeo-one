@@ -37,10 +37,13 @@ export async function getClients(): Promise<ActionResponse<ClientListItem[]>> {
         sector,
         client_type,
         status,
-        created_at
+        created_at,
+        is_pinned,
+        deferred_until
       `
       )
       .eq('operator_id', operatorId)
+      .order('is_pinned', { ascending: false }) // Pinned first
       .order('created_at', { ascending: false })
       .limit(500)
 
@@ -68,6 +71,8 @@ export async function getClients(): Promise<ActionResponse<ClientListItem[]>> {
         clientType: client.client_type,
         status: client.status,
         createdAt: client.created_at,
+        isPinned: client.is_pinned ?? false,
+        deferredUntil: client.deferred_until ?? null,
       })
     )
 
