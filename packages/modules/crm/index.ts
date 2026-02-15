@@ -31,6 +31,12 @@ export { ReminderDayList } from './components/reminder-day-list'
 export { CreateReminderDialog } from './components/create-reminder-dialog'
 export { RemindersCalendar } from './components/reminders-calendar'
 export { EditReminderDialog } from './components/edit-reminder-dialog'
+export { StatsDashboard } from './components/stats-dashboard'
+export { KpiCard } from './components/kpi-card'
+export { ClientTypeChart } from './components/client-type-chart'
+export { TimePerClientTable } from './components/time-per-client-table'
+export { StatsSkeleton } from './components/stats-skeleton'
+export { CrmSubNav } from './components/crm-sub-nav'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -42,6 +48,8 @@ export { useParcourTemplates } from './hooks/use-parcours-templates'
 export { useClientParcours } from './hooks/use-client-parcours'
 export { useClientNotes } from './hooks/use-client-notes'
 export { useReminders, useCreateReminder, useUpdateReminder, useToggleReminderComplete, useDeleteReminder } from './hooks/use-reminders'
+export { usePortfolioStats, useGraduationRate } from './hooks/use-portfolio-stats'
+export { useTimePerClient } from './hooks/use-time-per-client'
 
 // Actions
 export { getClients } from './actions/get-clients'
@@ -67,6 +75,9 @@ export { createReminder } from './actions/create-reminder'
 export { updateReminder } from './actions/update-reminder'
 export { toggleReminderComplete } from './actions/toggle-reminder-complete'
 export { deleteReminder } from './actions/delete-reminder'
+export { getPortfolioStats } from './actions/get-portfolio-stats'
+export { getGraduationRate } from './actions/get-graduation-rate'
+export { getTimePerClient } from './actions/get-time-per-client'
 
 // Utils
 export {
@@ -76,6 +87,8 @@ export {
   toKebabCase,
   BMAD_BASE_PATH,
 } from './utils/cursor-integration'
+export { TIME_ESTIMATES } from './utils/time-estimates'
+export type { TimeEstimateConfig } from './utils/time-estimates'
 
 // Types
 export type {
@@ -113,4 +126,10 @@ export type {
   UpdateReminderInput,
   ToggleReminderCompleteInput,
   ReminderDB,
+  PortfolioStats,
+  StatusCounts,
+  TypeCounts,
+  MrrInfo,
+  GraduationRate,
+  ClientTimeEstimate,
 } from './types/crm.types'

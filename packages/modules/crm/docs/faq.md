@@ -157,6 +157,29 @@ R: Non, ils restent dans votre historique. Vous devez les supprimer manuellement
 **Q: Puis-je "décocher" un rappel complété ?**
 R: Oui, cliquez à nouveau sur la checkbox pour le marquer comme non complété. Le rappel redeviendra actif.
 
+### Statistiques et temps passé
+
+**Q: Comment accéder aux statistiques du CRM ?**
+R: Depuis le module CRM, utilisez la sous-navigation : Clients | Rappels | **Statistiques**. Vous pouvez aussi accéder directement via l'URL `/modules/crm/stats`.
+
+**Q: Comment est calculé le temps passé par client ?**
+R: Le temps est estimé à partir des activités enregistrées : 2 minutes par message envoyé, 5 minutes par validation Hub (approbation ou refus), et la durée réelle des visioconférences. Ces constantes sont configurables.
+
+**Q: Pourquoi le MRR affiche "Module Facturation requis" ?**
+R: Le MRR (revenu mensuel récurrent) nécessite le module Facturation (Epic 11). Tant que ce module n'est pas activé, un placeholder est affiché.
+
+**Q: Les statistiques sont-elles en temps réel ?**
+R: Les données sont mises en cache pendant 10 minutes pour optimiser les performances. Rechargez la page pour forcer une mise à jour des données.
+
+**Q: Que signifie le taux de graduation ?**
+R: C'est le pourcentage de clients ayant un parcours Lab de type "Complet" qui ont gradué vers un dashboard One. Il mesure le taux de conversion de l'accompagnement.
+
+**Q: Puis-je trier le tableau du temps passé ?**
+R: Oui, cliquez sur les en-têtes de colonne (Client, Temps total, Dernière activité) pour trier par ordre croissant ou décroissant.
+
+**Q: Le temps passé est-il exact ?**
+R: Le temps des visios est exact (durée réelle). Pour les messages et validations, ce sont des estimations moyennes (2 min/message, 5 min/validation) qui donnent un ordre de grandeur fiable.
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

@@ -5,6 +5,10 @@ import {
   UpdateReminderInput,
   ToggleReminderCompleteInput,
   ReminderFilterEnum,
+  PortfolioStats,
+  GraduationRate,
+  ClientTimeEstimate,
+  MrrInfo,
 } from './crm.types'
 
 describe('Reminder Types & Schemas', () => {
@@ -236,6 +240,153 @@ describe('Reminder Types & Schemas', () => {
 
     it('rejects invalid filter value', () => {
       const result = ReminderFilterEnum.safeParse('invalid')
+      expect(result.success).toBe(false)
+    })
+  })
+})
+
+describe('Stats Types & Schemas (Story 2.8)', () => {
+  describe('PortfolioStats schema', () => {
+    it('validates a complete portfolio stats object', () => {
+      const validStats = {
+        totalClients: 10,
+        byStatus: { active: 6, inactive: 3, suspended: 1 },
+        byType: { complet: 5, directOne: 3, ponctuel: 2 },
+        labActive: 3,
+        oneActive: 3,
+        mrr: { available: false, message: 'Module Facturation requis' },
+      }
+
+      const result = PortfolioStats.safeParse(validStats)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates with MRR available', () => {
+      const stats = {
+        totalClients: 5,
+        byStatus: { active: 5, inactive: 0, suspended: 0 },
+        byType: { complet: 5, directOne: 0, ponctuel: 0 },
+        labActive: 2,
+        oneActive: 3,
+        mrr: { available: true, amount: 4500 },
+      }
+
+      const result = PortfolioStats.safeParse(stats)
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects negative counts', () => {
+      const invalid = {
+        totalClients: -1,
+        byStatus: { active: 0, inactive: 0, suspended: 0 },
+        byType: { complet: 0, directOne: 0, ponctuel: 0 },
+        labActive: 0,
+        oneActive: 0,
+        mrr: { available: false, message: 'N/A' },
+      }
+
+      const result = PortfolioStats.safeParse(invalid)
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('GraduationRate schema', () => {
+    it('validates a graduation rate object', () => {
+      const validRate = {
+        percentage: 40,
+        graduated: 4,
+        totalLabClients: 10,
+      }
+
+      const result = GraduationRate.safeParse(validRate)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates zero rate', () => {
+      const result = GraduationRate.safeParse({
+        percentage: 0,
+        graduated: 0,
+        totalLabClients: 0,
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects negative percentage', () => {
+      const result = GraduationRate.safeParse({
+        percentage: -5,
+        graduated: 0,
+        totalLabClients: 0,
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('ClientTimeEstimate schema', () => {
+    it('validates a complete time estimate', () => {
+      const valid = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        clientName: 'Alice',
+        clientCompany: 'AliceCorp',
+        clientType: 'complet',
+        messageCount: 15,
+        validationCount: 3,
+        visioSeconds: 3600,
+        totalEstimatedSeconds: 5400,
+        lastActivity: new Date().toISOString(),
+      }
+
+      const result = ClientTimeEstimate.safeParse(valid)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates with null lastActivity', () => {
+      const valid = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        clientName: 'Bob',
+        clientCompany: 'BobInc',
+        clientType: 'direct-one',
+        messageCount: 0,
+        validationCount: 0,
+        visioSeconds: 0,
+        totalEstimatedSeconds: 0,
+        lastActivity: null,
+      }
+
+      const result = ClientTimeEstimate.safeParse(valid)
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid clientType', () => {
+      const invalid = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        clientName: 'Test',
+        clientCompany: 'TestCorp',
+        clientType: 'invalid-type',
+        messageCount: 0,
+        validationCount: 0,
+        visioSeconds: 0,
+        totalEstimatedSeconds: 0,
+        lastActivity: null,
+      }
+
+      const result = ClientTimeEstimate.safeParse(invalid)
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('MrrInfo discriminated union', () => {
+    it('validates MRR not available', () => {
+      const result = MrrInfo.safeParse({ available: false, message: 'Module requis' })
+      expect(result.success).toBe(true)
+    })
+
+    it('validates MRR available', () => {
+      const result = MrrInfo.safeParse({ available: true, amount: 1500 })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects MRR available without amount', () => {
+      const result = MrrInfo.safeParse({ available: true, message: 'test' })
       expect(result.success).toBe(false)
     })
   })

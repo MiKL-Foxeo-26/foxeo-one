@@ -1,6 +1,6 @@
 # Story 2.8: Statistiques globales & temps passé par client
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -22,41 +22,41 @@ So that **je pilote mon activité avec des données concrètes et je mesure la r
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Server Actions / fonctions agrégation (AC: #1, #3)
-  - [ ] 1.1 `actions/get-portfolio-stats.ts` — Requête agrégée : count par type, count par statut, count Lab/One actifs
-  - [ ] 1.2 `actions/get-graduation-rate.ts` — Calcul taux graduation depuis `activity_logs` (type: 'client_graduated')
-  - [ ] 1.3 `actions/get-time-per-client.ts` — Requête `activity_logs` agrégée par client avec estimation temps
-  - [ ] 1.4 Constantes durées moyennes : `TIME_ESTIMATES = { visio: 'real', message: 120, validation: 300 }` (en secondes)
+- [x] Task 1 — Server Actions / fonctions agrégation (AC: #1, #3)
+  - [x] 1.1 `actions/get-portfolio-stats.ts` — Requête agrégée : count par type, count par statut, count Lab/One actifs
+  - [x] 1.2 `actions/get-graduation-rate.ts` — Calcul taux graduation depuis `activity_logs` (type: 'client_graduated')
+  - [x] 1.3 `actions/get-time-per-client.ts` — Requête `activity_logs` agrégée par client avec estimation temps
+  - [x] 1.4 Constantes durées moyennes : `TIME_ESTIMATES = { visio: 'real', message: 120, validation: 300 }` (en secondes)
 
-- [ ] Task 2 — Types TypeScript (AC: #1, #3)
-  - [ ] 2.1 Types : `PortfolioStats`, `GraduationRate`, `ClientTimeEstimate`, `TimeEstimateConfig`
-  - [ ] 2.2 Schémas Zod si nécessaire
+- [x] Task 2 — Types TypeScript (AC: #1, #3)
+  - [x] 2.1 Types : `PortfolioStats`, `GraduationRate`, `ClientTimeEstimate`, `TimeEstimateConfig`
+  - [x] 2.2 Schémas Zod si nécessaire
 
-- [ ] Task 3 — Hooks TanStack Query (AC: #1, #3)
-  - [ ] 3.1 `hooks/use-portfolio-stats.ts` — queryKey `['portfolio-stats']`
-  - [ ] 3.2 `hooks/use-time-per-client.ts` — queryKey `['time-per-client']`
-  - [ ] 3.3 StaleTime élevé (5-10 min) car données agrégées peu volatiles
+- [x] Task 3 — Hooks TanStack Query (AC: #1, #3)
+  - [x] 3.1 `hooks/use-portfolio-stats.ts` — queryKey `['portfolio-stats']`
+  - [x] 3.2 `hooks/use-time-per-client.ts` — queryKey `['time-per-client']`
+  - [x] 3.3 StaleTime élevé (5-10 min) car données agrégées peu volatiles
 
-- [ ] Task 4 — Composants UI (AC: #1, #2, #3)
-  - [ ] 4.1 `components/stats-dashboard.tsx` — Layout grille des KPI cards
-  - [ ] 4.2 `components/kpi-card.tsx` — Card individuelle : valeur, label, sparkline/tendance, tooltip
-  - [ ] 4.3 `components/client-type-chart.tsx` — Donut chart répartition par type (Tremor `DonutChart`)
-  - [ ] 4.4 `components/time-per-client-table.tsx` — Table temps passé avec tri, formatage durée humain
-  - [ ] 4.5 `components/stats-skeleton.tsx` — Skeleton spécifique stats (grille de cards grisées)
+- [x] Task 4 — Composants UI (AC: #1, #2, #3)
+  - [x] 4.1 `components/stats-dashboard.tsx` — Layout grille des KPI cards
+  - [x] 4.2 `components/kpi-card.tsx` — Card individuelle : valeur, label, sparkline/tendance, tooltip
+  - [x] 4.3 `components/client-type-chart.tsx` — Donut chart répartition par type (Tremor `DonutChart`)
+  - [x] 4.4 `components/time-per-client-table.tsx` — Table temps passé avec tri, formatage durée humain
+  - [x] 4.5 `components/stats-skeleton.tsx` — Skeleton spécifique stats (grille de cards grisées)
 
-- [ ] Task 5 — Route et intégration (AC: #1)
-  - [ ] 5.1 Ajouter route `/modules/crm/stats` dans le manifest CRM
-  - [ ] 5.2 Page Server Component avec données initiales pré-fetchées
-  - [ ] 5.3 Sous-navigation CRM : Clients | Rappels | Statistiques
+- [x] Task 5 — Route et intégration (AC: #1)
+  - [x] 5.1 Ajouter route `/modules/crm/stats` dans le manifest CRM
+  - [x] 5.2 Page Server Component avec données initiales pré-fetchées
+  - [x] 5.3 Sous-navigation CRM : Clients | Rappels | Statistiques
 
-- [ ] Task 6 — Tests (AC: #5)
-  - [ ] 6.1 Tests Server Actions : calculs agrégation, cas vides, performance
-  - [ ] 6.2 Tests composants : rendu cards, chart, table
-  - [ ] 6.3 Tests hooks
-  - [ ] 6.4 Tests edge cases : 0 clients, pas de graduations, pas d'activity_logs
+- [x] Task 6 — Tests (AC: #5)
+  - [x] 6.1 Tests Server Actions : calculs agrégation, cas vides, performance
+  - [x] 6.2 Tests composants : rendu cards, chart, table
+  - [x] 6.3 Tests hooks
+  - [x] 6.4 Tests edge cases : 0 clients, pas de graduations, pas d'activity_logs
 
-- [ ] Task 7 — Documentation (AC: #5)
-  - [ ] 7.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 7 — Documentation (AC: #5)
+  - [x] 7.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
 
 ## Dev Notes
 
@@ -188,8 +188,85 @@ function formatDuration(totalSeconds: number): string {
 
 ### Agent Model Used
 
+Claude Opus 4.6
+
 ### Debug Log References
+
+- Tremor non installé dans le projet. Utilisation de composants shadcn/ui (@foxeo/ui) comme fallback pour les KPI cards et le donut chart SVG custom. Conforme aux Dev Notes ("utiliser des composants shadcn/ui simples comme fallback").
 
 ### Completion Notes List
 
+- Task 1: 3 Server Actions créées (get-portfolio-stats, get-graduation-rate, get-time-per-client) + constantes TIME_ESTIMATES. 20 tests passent.
+- Task 2: 7 types Zod ajoutés à crm.types.ts (PortfolioStats, GraduationRate, ClientTimeEstimate, StatusCounts, TypeCounts, MrrInfo, TimeEstimateConfig). 32 tests types passent.
+- Task 3: 3 hooks TanStack Query (usePortfolioStats, useGraduationRate, useTimePerClient) avec staleTime 10min. 11 tests passent.
+- Task 4: 6 composants UI créés (StatsDashboard, KpiCard, ClientTypeChart, TimePerClientTable, StatsSkeleton, CrmSubNav). Donut chart en SVG pur. 30 tests composants passent.
+- Task 5: Route /modules/crm/stats ajoutée au manifest + app route RSC avec parallel fetch. CrmSubNav composant sous-navigation.
+- Task 6: 65 fichiers de test, 388 tests total, 0 échec, 0 régression.
+- Task 7: guide.md, faq.md, flows.md mis à jour avec section statistiques complète.
+
 ### File List
+
+**Fichiers créés :**
+- packages/modules/crm/actions/get-portfolio-stats.ts
+- packages/modules/crm/actions/get-portfolio-stats.test.ts
+- packages/modules/crm/actions/get-graduation-rate.ts
+- packages/modules/crm/actions/get-graduation-rate.test.ts
+- packages/modules/crm/actions/get-time-per-client.ts
+- packages/modules/crm/actions/get-time-per-client.test.ts
+- packages/modules/crm/hooks/use-portfolio-stats.ts
+- packages/modules/crm/hooks/use-portfolio-stats.test.tsx
+- packages/modules/crm/hooks/use-time-per-client.ts
+- packages/modules/crm/hooks/use-time-per-client.test.tsx
+- packages/modules/crm/components/stats-dashboard.tsx
+- packages/modules/crm/components/stats-dashboard.test.tsx
+- packages/modules/crm/components/kpi-card.tsx
+- packages/modules/crm/components/kpi-card.test.tsx
+- packages/modules/crm/components/client-type-chart.tsx
+- packages/modules/crm/components/client-type-chart.test.tsx
+- packages/modules/crm/components/time-per-client-table.tsx
+- packages/modules/crm/components/time-per-client-table.test.tsx
+- packages/modules/crm/components/stats-skeleton.tsx
+- packages/modules/crm/components/stats-skeleton.test.tsx
+- packages/modules/crm/components/crm-sub-nav.tsx
+- packages/modules/crm/components/crm-sub-nav.test.tsx
+- packages/modules/crm/utils/time-estimates.ts
+- packages/modules/crm/utils/time-estimates.test.ts
+- apps/hub/app/(dashboard)/modules/crm/stats/page.tsx
+- apps/hub/app/(dashboard)/modules/crm/stats/stats-page-client.tsx
+- apps/hub/app/(dashboard)/modules/crm/stats/loading.tsx
+
+**Fichiers modifiés :**
+- packages/modules/crm/types/crm.types.ts (ajout types stats Story 2.8)
+- packages/modules/crm/types/crm.types.test.ts (ajout tests types stats)
+- packages/modules/crm/manifest.ts (ajout route /modules/crm/stats + activity_logs dans requiredTables)
+- packages/modules/crm/index.ts (ajout exports stats)
+- packages/modules/crm/docs/guide.md (ajout section statistiques)
+- packages/modules/crm/docs/faq.md (ajout FAQ statistiques)
+- packages/modules/crm/docs/flows.md (ajout flux statistiques)
+- _bmad-output/implementation-artifacts/sprint-status.yaml (status 2-8 → in-progress → review)
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Amelia (Dev Agent) — Claude Sonnet 4.5
+**Date:** 2026-02-15
+
+**Issues Found:** 1 High, 4 Medium, 3 Low
+
+**Fixed (5/5 HIGH+MEDIUM):**
+- [x] H1: Runtime crash MRR tooltip — null-safe access ajouté (stats-dashboard.tsx:61)
+- [x] M1: Sprint-status.yaml désynchronisé (in-progress → review)
+- [x] M2: .limit(50000) réduit à 10000 + TODO RPC migration documenté (get-time-per-client.ts:64)
+- [x] M3: Renommage totalLabCompleted → totalLabClients (7 fichiers)
+- [x] M4: Ternaire redondant simplifié (résolu par fix H1)
+
+**Non corrigés (3 LOW — action items):**
+- [ ] L1: Accessibilité donut chart — ajouter role="img" + aria-label (client-type-chart.tsx)
+- [ ] L2: Duplication skeleton — loading.tsx devrait réutiliser StatsSkeleton
+- [ ] L3: Event type naming — documenter que graduated_to_one remplace client_graduated des Dev Notes
+
+**Tests post-review:** 65 fichiers, 389 tests, 0 échec, 0 régression
+
+### Change Log
+
+- 2026-02-15: Story 2.8 implementee — Dashboard statistiques CRM avec KPIs, donut chart, table temps passe, sous-navigation, 388 tests (0 regression)
+- 2026-02-15: Code review — 5 fixes (H1 crash tooltip, M1 sprint sync, M2 limit 50K→10K, M3 rename totalLabCompleted, M4 ternaire). 389 tests, 0 regression.

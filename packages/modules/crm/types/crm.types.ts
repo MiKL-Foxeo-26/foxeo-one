@@ -356,3 +356,69 @@ export type ReminderDB = {
   created_at: string
   updated_at: string
 }
+
+// ============================================================
+// Stats types (Story 2.8)
+// ============================================================
+
+// Status counts for portfolio stats
+export const StatusCounts = z.object({
+  active: z.number().int().nonnegative(),
+  inactive: z.number().int().nonnegative(),
+  suspended: z.number().int().nonnegative(),
+})
+
+export type StatusCounts = z.infer<typeof StatusCounts>
+
+// Type counts for portfolio stats
+export const TypeCounts = z.object({
+  complet: z.number().int().nonnegative(),
+  directOne: z.number().int().nonnegative(),
+  ponctuel: z.number().int().nonnegative(),
+})
+
+export type TypeCounts = z.infer<typeof TypeCounts>
+
+// MRR info (conditional on billing module)
+export const MrrInfo = z.discriminatedUnion('available', [
+  z.object({ available: z.literal(false), message: z.string() }),
+  z.object({ available: z.literal(true), amount: z.number() }),
+])
+
+export type MrrInfo = z.infer<typeof MrrInfo>
+
+// Portfolio stats (AC1)
+export const PortfolioStats = z.object({
+  totalClients: z.number().int().nonnegative(),
+  byStatus: StatusCounts,
+  byType: TypeCounts,
+  labActive: z.number().int().nonnegative(),
+  oneActive: z.number().int().nonnegative(),
+  mrr: MrrInfo,
+})
+
+export type PortfolioStats = z.infer<typeof PortfolioStats>
+
+// Graduation rate (AC1)
+export const GraduationRate = z.object({
+  percentage: z.number().nonnegative(),
+  graduated: z.number().int().nonnegative(),
+  totalLabClients: z.number().int().nonnegative(),
+})
+
+export type GraduationRate = z.infer<typeof GraduationRate>
+
+// Client time estimate (AC3)
+export const ClientTimeEstimate = z.object({
+  clientId: z.string().uuid(),
+  clientName: z.string(),
+  clientCompany: z.string(),
+  clientType: ClientTypeEnum,
+  messageCount: z.number().int().nonnegative(),
+  validationCount: z.number().int().nonnegative(),
+  visioSeconds: z.number().int().nonnegative(),
+  totalEstimatedSeconds: z.number().int().nonnegative(),
+  lastActivity: z.string().datetime().nullable(),
+})
+
+export type ClientTimeEstimate = z.infer<typeof ClientTimeEstimate>

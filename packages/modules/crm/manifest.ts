@@ -23,8 +23,12 @@ export const manifest: ModuleManifest = {
     {
       path: '/modules/crm/reminders',
       component: 'Reminders'
+    },
+    {
+      path: '/modules/crm/stats',
+      component: 'StatsDashboard'
     }
   ],
-  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates', 'client_notes', 'reminders'],
+  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates', 'client_notes', 'reminders', 'activity_logs'],
   dependencies: []
 }

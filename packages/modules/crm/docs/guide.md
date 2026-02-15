@@ -233,8 +233,56 @@ Utilisez les onglets en haut de la page :
 
 Utilisez les flèches **← →** pour naviguer entre les mois. Le jour actuel est mis en évidence par un contour bleu.
 
+## Statistiques & temps passé par client
+
+### Accès
+
+Navigation : **CRM → Statistiques** (sous-navigation CRM)
+
+### Indicateurs clés (KPIs)
+
+Le tableau de bord statistiques affiche 5 indicateurs principaux :
+
+- **Total clients** : Nombre total de clients dans le portefeuille (répartition actifs/inactifs/suspendus au survol)
+- **Clients Lab actifs** : Nombre de clients avec statut Lab actif
+- **Clients One actifs** : Nombre de clients avec statut One actif
+- **Taux de graduation** : Pourcentage de clients Lab ayant gradué vers One (nombre/total au survol)
+- **MRR estimé** : Revenu mensuel récurrent (nécessite le module Facturation, sinon placeholder)
+
+Chaque indicateur dispose d'un **tooltip** au survol affichant le détail du calcul.
+
+### Répartition par type de client
+
+Un graphique en donut affiche la répartition des clients par type :
+- **Complet (Lab)** : Clients en parcours d'incubation complet
+- **Direct One** : Clients accédant directement au dashboard One
+- **Ponctuel** : Clients pour des interventions ponctuelles
+
+La légende montre le nombre et le pourcentage pour chaque type.
+
+### Temps passé par client
+
+Un tableau détaillé estime le temps passé par l'opérateur pour chaque client :
+
+| Colonne | Description |
+|---------|-------------|
+| Client | Nom et entreprise |
+| Type | Badge du type de client |
+| Temps total | Estimation basée sur les activités |
+| Dernière activité | Date de la dernière interaction |
+
+**Calcul du temps estimé :**
+- Messages : 2 minutes par message envoyé
+- Validations Hub : 5 minutes par validation (approbation ou refus)
+- Visios : Durée réelle de la visioconférence
+
+Le tableau est triable par nom, temps total ou dernière activité. Par défaut, les clients avec le plus de temps passé apparaissent en premier.
+
+### Performance
+
+Les données sont chargées côté serveur (RSC) et mises en cache 10 minutes via TanStack Query. Un skeleton loader spécifique s'affiche pendant le chargement.
+
 ## Prochaines fonctionnalités
 
-- Statistiques temps passé par client (Story 2.8)
 - Suspendre/réactiver/clôturer un client (Stories 2.9a-2.9c)
 - Alertes inactivité Lab & import clients CSV (Story 2.10)

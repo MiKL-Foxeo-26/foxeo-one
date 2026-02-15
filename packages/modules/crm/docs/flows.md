@@ -337,6 +337,65 @@ flowchart TD
     RefreshCalendar --> ShowCalendar
 ```
 
+## Flux : Chargement des statistiques CRM
+
+```mermaid
+flowchart TD
+    Start([MiKL accède aux Statistiques]) --> RSCFetch[Server Component: Parallel fetch]
+    RSCFetch --> FetchStats[getPortfolioStats]
+    RSCFetch --> FetchGrad[getGraduationRate]
+    RSCFetch --> FetchTime[getTimePerClient]
+
+    FetchStats --> AuthCheck{Authentifié ?}
+    FetchGrad --> AuthCheck
+    FetchTime --> AuthCheck
+
+    AuthCheck -->|Non| Error[Erreur UNAUTHORIZED]
+    AuthCheck -->|Oui| QueryDB[Requêtes Supabase agrégées]
+
+    QueryDB --> ClientsQuery[SELECT clients WHERE operator_id]
+    QueryDB --> LogsQuery[SELECT activity_logs par client]
+
+    ClientsQuery --> AggregateTS[Agrégation TypeScript]
+    LogsQuery --> AggregateTS
+
+    AggregateTS --> StatsResult[PortfolioStats + GraduationRate]
+    AggregateTS --> TimeResult[ClientTimeEstimate par client]
+
+    StatsResult --> InitialData[Données initiales RSC]
+    TimeResult --> InitialData
+
+    InitialData --> HydrateTQ[Hydrater TanStack Query]
+    HydrateTQ --> RenderDashboard[Render StatsDashboard]
+
+    RenderDashboard --> ShowKPIs[KPI Cards avec tooltips]
+    RenderDashboard --> ShowChart[Donut chart répartition par type]
+    RenderDashboard --> ShowTable[Table temps passé avec tri]
+```
+
+```mermaid
+sequenceDiagram
+    participant Page as StatsPage RSC
+    participant SA as Server Actions
+    participant SB as Supabase
+    participant TQ as TanStack Query
+    participant UI as StatsDashboard
+
+    Page->>SA: Promise.all([getPortfolioStats, getGraduationRate, getTimePerClient])
+    SA->>SB: SELECT clients WHERE operator_id (agrégation)
+    SA->>SB: SELECT activity_logs IN client_ids (temps passé)
+    SB-->>SA: Données (snake_case)
+    SA->>SA: Agrégation TypeScript + transform camelCase
+    SA-->>Page: { data, error } x3
+
+    Page->>UI: Render avec initialData
+    UI->>TQ: usePortfolioStats(initialStats)
+    UI->>TQ: useGraduationRate(initialGraduation)
+    UI->>TQ: useTimePerClient(initialTimePerClient)
+    TQ-->>UI: Cache hydraté (staleTime: 10min)
+    UI-->>UI: Render KPIs + Chart + Table
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives

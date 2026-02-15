@@ -1,0 +1,163 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { ActionResponse } from '@foxeo/types'
+import type { PortfolioStats } from '../types/crm.types'
+
+// Mock Supabase server client
+const mockEq = vi.fn()
+const mockSelect = vi.fn(() => ({ eq: mockEq }))
+const mockFrom = vi.fn(() => ({ select: mockSelect }))
+const mockGetUser = vi.fn()
+
+vi.mock('@foxeo/supabase', () => ({
+  createServerSupabaseClient: vi.fn(() => ({
+    from: mockFrom,
+    auth: { getUser: mockGetUser },
+  })),
+}))
+
+describe('getPortfolioStats Server Action', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should return UNAUTHORIZED when user is not authenticated', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: null },
+      error: { message: 'Not authenticated' },
+    })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    const result: ActionResponse<PortfolioStats> = await getPortfolioStats()
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('UNAUTHORIZED')
+  })
+
+  it('should return correct aggregated stats for mixed portfolio', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockEq.mockResolvedValue({
+      data: [
+        { id: '1', client_type: 'complet', status: 'lab-actif' },
+        { id: '2', client_type: 'complet', status: 'one-actif' },
+        { id: '3', client_type: 'direct-one', status: 'one-actif' },
+        { id: '4', client_type: 'ponctuel', status: 'inactif' },
+        { id: '5', client_type: 'complet', status: 'suspendu' },
+      ],
+      error: null,
+    })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    const result: ActionResponse<PortfolioStats> = await getPortfolioStats()
+
+    expect(result.error).toBeNull()
+    expect(result.data).not.toBeNull()
+
+    const stats = result.data!
+    expect(stats.totalClients).toBe(5)
+
+    // Status counts: lab-actif + one-actif = active
+    expect(stats.byStatus.active).toBe(3)
+    expect(stats.byStatus.inactive).toBe(1)
+    expect(stats.byStatus.suspended).toBe(1)
+
+    // Type counts
+    expect(stats.byType.complet).toBe(3)
+    expect(stats.byType.directOne).toBe(1)
+    expect(stats.byType.ponctuel).toBe(1)
+
+    // Lab/One active
+    expect(stats.labActive).toBe(1)
+    expect(stats.oneActive).toBe(2)
+
+    // MRR not available (billing module not present)
+    expect(stats.mrr.available).toBe(false)
+  })
+
+  it('should return zero stats when no clients exist', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockEq.mockResolvedValue({
+      data: [],
+      error: null,
+    })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    const result: ActionResponse<PortfolioStats> = await getPortfolioStats()
+
+    expect(result.error).toBeNull()
+    const stats = result.data!
+    expect(stats.totalClients).toBe(0)
+    expect(stats.byStatus.active).toBe(0)
+    expect(stats.byType.complet).toBe(0)
+    expect(stats.labActive).toBe(0)
+    expect(stats.oneActive).toBe(0)
+  })
+
+  it('should return DATABASE_ERROR when Supabase query fails', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockEq.mockResolvedValue({
+      data: null,
+      error: { message: 'Connection refused', code: 'PGRST301' },
+    })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    const result: ActionResponse<PortfolioStats> = await getPortfolioStats()
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('DATABASE_ERROR')
+  })
+
+  it('should return camelCase fields only (no snake_case leak)', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockEq.mockResolvedValue({
+      data: [
+        { id: '1', client_type: 'complet', status: 'lab-actif' },
+      ],
+      error: null,
+    })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    const result: ActionResponse<PortfolioStats> = await getPortfolioStats()
+
+    const stats = result.data!
+    expect(stats).toHaveProperty('totalClients')
+    expect(stats).toHaveProperty('byStatus')
+    expect(stats).toHaveProperty('byType')
+    expect(stats).toHaveProperty('labActive')
+    expect(stats).toHaveProperty('oneActive')
+    expect(stats).toHaveProperty('mrr')
+    // No snake_case leakage
+    expect(stats).not.toHaveProperty('total_clients')
+    expect(stats).not.toHaveProperty('lab_active')
+  })
+
+  it('should query clients with operator_id filter', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockEq.mockResolvedValue({ data: [], error: null })
+
+    const { getPortfolioStats } = await import('./get-portfolio-stats')
+    await getPortfolioStats()
+
+    expect(mockFrom).toHaveBeenCalledWith('clients')
+    expect(mockEq).toHaveBeenCalledWith('operator_id', '550e8400-e29b-41d4-a716-446655440000')
+  })
+})
