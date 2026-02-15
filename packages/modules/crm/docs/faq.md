@@ -74,6 +74,26 @@ R: Les templates sont créés par l'opérateur. Un template "Parcours Complet" e
 **Q: Quel est l'effet de la désactivation de l'accès One ?**
 R: Le client perd l'accès à son dashboard One. Le dashboard_type est modifié en conséquence. L'action est tracée dans les logs d'activité.
 
+### Intégration Cursor
+
+**Q: Comment ouvrir le dossier BMAD d'un client dans Cursor ?**
+R: Dans la fiche client, cliquez sur le bouton "Ouvrir dans Cursor" dans le header. Si Cursor est installé et que le dossier existe, l'éditeur s'ouvrira automatiquement dans le dossier du client.
+
+**Q: Que faire si le dossier BMAD du client n'existe pas ?**
+R: Un message d'alerte vous indiquera le chemin attendu (ex: `/Users/mikl/bmad/clients/nom-entreprise`). Cliquez sur "Copier le chemin", créez le dossier manuellement, puis utilisez à nouveau le bouton.
+
+**Q: Le bouton Cursor ne fonctionne pas, que faire ?**
+R: Si le protocole `cursor://` n'est pas supporté par votre navigateur, un message de fallback s'affichera avec le chemin complet. Copiez-le et ouvrez manuellement dans Cursor via File → Open Folder.
+
+**Q: Comment personnaliser le chemin de base BMAD ?**
+R: Définissez la variable d'environnement `NEXT_PUBLIC_BMAD_BASE_PATH` dans votre fichier `.env.local`. Par défaut, le chemin est `/Users/mikl/bmad`.
+
+**Q: Le slug du client est-il basé sur le nom ou l'entreprise ?**
+R: Si le client a une entreprise renseignée, le slug est basé sur le nom de l'entreprise (ex: "Acme Corp" → `acme-corp`). Sinon, il est basé sur le nom du client (ex: "Jean Dupont" → `jean-dupont`).
+
+**Q: Les caractères spéciaux et accents sont-ils gérés ?**
+R: Oui, le slug est normalisé automatiquement : les accents sont retirés, les caractères spéciaux sont remplacés par des tirets, tout est en minuscules (ex: "Café & Restaurant" → `cafe-restaurant`).
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

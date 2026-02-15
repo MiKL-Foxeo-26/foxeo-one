@@ -5,6 +5,7 @@ import { Button } from '@foxeo/ui'
 import type { Client } from '../types/crm.types'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { CursorButton } from './cursor-button'
 
 interface ClientHeaderProps {
   client: Client
@@ -54,6 +55,10 @@ export function ClientHeader({ client, onEdit }: ClientHeaderProps) {
         </div>
 
         <div className="flex gap-2">
+          <CursorButton
+            clientName={client.name}
+            companyName={client.company || undefined}
+          />
           {onEdit && (
             <Button onClick={onEdit} variant="outline">
               Modifier

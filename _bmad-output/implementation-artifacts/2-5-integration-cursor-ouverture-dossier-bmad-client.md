@@ -1,6 +1,6 @@
 # Story 2.5: Intégration Cursor (ouverture dossier BMAD client)
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -20,31 +20,31 @@ So that **je peux travailler avec Orpheus sur les documents du client sans quitt
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Configuration chemin BMAD (AC: #1)
-  - [ ] 1.1 Ajouter constante `BMAD_BASE_PATH` configurable dans `packages/modules/crm/utils/cursor-integration.ts`
-  - [ ] 1.2 Fonction `buildClientSlug(name: string, company?: string): string` — kebab-case du nom entreprise ou nom client
-  - [ ] 1.3 Fonction `buildBmadPath(clientSlug: string, basePath?: string): string` — construit le chemin complet
-  - [ ] 1.4 Fonction `buildCursorUrl(path: string): string` — génère `cursor://file/{path}`
+- [x] Task 1 — Configuration chemin BMAD (AC: #1)
+  - [x] 1.1 Ajouter constante `BMAD_BASE_PATH` configurable dans `packages/modules/crm/utils/cursor-integration.ts`
+  - [x] 1.2 Fonction `buildClientSlug(name: string, company?: string): string` — kebab-case du nom entreprise ou nom client
+  - [x] 1.3 Fonction `buildBmadPath(clientSlug: string, basePath?: string): string` — construit le chemin complet
+  - [x] 1.4 Fonction `buildCursorUrl(path: string): string` — génère `cursor://file/{path}`
 
-- [ ] Task 2 — Composant CursorButton (AC: #1, #2, #3)
-  - [ ] 2.1 `components/cursor-button.tsx` — Bouton principal avec icône Cursor
-  - [ ] 2.2 Détection support protocole custom via `window.open()` avec timeout fallback
-  - [ ] 2.3 État "dossier inexistant" : message info + bouton "Copier le chemin"
-  - [ ] 2.4 État "protocole non supporté" : chemin complet affiché + bouton copier + instructions manuelles
-  - [ ] 2.5 Utiliser `navigator.clipboard.writeText()` pour la copie, toast "Chemin copié"
+- [x] Task 2 — Composant CursorButton (AC: #1, #2, #3)
+  - [x] 2.1 `components/cursor-button.tsx` — Bouton principal avec icône Cursor
+  - [x] 2.2 Détection support protocole custom via `window.open()` avec timeout fallback
+  - [x] 2.3 État "dossier inexistant" : message info + bouton "Copier le chemin"
+  - [x] 2.4 État "protocole non supporté" : chemin complet affiché + bouton copier + instructions manuelles
+  - [x] 2.5 Utiliser `navigator.clipboard.writeText()` pour la copie, toast "Chemin copié"
 
-- [ ] Task 3 — Intégration fiche client (AC: #1)
-  - [ ] 3.1 Ajouter le bouton CursorButton dans le header de la fiche client (Story 2.3)
-  - [ ] 3.2 Passer le client (name, company) en props pour construire le slug
+- [x] Task 3 — Intégration fiche client (AC: #1)
+  - [x] 3.1 Ajouter le bouton CursorButton dans le header de la fiche client (Story 2.3)
+  - [x] 3.2 Passer le client (name, company) en props pour construire le slug
 
-- [ ] Task 4 — Tests (AC: #4)
-  - [ ] 4.1 Tests unitaires `cursor-integration.test.ts` : buildClientSlug, buildBmadPath, buildCursorUrl
-  - [ ] 4.2 Tests composant `cursor-button.test.tsx` : render, clic, copie presse-papier, fallback
-  - [ ] 4.3 Tests edge cases : noms avec caractères spéciaux, accents, espaces
+- [x] Task 4 — Tests (AC: #4)
+  - [x] 4.1 Tests unitaires `cursor-integration.test.ts` : buildClientSlug, buildBmadPath, buildCursorUrl
+  - [x] 4.2 Tests composant `cursor-button.test.tsx` : render, clic, copie presse-papier, fallback
+  - [x] 4.3 Tests edge cases : noms avec caractères spéciaux, accents, espaces
 
-- [ ] Task 5 — Documentation (AC: #4)
-  - [ ] 5.1 Mettre à jour `docs/guide.md` avec section Cursor
-  - [ ] 5.2 Mettre à jour `docs/faq.md` avec questions Cursor
+- [x] Task 5 — Documentation (AC: #4)
+  - [x] 5.1 Mettre à jour `docs/guide.md` avec section Cursor
+  - [x] 5.2 Mettre à jour `docs/faq.md` avec questions Cursor
 
 ## Dev Notes
 

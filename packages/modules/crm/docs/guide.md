@@ -104,6 +104,33 @@ Dans la section **"Accès dashboards"** de la fiche client :
 - **Accès One** : Active/désactive le dashboard business.
 - La désactivation déclenche un dialog de confirmation.
 
+### Ouvrir le dossier client dans Cursor
+
+Dans le header de la fiche client, le bouton **"Ouvrir dans Cursor"** vous permet d'accéder directement au dossier BMAD du client pour travailler avec Orpheus.
+
+**Fonctionnement :**
+1. Le bouton génère un lien `cursor://file/` pointant vers le dossier du client
+2. Le chemin est construit selon la convention : `{bmad_base_path}/clients/{client-slug}/`
+3. Le slug est dérivé du nom de l'entreprise (ou du nom client si pas d'entreprise)
+4. Cliquer ouvre Cursor directement dans ce dossier
+
+**Si le dossier n'existe pas encore :**
+- Un message d'alerte s'affiche avec le chemin attendu
+- Un bouton "Copier le chemin" copie le chemin dans le presse-papier
+- Créez le dossier manuellement, puis utilisez le bouton
+
+**Si le protocole Cursor n'est pas supporté :**
+- Un message explique comment ouvrir manuellement
+- Le chemin complet est affiché avec un bouton "Copier"
+- Instructions : File → Open Folder dans Cursor
+
+**Configuration (optionnel) :**
+Vous pouvez personnaliser le chemin de base BMAD via la variable d'environnement :
+```
+NEXT_PUBLIC_BMAD_BASE_PATH=/votre/chemin/bmad
+```
+Par défaut : `/Users/mikl/bmad`
+
 ### Statuts parcours
 
 | Statut | Description |
@@ -114,6 +141,6 @@ Dans la section **"Accès dashboards"** de la fiche client :
 
 ## Prochaines fonctionnalités
 
-- Assignation/modification curseur client (Story 2.5)
 - Notes privées et rappels (Stories 2.6-2.7)
 - Statistiques temps passé par client (Story 2.8)
+- Suspendre/réactiver/clôturer un client (Stories 2.9a-2.9c)

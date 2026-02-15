@@ -20,6 +20,7 @@ export { AssignParcoursDialog } from './components/assign-parcours-dialog'
 export { ParcoursStageList } from './components/parcours-stage-list'
 export { AccessToggles } from './components/access-toggles'
 export { ParcoursStatusBadge } from './components/parcours-status-badge'
+export { CursorButton } from './components/cursor-button'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -43,6 +44,15 @@ export { assignParcours } from './actions/assign-parcours'
 export { getClientParcours } from './actions/get-client-parcours'
 export { toggleAccess } from './actions/toggle-access'
 export { suspendParcours } from './actions/suspend-parcours'
+
+// Utils
+export {
+  buildClientSlug,
+  buildBmadPath,
+  buildCursorUrl,
+  toKebabCase,
+  BMAD_BASE_PATH,
+} from './utils/cursor-integration'
 
 // Types
 export type {
