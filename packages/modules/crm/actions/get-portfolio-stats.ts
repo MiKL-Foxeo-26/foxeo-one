@@ -26,7 +26,7 @@ export async function getPortfolioStats(): Promise<ActionResponse<PortfolioStats
 
     const { data, error } = await supabase
       .from('clients')
-      .select('id, client_type, status')
+      .select('id, client_type, status, client_configs(dashboard_type)')
       .eq('operator_id', operatorId)
 
     if (error) {
@@ -43,16 +43,16 @@ export async function getPortfolioStats(): Promise<ActionResponse<PortfolioStats
     // Aggregate by status
     const byStatus = {
       active: 0,
-      inactive: 0,
+      archived: 0,
       suspended: 0,
     }
 
     for (const client of clients) {
-      if (client.status === 'lab-actif' || client.status === 'one-actif') {
+      if (client.status === 'active') {
         byStatus.active++
-      } else if (client.status === 'inactif') {
-        byStatus.inactive++
-      } else if (client.status === 'suspendu') {
+      } else if (client.status === 'archived') {
+        byStatus.archived++
+      } else if (client.status === 'suspended') {
         byStatus.suspended++
       }
     }
@@ -74,13 +74,15 @@ export async function getPortfolioStats(): Promise<ActionResponse<PortfolioStats
       }
     }
 
-    // Lab / One active counts
-    const labActive = clients.filter(
-      (c) => c.status === 'lab-actif'
+    // Lab / One active counts (based on dashboard_type from client_configs)
+    const clientConfigs = clients as Array<typeof clients[number] & { client_configs: { dashboard_type: string } | null }>
+
+    const labActive = clientConfigs.filter(
+      (c) => c.status === 'active' && c.client_configs?.dashboard_type === 'lab'
     ).length
 
-    const oneActive = clients.filter(
-      (c) => c.status === 'one-actif'
+    const oneActive = clientConfigs.filter(
+      (c) => c.status === 'active' && c.client_configs?.dashboard_type === 'one'
     ).length
 
     const stats = PortfolioStatsSchema.parse({

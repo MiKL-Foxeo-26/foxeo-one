@@ -19,7 +19,7 @@ describe('ClientHeader', () => {
     company: 'Acme Corp',
     email: 'jean@acme.com',
     clientType: 'complet',
-    status: 'lab-actif',
+    status: 'active',
     sector: 'tech',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-20T14:30:00Z',
@@ -47,7 +47,7 @@ describe('ClientHeader', () => {
   it('should render status badge', () => {
     render(<ClientHeader client={mockClient} />)
 
-    expect(screen.getByText(/lab actif/i)).toBeInTheDocument()
+    expect(screen.getByText(/actif/i)).toBeInTheDocument()
   })
 
   it('should render creation date', () => {

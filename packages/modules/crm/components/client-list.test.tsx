@@ -21,7 +21,7 @@ describe('ClientList', () => {
       name: 'John Doe',
       company: 'Acme Corp',
       clientType: 'complet',
-      status: 'lab-actif',
+      status: 'active',
       createdAt: '2024-01-15T10:00:00Z'
     },
     {
@@ -29,7 +29,7 @@ describe('ClientList', () => {
       name: 'Jane Smith',
       company: 'Tech Inc',
       clientType: 'direct-one',
-      status: 'one-actif',
+      status: 'suspended',
       createdAt: '2024-02-20T14:30:00Z'
     }
   ]
@@ -63,8 +63,8 @@ describe('ClientList', () => {
   it('should render status badges', () => {
     render(<ClientList clients={mockClients} />)
 
-    expect(screen.getByText('Lab actif')).toBeInTheDocument()
-    expect(screen.getByText('One actif')).toBeInTheDocument()
+    expect(screen.getByText('Actif')).toBeInTheDocument()
+    expect(screen.getByText('Suspendu')).toBeInTheDocument()
   })
 
   it('should format dates correctly', () => {

@@ -37,6 +37,9 @@ export { ClientTypeChart } from './components/client-type-chart'
 export { TimePerClientTable } from './components/time-per-client-table'
 export { StatsSkeleton } from './components/stats-skeleton'
 export { CrmSubNav } from './components/crm-sub-nav'
+export { ClientStatusBadge } from './components/client-status-badge'
+export { SuspendClientDialog } from './components/suspend-client-dialog'
+export { ClientLifecycleActions } from './components/client-lifecycle-actions'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -78,6 +81,8 @@ export { deleteReminder } from './actions/delete-reminder'
 export { getPortfolioStats } from './actions/get-portfolio-stats'
 export { getGraduationRate } from './actions/get-graduation-rate'
 export { getTimePerClient } from './actions/get-time-per-client'
+export { suspendClient } from './actions/suspend-client'
+export { reactivateClient } from './actions/reactivate-client'
 
 // Utils
 export {
@@ -132,4 +137,6 @@ export type {
   MrrInfo,
   GraduationRate,
   ClientTimeEstimate,
+  SuspendClientInput,
+  ReactivateClientInput,
 } from './types/crm.types'

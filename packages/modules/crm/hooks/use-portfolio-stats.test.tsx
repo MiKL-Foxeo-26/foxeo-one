@@ -34,7 +34,7 @@ describe('usePortfolioStats', () => {
   it('should use initialData when provided', () => {
     const initialData = {
       totalClients: 5,
-      byStatus: { active: 3, inactive: 1, suspended: 1 },
+      byStatus: { active: 3, archived: 1, suspended: 1 },
       byType: { complet: 3, directOne: 1, ponctuel: 1 },
       labActive: 1,
       oneActive: 2,
@@ -71,7 +71,7 @@ describe('usePortfolioStats', () => {
   it('should return data when successful', async () => {
     const mockData = {
       totalClients: 10,
-      byStatus: { active: 7, inactive: 2, suspended: 1 },
+      byStatus: { active: 7, archived: 2, suspended: 1 },
       byType: { complet: 5, directOne: 3, ponctuel: 2 },
       labActive: 3,
       oneActive: 4,

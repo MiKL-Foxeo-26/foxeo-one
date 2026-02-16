@@ -41,11 +41,11 @@ describe('getPortfolioStats Server Action', () => {
 
     mockEq.mockResolvedValue({
       data: [
-        { id: '1', client_type: 'complet', status: 'lab-actif' },
-        { id: '2', client_type: 'complet', status: 'one-actif' },
-        { id: '3', client_type: 'direct-one', status: 'one-actif' },
-        { id: '4', client_type: 'ponctuel', status: 'inactif' },
-        { id: '5', client_type: 'complet', status: 'suspendu' },
+        { id: '1', client_type: 'complet', status: 'active', client_configs: { dashboard_type: 'lab' } },
+        { id: '2', client_type: 'complet', status: 'active', client_configs: { dashboard_type: 'one' } },
+        { id: '3', client_type: 'direct-one', status: 'active', client_configs: { dashboard_type: 'one' } },
+        { id: '4', client_type: 'ponctuel', status: 'archived', client_configs: null },
+        { id: '5', client_type: 'complet', status: 'suspended', client_configs: null },
       ],
       error: null,
     })
@@ -59,9 +59,9 @@ describe('getPortfolioStats Server Action', () => {
     const stats = result.data!
     expect(stats.totalClients).toBe(5)
 
-    // Status counts: lab-actif + one-actif = active
+    // Status counts
     expect(stats.byStatus.active).toBe(3)
-    expect(stats.byStatus.inactive).toBe(1)
+    expect(stats.byStatus.archived).toBe(1)
     expect(stats.byStatus.suspended).toBe(1)
 
     // Type counts
@@ -69,7 +69,7 @@ describe('getPortfolioStats Server Action', () => {
     expect(stats.byType.directOne).toBe(1)
     expect(stats.byType.ponctuel).toBe(1)
 
-    // Lab/One active
+    // Lab/One active (based on client_configs.dashboard_type)
     expect(stats.labActive).toBe(1)
     expect(stats.oneActive).toBe(2)
 
@@ -126,7 +126,7 @@ describe('getPortfolioStats Server Action', () => {
 
     mockEq.mockResolvedValue({
       data: [
-        { id: '1', client_type: 'complet', status: 'lab-actif' },
+        { id: '1', client_type: 'complet', status: 'active', client_configs: { dashboard_type: 'lab' } },
       ],
       error: null,
     })

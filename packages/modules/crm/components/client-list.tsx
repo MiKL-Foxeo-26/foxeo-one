@@ -4,6 +4,7 @@ import { DataTable, type ColumnDef } from '@foxeo/ui'
 import { Badge } from '@foxeo/ui'
 import { CreateClientDialog } from './create-client-dialog'
 import { PinButton } from './pin-button'
+import { ClientStatusBadge } from './client-status-badge'
 import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
 
 interface ClientListProps {
@@ -17,14 +18,6 @@ const clientTypeConfig: Record<ClientType, { label: string; variant: 'default' |
   'complet': { label: 'Complet', variant: 'default' },
   'direct-one': { label: 'Direct One', variant: 'secondary' },
   'ponctuel': { label: 'Ponctuel', variant: 'outline' }
-}
-
-// Status badge variants and labels
-const clientStatusConfig: Record<ClientStatus, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-  'lab-actif': { label: 'Lab actif', variant: 'default' },
-  'one-actif': { label: 'One actif', variant: 'secondary' },
-  'inactif': { label: 'Inactif', variant: 'outline' },
-  'suspendu': { label: 'Suspendu', variant: 'destructive' }
 }
 
 // Format date to FR locale
@@ -87,10 +80,11 @@ export function ClientList({ clients, onRowClick, showCreateButton = true }: Cli
       id: 'status',
       header: 'Statut',
       accessorKey: 'status',
-      cell: (client) => {
-        const config = clientStatusConfig[client.status]
-        return <Badge variant={config.variant}>{config.label}</Badge>
-      },
+      cell: (client) => (
+        <ClientStatusBadge
+          status={client.status}
+        />
+      ),
       sortable: true,
     },
     {

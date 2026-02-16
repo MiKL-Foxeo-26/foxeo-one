@@ -41,7 +41,7 @@ const createWrapper = () => {
 
 const mockStats: PortfolioStats = {
   totalClients: 10,
-  byStatus: { active: 7, inactive: 2, suspended: 1 },
+  byStatus: { active: 7, archived: 2, suspended: 1 },
   byType: { complet: 5, directOne: 3, ponctuel: 2 },
   labActive: 3,
   oneActive: 4,

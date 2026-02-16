@@ -53,7 +53,7 @@ describe('getClients Server Action', () => {
           email: 'jean@acme.com',
           sector: 'tech',
           client_type: 'complet',
-          status: 'lab-actif',
+          status: 'active',
           created_at: '2024-01-15T10:00:00Z',
           is_pinned: false,
           deferred_until: null,

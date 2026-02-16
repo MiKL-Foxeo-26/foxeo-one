@@ -62,7 +62,7 @@ development_status:
   2-6-notes-privees-epinglage-a-traiter-plus-tard: review
   2-7-rappels-personnels-calendrier-deadlines: done
   2-8-statistiques-globales-temps-passe-par-client: done
-  2-9a-suspendre-reactiver-un-client: ready-for-dev
+  2-9a-suspendre-reactiver-un-client: done
   2-9b-cloturer-un-client-archiver-les-donnees: ready-for-dev
   2-9c-upgrader-un-client-ponctuel-vers-lab-ou-one: ready-for-dev
   2-10-alertes-inactivite-lab-import-clients-csv: ready-for-dev

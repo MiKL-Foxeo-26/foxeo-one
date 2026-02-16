@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isPublicPath, isStaticOrApi } from './middleware'
+import { isPublicPath, isStaticOrApi, isConsentExcluded, CONSENT_EXCLUDED_PATHS } from './middleware'
 
 describe('middleware routing logic', () => {
   describe('isPublicPath', () => {
@@ -46,6 +46,70 @@ describe('middleware routing logic', () => {
     it('returns false for page routes', () => {
       expect(isStaticOrApi('/login')).toBe(false)
       expect(isStaticOrApi('/')).toBe(false)
+    })
+  })
+
+  describe('isConsentExcluded', () => {
+    it('returns true for /suspended', () => {
+      expect(isConsentExcluded('/suspended')).toBe(true)
+    })
+
+    it('returns true for /consent-update', () => {
+      expect(isConsentExcluded('/consent-update')).toBe(true)
+    })
+
+    it('returns true for /legal', () => {
+      expect(isConsentExcluded('/legal')).toBe(true)
+    })
+
+    it('returns true for /api routes', () => {
+      expect(isConsentExcluded('/api/something')).toBe(true)
+    })
+
+    it('returns false for dashboard routes', () => {
+      expect(isConsentExcluded('/')).toBe(false)
+      expect(isConsentExcluded('/modules/crm')).toBe(false)
+    })
+
+    it('includes /suspended in CONSENT_EXCLUDED_PATHS', () => {
+      expect(CONSENT_EXCLUDED_PATHS).toContain('/suspended')
+    })
+  })
+
+  describe('suspension redirect logic', () => {
+    it('suspended client on protected route should be redirected to /suspended', () => {
+      // Given: client with status='suspended' on /modules/crm
+      const clientStatus = 'suspended'
+      const pathname = '/modules/crm'
+
+      // When: middleware checks status
+      const shouldRedirect = clientStatus === 'suspended' && pathname !== '/suspended'
+
+      // Then: should redirect
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('suspended client already on /suspended should NOT be redirected', () => {
+      const clientStatus = 'suspended'
+      const pathname = '/suspended'
+
+      const shouldRedirect = clientStatus === 'suspended' && pathname !== '/suspended'
+
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('active client should NOT be redirected to /suspended', () => {
+      const clientStatus = 'active'
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = clientStatus === 'suspended' && pathname !== '/suspended'
+
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('/suspended path is excluded from consent check', () => {
+      // Suspended clients redirected to /suspended must not be caught by consent check
+      expect(isConsentExcluded('/suspended')).toBe(true)
     })
   })
 

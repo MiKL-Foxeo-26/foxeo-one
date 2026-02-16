@@ -9,6 +9,10 @@ import {
   GraduationRate,
   ClientTimeEstimate,
   MrrInfo,
+  ClientStatusEnum,
+  SuspendClientInput,
+  ReactivateClientInput,
+  Client,
 } from './crm.types'
 
 describe('Reminder Types & Schemas', () => {
@@ -250,7 +254,7 @@ describe('Stats Types & Schemas (Story 2.8)', () => {
     it('validates a complete portfolio stats object', () => {
       const validStats = {
         totalClients: 10,
-        byStatus: { active: 6, inactive: 3, suspended: 1 },
+        byStatus: { active: 6, archived: 3, suspended: 1 },
         byType: { complet: 5, directOne: 3, ponctuel: 2 },
         labActive: 3,
         oneActive: 3,
@@ -264,7 +268,7 @@ describe('Stats Types & Schemas (Story 2.8)', () => {
     it('validates with MRR available', () => {
       const stats = {
         totalClients: 5,
-        byStatus: { active: 5, inactive: 0, suspended: 0 },
+        byStatus: { active: 5, archived: 0, suspended: 0 },
         byType: { complet: 5, directOne: 0, ponctuel: 0 },
         labActive: 2,
         oneActive: 3,
@@ -278,7 +282,7 @@ describe('Stats Types & Schemas (Story 2.8)', () => {
     it('rejects negative counts', () => {
       const invalid = {
         totalClients: -1,
-        byStatus: { active: 0, inactive: 0, suspended: 0 },
+        byStatus: { active: 0, archived: 0, suspended: 0 },
         byType: { complet: 0, directOne: 0, ponctuel: 0 },
         labActive: 0,
         oneActive: 0,
@@ -387,6 +391,165 @@ describe('Stats Types & Schemas (Story 2.8)', () => {
 
     it('rejects MRR available without amount', () => {
       const result = MrrInfo.safeParse({ available: true, message: 'test' })
+      expect(result.success).toBe(false)
+    })
+  })
+})
+
+describe('Client Lifecycle Types & Schemas (Story 2.9a)', () => {
+  describe('ClientStatusEnum', () => {
+    it('validates correct status values', () => {
+      expect(ClientStatusEnum.safeParse('active').success).toBe(true)
+      expect(ClientStatusEnum.safeParse('suspended').success).toBe(true)
+      expect(ClientStatusEnum.safeParse('archived').success).toBe(true)
+    })
+
+    it('rejects invalid status value', () => {
+      const result = ClientStatusEnum.safeParse('invalid-status')
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects old status values', () => {
+      expect(ClientStatusEnum.safeParse('lab-actif').success).toBe(false)
+      expect(ClientStatusEnum.safeParse('one-actif').success).toBe(false)
+      expect(ClientStatusEnum.safeParse('inactif').success).toBe(false)
+      expect(ClientStatusEnum.safeParse('suspendu').success).toBe(false)
+    })
+  })
+
+  describe('Client schema with lifecycle fields', () => {
+    it('validates client with suspendedAt', () => {
+      const client = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        operatorId: '123e4567-e89b-12d3-a456-426614174001',
+        name: 'Test Client',
+        company: 'Test Corp',
+        email: 'test@example.com',
+        clientType: 'complet',
+        status: 'suspended',
+        suspendedAt: new Date().toISOString(),
+        archivedAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const result = Client.safeParse(client)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates client with archivedAt', () => {
+      const client = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        operatorId: '123e4567-e89b-12d3-a456-426614174001',
+        name: 'Test Client',
+        company: 'Test Corp',
+        email: 'test@example.com',
+        clientType: 'complet',
+        status: 'archived',
+        suspendedAt: null,
+        archivedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const result = Client.safeParse(client)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates client without lifecycle timestamps', () => {
+      const client = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        operatorId: '123e4567-e89b-12d3-a456-426614174001',
+        name: 'Test Client',
+        company: 'Test Corp',
+        email: 'test@example.com',
+        clientType: 'complet',
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      const result = Client.safeParse(client)
+      expect(result.success).toBe(true)
+    })
+  })
+
+  describe('SuspendClientInput schema', () => {
+    it('validates valid suspend input with reason', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        reason: 'Client requested temporary pause',
+      }
+
+      const result = SuspendClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates suspend input without optional reason', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+      }
+
+      const result = SuspendClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid UUID', () => {
+      const invalidInput = {
+        clientId: 'not-a-uuid',
+        reason: 'Test',
+      }
+
+      const result = SuspendClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects reason longer than 500 characters', () => {
+      const invalidInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        reason: 'a'.repeat(501),
+      }
+
+      const result = SuspendClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain('500')
+      }
+    })
+
+    it('rejects missing clientId', () => {
+      const invalidInput = {
+        reason: 'Test',
+      }
+
+      const result = SuspendClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('ReactivateClientInput schema', () => {
+    it('validates valid reactivate input', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+      }
+
+      const result = ReactivateClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid UUID', () => {
+      const invalidInput = {
+        clientId: 'not-a-uuid',
+      }
+
+      const result = ReactivateClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects missing clientId', () => {
+      const invalidInput = {}
+
+      const result = ReactivateClientInput.safeParse(invalidInput)
       expect(result.success).toBe(false)
     })
   })

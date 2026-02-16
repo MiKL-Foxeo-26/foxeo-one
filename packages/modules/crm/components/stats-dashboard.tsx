@@ -38,7 +38,7 @@ export function StatsDashboard({
         <KpiCard
           label="Total clients"
           value={stats?.totalClients ?? 0}
-          tooltip={`${stats?.byStatus.active ?? 0} actifs, ${stats?.byStatus.inactive ?? 0} inactifs, ${stats?.byStatus.suspended ?? 0} suspendus`}
+          tooltip={`${stats?.byStatus.active ?? 0} actifs, ${stats?.byStatus.archived ?? 0} archivés, ${stats?.byStatus.suspended ?? 0} suspendus`}
         />
         <KpiCard
           label="Clients Lab actifs"

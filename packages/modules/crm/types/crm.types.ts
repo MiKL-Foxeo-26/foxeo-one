@@ -3,7 +3,7 @@ import { createClientSchema, updateClientSchema } from '@foxeo/utils'
 
 // Client type enums
 export const ClientTypeEnum = z.enum(['complet', 'direct-one', 'ponctuel'])
-export const ClientStatusEnum = z.enum(['lab-actif', 'one-actif', 'inactif', 'suspendu'])
+export const ClientStatusEnum = z.enum(['active', 'suspended', 'archived'])
 
 // Client Config types (from client_configs table)
 export const ClientConfig = z.object({
@@ -28,6 +28,8 @@ export const Client = z.object({
   phone: z.string().optional(),
   website: z.string().url().optional().or(z.literal('')),
   notes: z.string().optional(),
+  suspendedAt: z.string().datetime().nullable().optional(),
+  archivedAt: z.string().datetime().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   config: ClientConfig.optional(),
@@ -78,11 +80,13 @@ export type ClientDB = {
   company: string
   email: string
   client_type: 'complet' | 'direct-one' | 'ponctuel'
-  status: 'lab-actif' | 'one-actif' | 'inactif' | 'suspendu'
+  status: 'active' | 'suspended' | 'archived'
   sector?: string
   phone?: string
   website?: string
   notes?: string
+  suspended_at?: string | null
+  archived_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -364,7 +368,7 @@ export type ReminderDB = {
 // Status counts for portfolio stats
 export const StatusCounts = z.object({
   active: z.number().int().nonnegative(),
-  inactive: z.number().int().nonnegative(),
+  archived: z.number().int().nonnegative(),
   suspended: z.number().int().nonnegative(),
 })
 
@@ -422,3 +426,22 @@ export const ClientTimeEstimate = z.object({
 })
 
 export type ClientTimeEstimate = z.infer<typeof ClientTimeEstimate>
+
+// ============================================================
+// Client Lifecycle types (Story 2.9a)
+// ============================================================
+
+// Suspend client input (AC2)
+export const SuspendClientInput = z.object({
+  clientId: z.string().uuid(),
+  reason: z.string().max(500, 'La raison ne peut pas dépasser 500 caractères').optional(),
+})
+
+export type SuspendClientInput = z.infer<typeof SuspendClientInput>
+
+// Reactivate client input (AC3)
+export const ReactivateClientInput = z.object({
+  clientId: z.string().uuid(),
+})
+
+export type ReactivateClientInput = z.infer<typeof ReactivateClientInput>

@@ -6,6 +6,8 @@ import type { Client } from '../types/crm.types'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { CursorButton } from './cursor-button'
+import { ClientStatusBadge } from './client-status-badge'
+import { ClientLifecycleActions } from './client-lifecycle-actions'
 
 interface ClientHeaderProps {
   client: Client
@@ -16,20 +18,6 @@ const clientTypeLabels: Record<string, string> = {
   'complet': 'Complet',
   'direct-one': 'Direct One',
   'ponctuel': 'Ponctuel',
-}
-
-const statusLabels: Record<string, string> = {
-  'lab-actif': 'Lab actif',
-  'one-actif': 'One actif',
-  'inactif': 'Inactif',
-  'suspendu': 'Suspendu',
-}
-
-const statusColors: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  'lab-actif': 'default',
-  'one-actif': 'secondary',
-  'inactif': 'outline',
-  'suspendu': 'destructive',
 }
 
 export function ClientHeader({ client, onEdit }: ClientHeaderProps) {
@@ -45,9 +33,11 @@ export function ClientHeader({ client, onEdit }: ClientHeaderProps) {
             <Badge variant="outline">
               {clientTypeLabels[client.clientType] || client.clientType}
             </Badge>
-            <Badge variant={statusColors[client.status] || 'default'}>
-              {statusLabels[client.status] || client.status}
-            </Badge>
+            <ClientStatusBadge
+              status={client.status}
+              suspendedAt={client.suspendedAt}
+              archivedAt={client.archivedAt}
+            />
           </div>
           <p className="text-sm text-muted-foreground">
             Client depuis le {creationDate}
@@ -59,6 +49,7 @@ export function ClientHeader({ client, onEdit }: ClientHeaderProps) {
             clientName={client.name}
             companyName={client.company || undefined}
           />
+          <ClientLifecycleActions client={client} />
           {onEdit && (
             <Button onClick={onEdit} variant="outline">
               Modifier

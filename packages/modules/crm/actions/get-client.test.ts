@@ -92,7 +92,7 @@ describe('getClient Server Action', () => {
         company: 'Acme Corp',
         email: 'jean@acme.com',
         client_type: 'complet',
-        status: 'lab-actif',
+        status: 'active',
         sector: 'tech',
         phone: '+33612345678',
         website: 'https://acme.com',
@@ -122,7 +122,7 @@ describe('getClient Server Action', () => {
     expect(client).toHaveProperty('company', 'Acme Corp')
     expect(client).toHaveProperty('email', 'jean@acme.com')
     expect(client).toHaveProperty('clientType', 'complet')
-    expect(client).toHaveProperty('status', 'lab-actif')
+    expect(client).toHaveProperty('status', 'active')
     expect(client).toHaveProperty('sector', 'tech')
     expect(client).toHaveProperty('phone', '+33612345678')
     expect(client).toHaveProperty('website', 'https://acme.com')
@@ -175,7 +175,7 @@ describe('getClient Server Action', () => {
         company: 'Test Inc',
         email: 'test@test.com',
         client_type: 'ponctuel',
-        status: 'inactif',
+        status: 'active',
         created_at: '2024-01-15T10:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
         client_configs: null,
@@ -232,7 +232,7 @@ describe('getClient Server Action', () => {
         company: 'Acme Corp',
         email: 'jean@acme.com',
         client_type: 'ponctuel',
-        status: 'inactif',
+        status: 'active',
         sector: null,
         phone: null,
         website: null,

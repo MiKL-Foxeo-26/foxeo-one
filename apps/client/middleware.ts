@@ -4,7 +4,7 @@ import { checkConsentVersion } from './middleware-consent'
 import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
-export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api']
+export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended']
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
   // 1. Detect and set locale (before auth check)
   const locale = detectLocale(request)
 
-  const { user, response } = await createMiddlewareSupabaseClient(request)
+  const { user, response, supabase } = await createMiddlewareSupabaseClient(request)
 
   // Set locale cookie on response
   setLocaleCookie(response, locale)
@@ -58,17 +58,25 @@ export async function middleware(request: NextRequest) {
     return redirectResponse
   }
 
-  // Check CGU consent version for authenticated users (exclude specific paths)
+  // Check CGU consent version and client status for authenticated users (exclude specific paths)
   if (user && !isConsentExcluded(request.nextUrl.pathname)) {
-    // Get client_id from clients table
-    const { supabase } = await createMiddlewareSupabaseClient(request)
-    const { data: client } = (await supabase
+    // Get client info from clients table
+    const { data: client } = await supabase
       .from('clients')
-      .select('id')
+      .select('id, status')
       .eq('auth_user_id', user.id)
-      .maybeSingle()) as { data: { id: string } | null }
+      .maybeSingle()
 
     if (client?.id) {
+      // Check if client is suspended
+      if (client.status === 'suspended' && request.nextUrl.pathname !== '/suspended') {
+        const suspendedUrl = new URL('/suspended', request.url)
+        const suspendedResponse = NextResponse.redirect(suspendedUrl)
+        setLocaleCookie(suspendedResponse, locale)
+        return suspendedResponse
+      }
+
+      // Check consent version
       const consentRedirect = await checkConsentVersion(request, client.id)
       if (consentRedirect) {
         return consentRedirect
