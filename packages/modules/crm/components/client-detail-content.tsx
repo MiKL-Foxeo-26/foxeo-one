@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ClientHeader } from './client-header'
 import { ClientTabs } from './client-tabs'
 import { EditClientDialog } from './edit-client-dialog'
+import { ArchivedBanner } from './archived-banner'
 import { useClient } from '../hooks/use-client'
 import type { Client } from '../types/crm.types'
 
@@ -21,20 +22,35 @@ export function ClientDetailContent({ client: initialClient }: ClientDetailConte
   })
 
   const displayClient = client ?? initialClient
+  const isArchived = displayClient.status === 'archived'
 
   return (
     <>
       <div className="container mx-auto py-6 space-y-6">
-        <ClientHeader client={displayClient} onEdit={() => setIsEditDialogOpen(true)} />
-        <ClientTabs clientId={displayClient.id} onEdit={() => setIsEditDialogOpen(true)} />
+        {isArchived && (
+          <ArchivedBanner
+            clientId={displayClient.id}
+            archivedAt={displayClient.archivedAt}
+          />
+        )}
+        <ClientHeader
+          client={displayClient}
+          onEdit={isArchived ? undefined : () => setIsEditDialogOpen(true)}
+        />
+        <ClientTabs
+          clientId={displayClient.id}
+          onEdit={isArchived ? undefined : () => setIsEditDialogOpen(true)}
+        />
       </div>
 
       {/* Controlled Edit Dialog (no trigger, opened programmatically) */}
-      <EditClientDialog
-        client={displayClient}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-      />
+      {!isArchived && (
+        <EditClientDialog
+          client={displayClient}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+        />
+      )}
     </>
   )
 }

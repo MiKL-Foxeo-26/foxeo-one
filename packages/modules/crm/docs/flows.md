@@ -396,6 +396,104 @@ sequenceDiagram
     UI-->>UI: Render KPIs + Chart + Table
 ```
 
+## Flux : Cycle de vie client — Suspendre / Clôturer / Réactiver
+
+```mermaid
+flowchart TD
+    Start([MiKL ouvre fiche client]) --> CheckStatus{Statut actuel ?}
+
+    CheckStatus -->|Actif| ShowActive[Header: boutons Suspendre + Clôturer]
+    CheckStatus -->|Suspendu| ShowSuspended[Header: boutons Réactiver + Clôturer]
+    CheckStatus -->|Clôturé| ShowArchived[Bandeau: bouton Réactiver + Mode lecture seule]
+
+    ShowActive --> ActionChoice{Action choisie ?}
+    ShowSuspended --> ActionChoice
+    ShowArchived --> ActionReactivate
+
+    ActionChoice -->|Suspendre| OpenSuspendDialog[Ouvrir SuspendClientDialog]
+    ActionChoice -->|Clôturer| OpenCloseDialog[Ouvrir CloseClientDialog]
+    ActionChoice -->|Réactiver| ActionReactivate[Clic Réactiver]
+
+    OpenSuspendDialog --> FillReason[Optionnel: Saisir raison max 500 chars]
+    FillReason --> ClickSuspend[Cliquer "Suspendre le client"]
+    ClickSuspend --> SuspendAction[Server Action suspendClient]
+    SuspendAction --> UpdateSuspend[UPDATE status=suspended, suspended_at=NOW]
+    UpdateSuspend --> LogSuspend[INSERT activity_logs action=client_suspended]
+    LogSuspend --> InvalidateSuspend[Invalider caches TanStack Query]
+    InvalidateSuspend --> ToastSuspend[Toast "Client suspendu"]
+    ToastSuspend --> CloseSuspendDialog[Fermer dialog]
+    CloseSuspendDialog --> RefreshPage[Rafraîchir fiche client]
+
+    OpenCloseDialog --> ShowConsequences[Afficher conséquences + double validation]
+    ShowConsequences --> TypeName[MiKL saisit nom du client]
+    TypeName --> ValidateName{Nom correspond ?}
+
+    ValidateName -->|Non| DisableButton[Bouton "Clôturer définitivement" désactivé]
+    ValidateName -->|Case-insensitive match| EnableButton[Bouton activé]
+
+    EnableButton --> ClickClose[Cliquer "Clôturer définitivement"]
+    ClickClose --> CloseAction[Server Action closeClient]
+    CloseAction --> ServerValidate{Server valide nom ?}
+
+    ServerValidate -->|Non| ErrorName[Erreur VALIDATION_ERROR]
+    ServerValidate -->|Oui| UpdateClose[UPDATE status=archived, archived_at=NOW]
+
+    UpdateClose --> LogClose[INSERT activity_logs action=client_closed]
+    LogClose --> InvalidateClose[Invalider caches TanStack Query]
+    InvalidateClose --> ToastClose[Toast "Client clôturé"]
+    ToastClose --> CloseCloseDialog[Fermer dialog]
+    CloseCloseDialog --> RefreshPage
+
+    ActionReactivate --> ReactivateAction[Server Action reactivateClient]
+    ReactivateAction --> UpdateReactivate[UPDATE status=active, suspended_at=null, archived_at=null]
+    UpdateReactivate --> LogReactivate[INSERT activity_logs action=client_reactivated]
+    LogReactivate --> InvalidateReactivate[Invalider caches TanStack Query]
+    InvalidateReactivate --> ToastReactivate[Toast "Client réactivé"]
+    ToastReactivate --> RefreshPage
+
+    RefreshPage --> End([Fin])
+    DisableButton --> TypeName
+    ErrorName --> TypeName
+```
+
+```mermaid
+sequenceDiagram
+    participant UI as ClientDetailContent
+    participant Dialog as CloseClientDialog
+    participant SA as Server Action
+    participant SB as Supabase
+    participant TQ as TanStack Query
+
+    UI->>UI: isArchived = client.status === 'archived'
+
+    alt Client archived
+        UI->>UI: Show ArchivedBanner + disable edit buttons
+        UI->>UI: onEdit = undefined (désactiver édition)
+    else Client active/suspended
+        UI->>UI: Show normal header with action buttons
+    end
+
+    UI->>Dialog: MiKL clique "Clôturer"
+    Dialog->>Dialog: User types confirmName
+    Dialog->>Dialog: Validate case-insensitive: confirmName === clientName
+
+    alt Name matches
+        Dialog->>SA: closeClient({ clientId, confirmName })
+        SA->>SB: SELECT name FROM clients WHERE id
+        SA->>SA: Validate confirmName (server-side)
+        SA->>SB: UPDATE clients SET status=archived, archived_at=NOW()
+        SA->>SB: INSERT activity_logs (client_closed)
+        SB-->>SA: { data: { success: true }, error: null }
+        SA-->>Dialog: Success response
+        Dialog->>TQ: invalidateQueries(['clients'])
+        Dialog->>TQ: invalidateQueries(['client', clientId])
+        Dialog->>UI: Close dialog + show success toast
+        UI-->>UI: Refresh with archived status + banner
+    else Name mismatch
+        Dialog->>Dialog: Keep button disabled + show error
+    end
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives
@@ -404,3 +502,6 @@ sequenceDiagram
 - TanStack Query met en cache les résultats pour améliorer les performances
 - Les onglets utilisent le lazy-loading : les données ne sont fetchées qu'au premier clic
 - L'onglet actif est synchronisé avec l'URL query param pour le partage de liens
+- La clôture nécessite une double validation (saisie nom client) pour éviter les erreurs
+- Les clients archivés sont exclus par défaut de la liste (filtre "Clôturés" disponible)
+- La réactivation (suspendu/archivé → actif) est immédiate sans confirmation

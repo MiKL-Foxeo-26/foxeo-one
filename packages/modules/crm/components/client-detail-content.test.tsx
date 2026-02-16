@@ -21,13 +21,18 @@ vi.mock('../actions/get-client', () => ({
       company: 'Acme Corp',
       email: 'jean@acme.com',
       clientType: 'complet',
-      status: 'lab-actif',
+      status: 'active',
       sector: 'tech',
       createdAt: '2024-01-15T10:00:00Z',
       updatedAt: '2024-01-20T14:30:00Z',
     },
     error: null,
   }),
+}))
+
+// Mock reactivateClient (used by ArchivedBanner)
+vi.mock('../actions/reactivate-client', () => ({
+  reactivateClient: vi.fn().mockResolvedValue({ data: { success: true }, error: null }),
 }))
 
 function renderWithQueryClient(ui: React.ReactElement) {
@@ -53,7 +58,7 @@ describe('ClientDetailContent', () => {
     company: 'Acme Corp',
     email: 'jean@acme.com',
     clientType: 'complet',
-    status: 'lab-actif',
+    status: 'active',
     sector: 'tech',
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-20T14:30:00Z',
@@ -74,10 +79,50 @@ describe('ClientDetailContent', () => {
     expect(screen.getByRole('tab', { name: /échanges/i })).toBeInTheDocument()
   })
 
-  it('should render edit buttons', () => {
+  it('should render edit buttons for active client', () => {
     renderWithQueryClient(<ClientDetailContent client={mockClient} />)
 
     const editButtons = screen.getAllByRole('button', { name: /modifier/i })
     expect(editButtons.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('should render ArchivedBanner for archived client', () => {
+    const archivedClient: Client = {
+      ...mockClient,
+      status: 'archived',
+      archivedAt: '2026-02-16T10:00:00.000Z',
+    }
+
+    renderWithQueryClient(<ClientDetailContent client={archivedClient} />)
+
+    expect(screen.getByText('Client clôturé')).toBeInTheDocument()
+    expect(screen.getByText(/données sont en lecture seule/i)).toBeInTheDocument()
+  })
+
+  it('should disable edit buttons for archived client', () => {
+    const archivedClient: Client = {
+      ...mockClient,
+      status: 'archived',
+      archivedAt: '2026-02-16T10:00:00.000Z',
+    }
+
+    renderWithQueryClient(<ClientDetailContent client={archivedClient} />)
+
+    // Edit buttons should not be present for archived client
+    expect(screen.queryByRole('button', { name: /modifier/i })).not.toBeInTheDocument()
+  })
+
+  it('should show Réactiver button(s) for archived client', () => {
+    const archivedClient: Client = {
+      ...mockClient,
+      status: 'archived',
+      archivedAt: '2026-02-16T10:00:00.000Z',
+    }
+
+    renderWithQueryClient(<ClientDetailContent client={archivedClient} />)
+
+    // ArchivedBanner + ClientLifecycleActions both show Réactiver
+    const reactivateButtons = screen.getAllByRole('button', { name: /réactiver/i })
+    expect(reactivateButtons.length).toBeGreaterThanOrEqual(1)
   })
 })

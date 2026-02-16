@@ -179,6 +179,79 @@ NEXT_PUBLIC_BMAD_BASE_PATH=/votre/chemin/bmad
 ```
 Par défaut : `/Users/mikl/bmad`
 
+### Cycle de vie du client — Suspendre, Clôturer, Réactiver
+
+Le module CRM permet de gérer le cycle de vie complet de vos clients avec trois actions principales : **Suspendre**, **Clôturer** et **Réactiver**.
+
+#### Suspendre un client
+
+Mettre un client en pause temporaire lorsqu'il ne peut pas poursuivre son parcours (attente de paiement, demande du client, etc.).
+
+**Comment suspendre :**
+1. Accédez à la fiche du client
+2. Dans le header, cliquez sur le bouton **"Suspendre"**
+3. Un dialog de confirmation s'affiche
+4. (Optionnel) Ajoutez une raison dans le champ de texte (max 500 caractères)
+5. Cliquez sur **"Suspendre le client"**
+
+**Conséquences de la suspension :**
+- Le client ne peut plus accéder à son dashboard (Lab ou One)
+- Toutes ses données sont conservées intactes
+- Le statut passe à "Suspendu" avec badge orange
+- L'activité est enregistrée dans l'historique du client
+- Vous pouvez réactiver le client à tout moment
+
+#### Clôturer un client
+
+Fermer définitivement un dossier client et archiver ses données en lecture seule.
+
+**Comment clôturer :**
+1. Accédez à la fiche du client (statut actif ou suspendu)
+2. Dans le header, cliquez sur le bouton **"Clôturer"** (rouge)
+3. Un dialog de confirmation avec **double validation** s'affiche
+4. **Saisissez le nom exact du client** pour confirmer l'action
+5. La validation est insensible à la casse et aux espaces (ex: "Jean Dupont" = "jean dupont")
+6. Le bouton "Clôturer définitivement" ne s'active qu'une fois le nom correct saisi
+7. Cliquez sur **"Clôturer définitivement"**
+
+**Conséquences de la clôture :**
+- Le client ne peut plus se connecter à son dashboard
+- Toutes ses données sont archivées en lecture seule
+- Le statut passe à "Clôturé" avec badge gris
+- Le client n'apparaît plus dans la liste par défaut
+- Un bandeau d'information apparaît en haut de la fiche : "Client clôturé le [date]"
+- Tous les boutons d'édition sont désactivés
+- Vous pouvez toujours consulter les données en lecture seule
+- L'activité est enregistrée dans l'historique du client
+
+**Accès aux clients clôturés :**
+- Dans la liste des clients, utilisez le filtre **"Statut" → "Clôturé"**
+- Les clients clôturés sont exclus par défaut de la liste pour éviter l'encombrement
+
+#### Réactiver un client
+
+Remettre un client suspendu ou clôturé en statut actif.
+
+**Comment réactiver :**
+1. Accédez à la fiche du client (suspendu ou clôturé)
+2. Cliquez sur le bouton **"Réactiver"**
+   - Dans le header pour un client suspendu
+   - Dans le bandeau d'information pour un client clôturé
+3. La réactivation est immédiate (pas de confirmation)
+
+**Conséquences de la réactivation :**
+- Le statut repasse à "Actif" avec badge vert
+- Le client peut à nouveau accéder à son dashboard
+- Tous les boutons d'édition sont réactivés
+- Le client réapparaît dans la liste par défaut
+- Les dates `suspended_at` et `archived_at` sont effacées
+- L'activité est enregistrée dans l'historique du client
+
+**Cas d'usage typiques :**
+- **Suspension** : Retard de paiement, pause demandée par le client, congés prolongés
+- **Clôture** : Fin de mission, client ayant quitté l'offre, dossier terminé sans renouvellement
+- **Réactivation** : Reprise après suspension, réouverture d'un ancien dossier clôturé
+
 ### Statuts parcours
 
 | Statut | Description |
@@ -284,5 +357,5 @@ Les données sont chargées côté serveur (RSC) et mises en cache 10 minutes vi
 
 ## Prochaines fonctionnalités
 
-- Suspendre/réactiver/clôturer un client (Stories 2.9a-2.9c)
 - Alertes inactivité Lab & import clients CSV (Story 2.10)
+- Upgrader un client ponctuel vers Lab ou One (Story 2.9c)

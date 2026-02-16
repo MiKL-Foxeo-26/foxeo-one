@@ -6,7 +6,9 @@ import type { ClientListItem } from '../types/crm.types'
 const mockLimit = vi.fn()
 const mockOrder2 = vi.fn(() => ({ limit: mockLimit }))
 const mockOrder1 = vi.fn(() => ({ order: mockOrder2 }))
-const mockEq = vi.fn(() => ({ order: mockOrder1 }))
+const mockIn = vi.fn(() => ({ order: mockOrder1 }))
+const mockNeq = vi.fn(() => ({ order: mockOrder1, in: mockIn }))
+const mockEq = vi.fn(() => ({ neq: mockNeq, order: mockOrder1, in: mockIn }))
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
 const mockFrom = vi.fn(() => ({ select: mockSelect }))
 const mockGetUser = vi.fn()
@@ -157,5 +159,63 @@ describe('getClients Server Action', () => {
 
     expect(mockFrom).toHaveBeenCalledWith('clients')
     expect(mockEq).toHaveBeenCalledWith('operator_id', operatorId)
+  })
+
+  it('should exclude archived clients by default', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockLimit.mockResolvedValue({ data: [], error: null })
+
+    const { getClients } = await import('./get-clients')
+    await getClients()
+
+    expect(mockNeq).toHaveBeenCalledWith('status', 'archived')
+  })
+
+  it('should include archived clients when archived filter is active', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockLimit.mockResolvedValue({ data: [], error: null })
+
+    const { getClients } = await import('./get-clients')
+    await getClients({ status: ['archived'] })
+
+    expect(mockNeq).not.toHaveBeenCalled()
+    expect(mockIn).toHaveBeenCalledWith('status', ['archived'])
+  })
+
+  it('should apply clientType filter when provided', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockLimit.mockResolvedValue({ data: [], error: null })
+
+    const { getClients } = await import('./get-clients')
+    await getClients({ clientType: ['complet', 'ponctuel'] })
+
+    expect(mockIn).toHaveBeenCalledWith('client_type', ['complet', 'ponctuel'])
+  })
+
+  it('should apply status filter when provided', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockLimit.mockResolvedValue({ data: [], error: null })
+
+    const { getClients } = await import('./get-clients')
+    await getClients({ status: ['active', 'suspended'] })
+
+    expect(mockNeq).not.toHaveBeenCalled()
+    expect(mockIn).toHaveBeenCalledWith('status', ['active', 'suspended'])
   })
 })

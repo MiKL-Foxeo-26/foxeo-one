@@ -2,16 +2,17 @@
 
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import type { ActionResponse } from '@foxeo/types'
-import type { ClientListItem } from '../types/crm.types'
+import type { ClientListItem, ClientFilters } from '../types/crm.types'
 import { getClients } from '../actions/get-clients'
 
 export function useClients(
+  filters?: ClientFilters,
   initialData?: ClientListItem[]
 ): UseQueryResult<ClientListItem[], Error> {
   return useQuery({
-    queryKey: ['clients'],
+    queryKey: ['clients', filters],
     queryFn: async () => {
-      const response: ActionResponse<ClientListItem[]> = await getClients()
+      const response: ActionResponse<ClientListItem[]> = await getClients(filters)
 
       if (response.error) {
         throw new Error(response.error.message)

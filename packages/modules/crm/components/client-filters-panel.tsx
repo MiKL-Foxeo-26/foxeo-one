@@ -22,10 +22,9 @@ const CLIENT_TYPE_OPTIONS: { value: ClientType; label: string }[] = [
 ]
 
 const CLIENT_STATUS_OPTIONS: { value: ClientStatus; label: string }[] = [
-  { value: 'lab-actif', label: 'Lab actif' },
-  { value: 'one-actif', label: 'One actif' },
-  { value: 'inactif', label: 'Inactif' },
-  { value: 'suspendu', label: 'Suspendu' },
+  { value: 'active', label: 'Actif' },
+  { value: 'suspended', label: 'Suspendu' },
+  { value: 'archived', label: 'Clôturé' },
 ]
 
 const ALL_VALUE = '__all__'

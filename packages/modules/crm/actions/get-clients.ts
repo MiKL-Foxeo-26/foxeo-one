@@ -7,9 +7,11 @@ import {
   errorResponse,
 } from '@foxeo/types'
 import { ClientListItem as ClientListItemSchema } from '../types/crm.types'
-import type { ClientListItem } from '../types/crm.types'
+import type { ClientListItem, ClientFilters } from '../types/crm.types'
 
-export async function getClients(): Promise<ActionResponse<ClientListItem[]>> {
+export async function getClients(
+  filters?: ClientFilters
+): Promise<ActionResponse<ClientListItem[]>> {
   try {
     const supabase = await createServerSupabaseClient()
 
@@ -25,7 +27,8 @@ export async function getClients(): Promise<ActionResponse<ClientListItem[]>> {
 
     const operatorId = user.id
 
-    const { data, error } = await supabase
+    // Build query
+    let query = supabase
       .from('clients')
       .select(
         `
@@ -43,6 +46,22 @@ export async function getClients(): Promise<ActionResponse<ClientListItem[]>> {
       `
       )
       .eq('operator_id', operatorId)
+
+    // Apply filters if provided
+    const hasStatusFilter = filters?.status && filters.status.length > 0
+    if (hasStatusFilter) {
+      // If specific statuses are requested, filter by those statuses
+      query = query.in('status', filters.status)
+    } else {
+      // Story 2.9b AC2: Exclude archived clients by default when no status filter is active
+      query = query.neq('status', 'archived')
+    }
+
+    if (filters?.clientType && filters.clientType.length > 0) {
+      query = query.in('client_type', filters.clientType)
+    }
+
+    const { data, error } = await query
       .order('is_pinned', { ascending: false }) // Pinned first
       .order('created_at', { ascending: false })
       .limit(500)

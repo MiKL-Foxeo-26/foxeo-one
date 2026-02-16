@@ -38,12 +38,12 @@ describe('useClients', () => {
         name: 'Test Client',
         company: 'Test Company',
         clientType: 'complet' as const,
-        status: 'lab-actif' as const,
+        status: 'active' as const,
         createdAt: '2024-01-01T00:00:00Z',
       },
     ]
 
-    const { result } = renderHook(() => useClients(initialData), {
+    const { result } = renderHook(() => useClients(undefined, initialData), {
       wrapper: createWrapper(),
     })
 
@@ -78,7 +78,7 @@ describe('useClients', () => {
         name: 'Test Client',
         company: 'Test Company',
         clientType: 'complet' as const,
-        status: 'lab-actif' as const,
+        status: 'active' as const,
         createdAt: '2024-01-01T00:00:00Z',
       },
     ]

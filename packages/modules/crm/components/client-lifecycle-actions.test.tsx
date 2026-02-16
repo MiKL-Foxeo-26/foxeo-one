@@ -37,12 +37,10 @@ describe('ClientLifecycleActions', () => {
     expect(screen.getByRole('button', { name: /réactiver/i })).toBeInTheDocument()
   })
 
-  it('should render nothing for archived client', () => {
-    const { container } = render(
-      <ClientLifecycleActions client={{ ...baseClient, status: 'archived' }} />
-    )
+  it('should render "Réactiver" button for archived client', () => {
+    render(<ClientLifecycleActions client={{ ...baseClient, status: 'archived' }} />)
 
-    expect(container.innerHTML).toBe('')
+    expect(screen.getByRole('button', { name: /réactiver/i })).toBeInTheDocument()
   })
 
   it('should NOT show "Réactiver" button for active client', () => {

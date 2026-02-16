@@ -40,6 +40,8 @@ export { CrmSubNav } from './components/crm-sub-nav'
 export { ClientStatusBadge } from './components/client-status-badge'
 export { SuspendClientDialog } from './components/suspend-client-dialog'
 export { ClientLifecycleActions } from './components/client-lifecycle-actions'
+export { CloseClientDialog } from './components/close-client-dialog'
+export { ArchivedBanner } from './components/archived-banner'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -83,6 +85,7 @@ export { getGraduationRate } from './actions/get-graduation-rate'
 export { getTimePerClient } from './actions/get-time-per-client'
 export { suspendClient } from './actions/suspend-client'
 export { reactivateClient } from './actions/reactivate-client'
+export { closeClient } from './actions/close-client'
 
 // Utils
 export {
@@ -139,4 +142,5 @@ export type {
   ClientTimeEstimate,
   SuspendClientInput,
   ReactivateClientInput,
+  CloseClientInput,
 } from './types/crm.types'

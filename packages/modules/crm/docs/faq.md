@@ -105,6 +105,44 @@ R: Les templates sont créés par l'opérateur. Un template "Parcours Complet" e
 **Q: Quel est l'effet de la désactivation de l'accès One ?**
 R: Le client perd l'accès à son dashboard One. Le dashboard_type est modifié en conséquence. L'action est tracée dans les logs d'activité.
 
+### Suspension, clôture et réactivation
+
+**Q: Quelle est la différence entre "Suspendre" et "Clôturer" un client ?**
+R: **Suspendre** est une action temporaire réversible (ex: en attente de paiement). **Clôturer** est une action permanente qui archive définitivement les données en lecture seule (ex: fin de mission). Les deux peuvent être réactivés, mais la clôture nécessite une double validation.
+
+**Q: Pourquoi la clôture nécessite-t-elle une double validation ?**
+R: Pour éviter les clôtures accidentelles. Vous devez saisir le nom exact du client pour confirmer l'action. Cette sécurité garantit que vous êtes conscient des conséquences (archivage en lecture seule).
+
+**Q: Que se passe-t-il avec les données d'un client clôturé ?**
+R: Toutes les données sont conservées et archivées en lecture seule. Vous pouvez consulter la fiche (onglets Informations, Historique, Documents, Échanges) mais vous ne pouvez plus modifier ni supprimer quoi que ce soit. Le client n'apparaît plus dans la liste par défaut.
+
+**Q: Comment accéder à un client clôturé ?**
+R: Utilisez le filtre "Statut" → "Clôturé" dans la liste des clients. Les clients clôturés sont exclus par défaut pour éviter l'encombrement de la liste.
+
+**Q: Puis-je clôturer un client qui est déjà suspendu ?**
+R: Oui, vous pouvez clôturer un client depuis n'importe quel statut (actif ou suspendu). La clôture est toujours disponible via le bouton rouge "Clôturer" dans le header de la fiche.
+
+**Q: Est-il possible de réactiver un client clôturé ?**
+R: Oui, vous pouvez réactiver un client clôturé à tout moment. Sur la fiche d'un client clôturé, un bandeau d'information affiche un bouton "Réactiver". La réactivation repasse le statut à "Actif" et restaure tous les droits d'édition.
+
+**Q: Que se passe-t-il quand je réactive un client suspendu ?**
+R: Le statut repasse à "Actif" immédiatement, le client peut à nouveau accéder à son dashboard, et tous les boutons d'édition sont réactivés. L'action est tracée dans les logs d'activité.
+
+**Q: La réactivation nécessite-t-elle une confirmation ?**
+R: Non, la réactivation est immédiate (un seul clic). Elle est considérée comme une action moins risquée que la suspension ou la clôture.
+
+**Q: Puis-je ajouter une raison lors de la suspension ?**
+R: Oui, le dialog de suspension propose un champ optionnel "Raison" (max 500 caractères). Cette raison est stockée mais n'est pas affichée dans l'interface pour le moment. Elle sera disponible dans les logs d'activité détaillés.
+
+**Q: Les dates de suspension/clôture sont-elles conservées après réactivation ?**
+R: Non, lors de la réactivation, les champs `suspended_at` et `archived_at` sont effacés. L'historique des événements (activity_logs) conserve la trace des actions, mais les timestamps de statut sont nettoyés.
+
+**Q: Un client clôturé peut-il envoyer des messages ou accéder à son espace ?**
+R: Non, un client clôturé perd tout accès à son dashboard (Lab ou One). Il ne peut ni se connecter, ni envoyer de messages, ni accéder à ses données.
+
+**Q: Puis-je supprimer définitivement un client au lieu de le clôturer ?**
+R: Non, le système ne permet pas la suppression définitive des clients. La clôture est l'action la plus forte disponible. Si vous devez réellement supprimer des données client (conformité RGPD), cela sera géré via le module d'export/anonymisation (Epic 9).
+
 ### Intégration Cursor
 
 **Q: Comment ouvrir le dossier BMAD d'un client dans Cursor ?**

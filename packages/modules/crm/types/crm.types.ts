@@ -445,3 +445,15 @@ export const ReactivateClientInput = z.object({
 })
 
 export type ReactivateClientInput = z.infer<typeof ReactivateClientInput>
+
+// ============================================================
+// Client Lifecycle types (Story 2.9b)
+// ============================================================
+
+// Close client input (AC1, AC2)
+export const CloseClientInput = z.object({
+  clientId: z.string().uuid(),
+  confirmName: z.string().min(1, 'Le nom de confirmation est requis'),
+})
+
+export type CloseClientInput = z.infer<typeof CloseClientInput>

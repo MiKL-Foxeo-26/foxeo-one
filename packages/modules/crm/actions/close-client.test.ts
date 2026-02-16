@@ -36,14 +36,29 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }))
 
-describe('reactivateClient Server Action', () => {
+describe('closeClient Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('should return INVALID_INPUT for non-UUID clientId', async () => {
-    const { reactivateClient } = await import('./reactivate-client')
-    const result = await reactivateClient({ clientId: 'not-a-uuid' })
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
+      clientId: 'not-a-uuid',
+      confirmName: 'Test Client',
+    })
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('INVALID_INPUT')
+    expect(mockGetUser).not.toHaveBeenCalled()
+  })
+
+  it('should return INVALID_INPUT when confirmName is empty', async () => {
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
+      clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: '',
+    })
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('INVALID_INPUT')
@@ -56,9 +71,10 @@ describe('reactivateClient Server Action', () => {
       error: { message: 'Not authenticated' },
     })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    const result = await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(result.data).toBeNull()
@@ -76,9 +92,10 @@ describe('reactivateClient Server Action', () => {
       error: { code: 'PGRST116', message: 'Not found' },
     })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    const result = await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(result.data).toBeNull()
@@ -86,7 +103,7 @@ describe('reactivateClient Server Action', () => {
     expect(result.error?.message).toContain('introuvable')
   })
 
-  it('should return INVALID_STATUS if client is not suspended', async () => {
+  it('should return VALIDATION_ERROR when confirmName does not match client name', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
       error: null,
@@ -95,22 +112,25 @@ describe('reactivateClient Server Action', () => {
     mockFetchSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
         status: 'active',
         operator_id: '550e8400-e29b-41d4-a716-446655440000',
       },
       error: null,
     })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    const result = await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Wrong Name',
     })
 
     expect(result.data).toBeNull()
-    expect(result.error?.code).toBe('INVALID_STATUS')
+    expect(result.error?.code).toBe('VALIDATION_ERROR')
+    expect(result.error?.message).toContain('ne correspond pas')
   })
 
-  it('should successfully reactivate a suspended client', async () => {
+  it('should match confirmName case-insensitively', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
       error: null,
@@ -119,7 +139,8 @@ describe('reactivateClient Server Action', () => {
     mockFetchSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        status: 'suspended',
+        name: 'Test Client',
+        status: 'active',
         operator_id: '550e8400-e29b-41d4-a716-446655440000',
       },
       error: null,
@@ -127,9 +148,93 @@ describe('reactivateClient Server Action', () => {
 
     mockUpdateEqSecond.mockReturnValue({ error: null })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    const result: ActionResponse<{ success: true }> = await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'test client', // Different case
+    })
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual({ success: true })
+  })
+
+  it('should trim whitespace from confirmName', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
+        status: 'active',
+        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
+      clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: '  Test Client  ', // With whitespace
+    })
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual({ success: true })
+  })
+
+  it('should return INVALID_STATUS if client is already archived', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
+        status: 'archived',
+        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+      },
+      error: null,
+    })
+
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
+      clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
+    })
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('INVALID_STATUS')
+    expect(result.error?.message).toContain('déjà clôturé')
+  })
+
+  it('should successfully close an active client', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
+        status: 'active',
+        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { closeClient } = await import('./close-client')
+    const result: ActionResponse<{ success: true }> = await closeClient({
+      clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(result.error).toBeNull()
@@ -138,7 +243,7 @@ describe('reactivateClient Server Action', () => {
     expect(mockInsert).toHaveBeenCalled()
   })
 
-  it('should log activity for reactivation', async () => {
+  it('should successfully close a suspended client', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
       error: null,
@@ -147,6 +252,7 @@ describe('reactivateClient Server Action', () => {
     mockFetchSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
         status: 'suspended',
         operator_id: '550e8400-e29b-41d4-a716-446655440000',
       },
@@ -155,19 +261,48 @@ describe('reactivateClient Server Action', () => {
 
     mockUpdateEqSecond.mockReturnValue({ error: null })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result: ActionResponse<{ success: true }> = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
+    })
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual({ success: true })
+  })
+
+  it('should log activity with client_closed action', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'Test Client',
+        status: 'active',
+        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { closeClient } = await import('./close-client')
+    await closeClient({
+      clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(mockInsert).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: 'client_reactivated',
+        action: 'client_closed',
       })
     )
   })
 
-  it('should clear suspended_at timestamp', async () => {
+  it('should set archived_at timestamp and status to archived', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
       error: null,
@@ -176,7 +311,8 @@ describe('reactivateClient Server Action', () => {
     mockFetchSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        status: 'suspended',
+        name: 'Test Client',
+        status: 'active',
         operator_id: '550e8400-e29b-41d4-a716-446655440000',
       },
       error: null,
@@ -184,15 +320,16 @@ describe('reactivateClient Server Action', () => {
 
     mockUpdateEqSecond.mockReturnValue({ error: null })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        status: 'active',
-        suspended_at: null,
+        status: 'archived',
+        archived_at: expect.any(String),
       })
     )
   })
@@ -206,7 +343,8 @@ describe('reactivateClient Server Action', () => {
     mockFetchSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        status: 'suspended',
+        name: 'Test Client',
+        status: 'active',
         operator_id: '550e8400-e29b-41d4-a716-446655440000',
       },
       error: null,
@@ -216,69 +354,13 @@ describe('reactivateClient Server Action', () => {
       error: { message: 'Database error', code: '500' },
     })
 
-    const { reactivateClient } = await import('./reactivate-client')
-    const result = await reactivateClient({
+    const { closeClient } = await import('./close-client')
+    const result = await closeClient({
       clientId: '550e8400-e29b-41d4-a716-446655440001',
+      confirmName: 'Test Client',
     })
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('DATABASE_ERROR')
-  })
-
-  it('should successfully reactivate an archived client', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
-      error: null,
-    })
-
-    mockFetchSingle.mockResolvedValue({
-      data: {
-        id: '550e8400-e29b-41d4-a716-446655440001',
-        status: 'archived',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
-      },
-      error: null,
-    })
-
-    mockUpdateEqSecond.mockReturnValue({ error: null })
-
-    const { reactivateClient } = await import('./reactivate-client')
-    const result: ActionResponse<{ success: true }> = await reactivateClient({
-      clientId: '550e8400-e29b-41d4-a716-446655440001',
-    })
-
-    expect(result.error).toBeNull()
-    expect(result.data).toEqual({ success: true })
-  })
-
-  it('should clear both suspended_at and archived_at timestamps', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
-      error: null,
-    })
-
-    mockFetchSingle.mockResolvedValue({
-      data: {
-        id: '550e8400-e29b-41d4-a716-446655440001',
-        status: 'suspended',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
-      },
-      error: null,
-    })
-
-    mockUpdateEqSecond.mockReturnValue({ error: null })
-
-    const { reactivateClient } = await import('./reactivate-client')
-    await reactivateClient({
-      clientId: '550e8400-e29b-41d4-a716-446655440001',
-    })
-
-    expect(mockUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        status: 'active',
-        suspended_at: null,
-        archived_at: null,
-      })
-    )
   })
 })
