@@ -17,7 +17,7 @@ interface ClientFiltersPanelProps {
 
 const CLIENT_TYPE_OPTIONS: { value: ClientType; label: string }[] = [
   { value: 'complet', label: 'Complet' },
-  { value: 'direct-one', label: 'Direct One' },
+  { value: 'direct_one', label: 'Direct One' },
   { value: 'ponctuel', label: 'Ponctuel' },
 ]
 

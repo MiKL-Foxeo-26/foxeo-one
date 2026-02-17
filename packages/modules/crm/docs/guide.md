@@ -355,7 +355,40 @@ Le tableau est triable par nom, temps total ou dernière activité. Par défaut,
 
 Les données sont chargées côté serveur (RSC) et mises en cache 10 minutes via TanStack Query. Un skeleton loader spécifique s'affiche pendant le chargement.
 
+### Upgrader un client Ponctuel vers Lab ou One
+
+Pour faire évoluer un client Ponctuel vers un accompagnement plus complet, utilisez les boutons d'upgrade disponibles sur la fiche client.
+
+**Conditions d'accès :**
+- Le client doit être de type **Ponctuel** (les boutons sont masqués pour les autres types)
+- Le client doit être en statut **Actif**
+
+**Upgrader vers Lab :**
+1. Sur la fiche client, cliquez sur **"Upgrader vers Lab"** dans le header
+2. Un dialog s'ouvre sur l'onglet "Upgrader vers Lab"
+3. Sélectionnez un template de parcours (ex: "Parcours Complet")
+4. Configurez les étapes actives du parcours
+5. Cliquez sur **"Upgrader"**
+
+**Conséquences de l'upgrade vers Lab :**
+- Le type client passe à **Complet**
+- Un parcours Lab est créé avec les étapes sélectionnées
+- Le dashboard passe en mode **Lab**
+- L'action est enregistrée dans l'historique (`client_upgraded`)
+
+**Upgrader vers One :**
+1. Sur la fiche client, cliquez sur **"Upgrader vers One"** dans le header
+2. Un dialog s'ouvre sur l'onglet "Upgrader vers One"
+3. Sélectionnez les modules à activer (Core Dashboard inclus par défaut)
+4. Cliquez sur **"Upgrader"**
+
+**Conséquences de l'upgrade vers One :**
+- Le type client passe à **Direct One**
+- Le dashboard passe en mode **One** avec les modules sélectionnés
+- L'action est enregistrée dans l'historique (`client_upgraded`)
+
+**Note :** À ce stade du développement, peu de modules supplémentaires sont disponibles. Le module Core Dashboard est activé par défaut et ne peut pas être désactivé.
+
 ## Prochaines fonctionnalités
 
 - Alertes inactivité Lab & import clients CSV (Story 2.10)
-- Upgrader un client ponctuel vers Lab ou One (Story 2.9c)

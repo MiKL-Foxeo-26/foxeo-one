@@ -20,7 +20,7 @@ const mockData: ClientTimeEstimate[] = [
     clientId: '550e8400-e29b-41d4-a716-446655440002',
     clientName: 'Bob',
     clientCompany: 'BobInc',
-    clientType: 'direct-one',
+    clientType: 'direct_one',
     messageCount: 1,
     validationCount: 0,
     visioSeconds: 0,

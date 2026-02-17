@@ -12,6 +12,10 @@ vi.mock('../actions/reactivate-client', () => ({
   reactivateClient: vi.fn().mockResolvedValue({ data: { success: true }, error: null }),
 }))
 
+vi.mock('./upgrade-client-dialog', () => ({
+  UpgradeClientDialog: () => null,
+}))
+
 const baseClient: Client = {
   id: '550e8400-e29b-41d4-a716-446655440001',
   operatorId: '550e8400-e29b-41d4-a716-446655440000',
@@ -53,5 +57,39 @@ describe('ClientLifecycleActions', () => {
     render(<ClientLifecycleActions client={{ ...baseClient, status: 'suspended' }} />)
 
     expect(screen.queryByRole('button', { name: /suspendre/i })).not.toBeInTheDocument()
+  })
+
+  // Story 2.9c — Upgrade buttons for ponctuel clients
+  it('should show upgrade buttons for ponctuel active client', () => {
+    render(
+      <ClientLifecycleActions
+        client={{ ...baseClient, clientType: 'ponctuel', status: 'active' }}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: /upgrader vers lab/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /upgrader vers one/i })).toBeInTheDocument()
+  })
+
+  it('should NOT show upgrade buttons for non-ponctuel client', () => {
+    render(
+      <ClientLifecycleActions
+        client={{ ...baseClient, clientType: 'complet', status: 'active' }}
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: /upgrader vers lab/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /upgrader vers one/i })).not.toBeInTheDocument()
+  })
+
+  it('should NOT show upgrade buttons for ponctuel suspended client', () => {
+    render(
+      <ClientLifecycleActions
+        client={{ ...baseClient, clientType: 'ponctuel', status: 'suspended' }}
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: /upgrader vers lab/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /upgrader vers one/i })).not.toBeInTheDocument()
   })
 })

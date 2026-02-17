@@ -218,6 +218,26 @@ R: Oui, cliquez sur les en-têtes de colonne (Client, Temps total, Dernière act
 **Q: Le temps passé est-il exact ?**
 R: Le temps des visios est exact (durée réelle). Pour les messages et validations, ce sont des estimations moyennes (2 min/message, 5 min/validation) qui donnent un ordre de grandeur fiable.
 
+### Upgrade d'un client Ponctuel
+
+**Q: Quand peut-on upgrader un client Ponctuel ?**
+R: Uniquement si le client est de type **Ponctuel** et en statut **Actif**. Les boutons "Upgrader vers Lab" et "Upgrader vers One" n'apparaissent pas pour les clients de type Complet ou Direct One.
+
+**Q: Quelle est la différence entre "Upgrader vers Lab" et "Upgrader vers One" ?**
+R: **Upgrader vers Lab** crée un parcours d'incubation (template requis) et passe le type client à "Complet". **Upgrader vers One** active directement le dashboard business et passe le type client à "Direct One".
+
+**Q: Peut-on annuler un upgrade ?**
+R: Non, l'upgrade est permanent. Si nécessaire, modifiez manuellement le type de client via le bouton "Modifier".
+
+**Q: Que se passe-t-il si aucun template de parcours n'est disponible pour l'upgrade vers Lab ?**
+R: Un message "Aucun template de parcours" s'affiche. Créez d'abord un template via le module Templates (Epic 12), puis revenez pour effectuer l'upgrade.
+
+**Q: Les modules sélectionnés lors de l'upgrade vers One sont-ils définitifs ?**
+R: Ils constituent la configuration initiale. Vous pouvez modifier les modules actifs ultérieurement via les accès client (si la fonctionnalité est disponible dans votre version).
+
+**Q: L'upgrade est-il traçable ?**
+R: Oui, chaque upgrade génère une entrée dans les logs d'activité (`client_upgraded`) avec le type de cible et les paramètres choisis.
+
 ## Besoin d'aide ?
 
 Contactez le support technique via le module d'aide en ligne.

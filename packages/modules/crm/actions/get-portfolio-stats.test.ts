@@ -43,7 +43,7 @@ describe('getPortfolioStats Server Action', () => {
       data: [
         { id: '1', client_type: 'complet', status: 'active', client_configs: { dashboard_type: 'lab' } },
         { id: '2', client_type: 'complet', status: 'active', client_configs: { dashboard_type: 'one' } },
-        { id: '3', client_type: 'direct-one', status: 'active', client_configs: { dashboard_type: 'one' } },
+        { id: '3', client_type: 'direct_one', status: 'active', client_configs: { dashboard_type: 'one' } },
         { id: '4', client_type: 'ponctuel', status: 'archived', client_configs: null },
         { id: '5', client_type: 'complet', status: 'suspended', client_configs: null },
       ],

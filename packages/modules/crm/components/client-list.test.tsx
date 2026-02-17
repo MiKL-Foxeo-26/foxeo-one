@@ -28,7 +28,7 @@ describe('ClientList', () => {
       id: '550e8400-e29b-41d4-a716-446655440001',
       name: 'Jane Smith',
       company: 'Tech Inc',
-      clientType: 'direct-one',
+      clientType: 'direct_one',
       status: 'suspended',
       createdAt: '2024-02-20T14:30:00Z'
     }

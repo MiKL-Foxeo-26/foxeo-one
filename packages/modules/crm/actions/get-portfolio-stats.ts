@@ -67,7 +67,7 @@ export async function getPortfolioStats(): Promise<ActionResponse<PortfolioStats
     for (const client of clients) {
       if (client.client_type === 'complet') {
         byType.complet++
-      } else if (client.client_type === 'direct-one') {
+      } else if (client.client_type === 'direct_one') {
         byType.directOne++
       } else if (client.client_type === 'ponctuel') {
         byType.ponctuel++

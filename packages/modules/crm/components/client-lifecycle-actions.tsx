@@ -3,10 +3,11 @@
 import { useState, useTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button, showSuccess, showError } from '@foxeo/ui'
-import { Pause, Play, Lock } from 'lucide-react'
+import { Pause, Play, Lock, ArrowUpCircle } from 'lucide-react'
 import type { Client } from '../types/crm.types'
 import { SuspendClientDialog } from './suspend-client-dialog'
 import { CloseClientDialog } from './close-client-dialog'
+import { UpgradeClientDialog } from './upgrade-client-dialog'
 import { reactivateClient } from '../actions/reactivate-client'
 
 interface ClientLifecycleActionsProps {
@@ -22,8 +23,17 @@ export function ClientLifecycleActions({
 }: ClientLifecycleActionsProps) {
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false)
   const [closeDialogOpen, setCloseDialogOpen] = useState(false)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const [upgradeMode, setUpgradeMode] = useState<'lab' | 'one'>('lab')
   const [isPending, startTransition] = useTransition()
   const queryClient = useQueryClient()
+
+  const isPonctuel = client.clientType === 'ponctuel'
+
+  const openUpgradeDialog = (mode: 'lab' | 'one') => {
+    setUpgradeMode(mode)
+    setUpgradeDialogOpen(true)
+  }
 
   const handleReactivate = () => {
     startTransition(async () => {
@@ -43,6 +53,28 @@ export function ClientLifecycleActions({
   if (client.status === 'active') {
     return (
       <>
+        {isPonctuel && (
+          <>
+            <Button
+              variant={variant}
+              size={size}
+              onClick={() => openUpgradeDialog('lab')}
+              disabled={isPending}
+            >
+              <ArrowUpCircle className="h-4 w-4 mr-2" />
+              Upgrader vers Lab
+            </Button>
+            <Button
+              variant={variant}
+              size={size}
+              onClick={() => openUpgradeDialog('one')}
+              disabled={isPending}
+            >
+              <ArrowUpCircle className="h-4 w-4 mr-2" />
+              Upgrader vers One
+            </Button>
+          </>
+        )}
         <Button
           variant={variant}
           size={size}
@@ -61,6 +93,14 @@ export function ClientLifecycleActions({
           <Lock className="h-4 w-4 mr-2" />
           Clôturer
         </Button>
+        {isPonctuel && (
+          <UpgradeClientDialog
+            clientId={client.id}
+            open={upgradeDialogOpen}
+            onOpenChange={setUpgradeDialogOpen}
+            defaultMode={upgradeMode}
+          />
+        )}
         <SuspendClientDialog
           clientId={client.id}
           clientName={client.name}

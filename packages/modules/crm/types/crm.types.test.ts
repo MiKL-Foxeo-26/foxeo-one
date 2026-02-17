@@ -13,6 +13,7 @@ import {
   SuspendClientInput,
   ReactivateClientInput,
   Client,
+  UpgradeClientInput,
 } from './crm.types'
 
 describe('Reminder Types & Schemas', () => {
@@ -348,7 +349,7 @@ describe('Stats Types & Schemas (Story 2.8)', () => {
         clientId: '123e4567-e89b-12d3-a456-426614174000',
         clientName: 'Bob',
         clientCompany: 'BobInc',
-        clientType: 'direct-one',
+        clientType: 'direct_one',
         messageCount: 0,
         validationCount: 0,
         visioSeconds: 0,
@@ -551,6 +552,115 @@ describe('Client Lifecycle Types & Schemas (Story 2.9a)', () => {
 
       const result = ReactivateClientInput.safeParse(invalidInput)
       expect(result.success).toBe(false)
+    })
+  })
+})
+
+describe('Client Upgrade Types & Schemas (Story 2.9c)', () => {
+  describe('UpgradeClientInput schema', () => {
+    it('validates upgrade to Lab (complet) with parcoursConfig', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'complet',
+        parcoursConfig: {
+          templateId: '123e4567-e89b-12d3-a456-426614174001',
+          activeStages: [{ key: 'stage-1', active: true }],
+        },
+      }
+
+      const result = UpgradeClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates upgrade to One (direct_one) with modules', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'direct_one',
+        modules: ['core-dashboard', 'documents'],
+      }
+
+      const result = UpgradeClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('validates upgrade to One without optional fields', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'direct_one',
+      }
+
+      const result = UpgradeClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid targetType', () => {
+      const invalidInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'ponctuel',
+      }
+
+      const result = UpgradeClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects invalid clientId UUID', () => {
+      const invalidInput = {
+        clientId: 'not-a-uuid',
+        targetType: 'complet',
+      }
+
+      const result = UpgradeClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects missing clientId', () => {
+      const invalidInput = {
+        targetType: 'complet',
+      }
+
+      const result = UpgradeClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects missing targetType', () => {
+      const invalidInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+      }
+
+      const result = UpgradeClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('rejects invalid templateId UUID in parcoursConfig', () => {
+      const invalidInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'complet',
+        parcoursConfig: {
+          templateId: 'not-a-uuid',
+          activeStages: [],
+        },
+      }
+
+      const result = UpgradeClientInput.safeParse(invalidInput)
+      expect(result.success).toBe(false)
+    })
+
+    it('validates parcoursConfig with multiple stages', () => {
+      const validInput = {
+        clientId: '123e4567-e89b-12d3-a456-426614174000',
+        targetType: 'complet',
+        parcoursConfig: {
+          templateId: '123e4567-e89b-12d3-a456-426614174001',
+          activeStages: [
+            { key: 'discovery', active: true },
+            { key: 'ideation', active: true },
+            { key: 'validation', active: false },
+          ],
+        },
+      }
+
+      const result = UpgradeClientInput.safeParse(validInput)
+      expect(result.success).toBe(true)
     })
   })
 })

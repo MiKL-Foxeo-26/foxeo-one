@@ -145,7 +145,7 @@ export function ClientForm({
           <label className="flex items-center gap-2 text-sm">
             <input
               type="radio"
-              value="direct-one"
+              value="direct_one"
               className="accent-primary"
               {...register('clientType')}
             />

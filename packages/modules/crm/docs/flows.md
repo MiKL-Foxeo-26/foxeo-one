@@ -494,6 +494,56 @@ sequenceDiagram
     end
 ```
 
+## Flux : Upgrade client Ponctuel vers Lab ou One
+
+```mermaid
+flowchart TD
+    Start([MiKL ouvre fiche client Ponctuel actif]) --> ShowButtons[Header: boutons Upgrader vers Lab + Upgrader vers One]
+
+    ShowButtons --> ClickLab[MiKL clique "Upgrader vers Lab"]
+    ShowButtons --> ClickOne[MiKL clique "Upgrader vers One"]
+
+    ClickLab --> OpenDialog[Ouvrir UpgradeClientDialog - onglet Lab]
+    ClickOne --> OpenDialogOne[Ouvrir UpgradeClientDialog - onglet One]
+
+    OpenDialog --> LoadTemplates[Charger templates via useParcourTemplates]
+    LoadTemplates --> HasTemplates{Templates disponibles ?}
+
+    HasTemplates -->|Non| EmptyState[Afficher "Aucun template de parcours"]
+    HasTemplates -->|Oui| SelectTemplate[MiKL sélectionne un template]
+
+    SelectTemplate --> ConfigStages[MiKL active/désactive les étapes]
+    ConfigStages --> ClickUpgradeLab[Cliquer "Upgrader"]
+    ClickUpgradeLab --> UpgradeActionLab[Server Action upgradeClient complet]
+
+    UpgradeActionLab --> ValidateClient{client_type = ponctuel ?}
+    ValidateClient -->|Non| ErrorNotPonctuel[Erreur VALIDATION_ERROR]
+    ValidateClient -->|Oui| UpdateClientTypeLab[UPDATE clients.client_type = complet]
+    UpdateClientTypeLab --> InsertParcours[INSERT parcours avec étapes]
+    InsertParcours --> UpdateConfigLab[UPDATE client_configs dashboard_type=lab]
+    UpdateConfigLab --> LogUpgradeLab[INSERT activity_logs action=client_upgraded]
+    LogUpgradeLab --> InvalidateLab[Invalider caches TanStack Query]
+    InvalidateLab --> ToastLab[Toast "Client upgradé vers Lab"]
+    ToastLab --> CloseDialogLab[Fermer dialog]
+
+    OpenDialogOne --> ShowModules[Afficher liste modules activables]
+    ShowModules --> SelectModules[MiKL sélectionne modules optionnels]
+    SelectModules --> ClickUpgradeOne[Cliquer "Upgrader"]
+    ClickUpgradeOne --> UpgradeActionOne[Server Action upgradeClient direct_one]
+
+    UpgradeActionOne --> ValidateClientOne{client_type = ponctuel ?}
+    ValidateClientOne -->|Non| ErrorNotPonctuelOne[Erreur VALIDATION_ERROR]
+    ValidateClientOne -->|Oui| UpdateClientTypeOne[UPDATE clients.client_type = direct_one]
+    UpdateClientTypeOne --> UpdateConfigOne[UPDATE client_configs dashboard_type=one, active_modules]
+    UpdateConfigOne --> LogUpgradeOne[INSERT activity_logs action=client_upgraded]
+    LogUpgradeOne --> InvalidateOne[Invalider caches TanStack Query]
+    InvalidateOne --> ToastOne[Toast "Client upgradé vers One"]
+    ToastOne --> CloseDialogOne[Fermer dialog]
+
+    CloseDialogLab --> End([Fin])
+    CloseDialogOne --> End
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { createClientSchema, updateClientSchema } from '@foxeo/utils'
 
 // Client type enums
-export const ClientTypeEnum = z.enum(['complet', 'direct-one', 'ponctuel'])
+export const ClientTypeEnum = z.enum(['complet', 'direct_one', 'ponctuel'])
 export const ClientStatusEnum = z.enum(['active', 'suspended', 'archived'])
 
 // Client Config types (from client_configs table)
@@ -79,7 +79,7 @@ export type ClientDB = {
   name: string
   company: string
   email: string
-  client_type: 'complet' | 'direct-one' | 'ponctuel'
+  client_type: 'complet' | 'direct_one' | 'ponctuel'
   status: 'active' | 'suspended' | 'archived'
   sector?: string
   phone?: string
@@ -457,3 +457,27 @@ export const CloseClientInput = z.object({
 })
 
 export type CloseClientInput = z.infer<typeof CloseClientInput>
+
+// ============================================================
+// Client Upgrade types (Story 2.9c)
+// ============================================================
+
+// Input for upgrading a ponctuel client to Lab or One
+export const UpgradeClientInput = z.object({
+  clientId: z.string().uuid(),
+  targetType: z.enum(['complet', 'direct_one']),
+  parcoursConfig: z
+    .object({
+      templateId: z.string().uuid(),
+      activeStages: z.array(
+        z.object({
+          key: z.string().min(1),
+          active: z.boolean(),
+        })
+      ),
+    })
+    .optional(),
+  modules: z.array(z.string()).optional(),
+})
+
+export type UpgradeClientInput = z.infer<typeof UpgradeClientInput>

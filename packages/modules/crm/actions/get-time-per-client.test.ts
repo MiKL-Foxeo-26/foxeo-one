@@ -52,7 +52,7 @@ describe('getTimePerClient Server Action', () => {
           id: '550e8400-e29b-41d4-a716-446655440002',
           name: 'Bob',
           company: 'BobInc',
-          client_type: 'direct-one',
+          client_type: 'direct_one',
           status: 'one-actif',
         },
       ],

@@ -16,7 +16,7 @@ interface ClientHeaderProps {
 
 const clientTypeLabels: Record<string, string> = {
   'complet': 'Complet',
-  'direct-one': 'Direct One',
+  'direct_one': 'Direct One',
   'ponctuel': 'Ponctuel',
 }
 

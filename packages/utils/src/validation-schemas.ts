@@ -22,7 +22,7 @@ export const phoneSchema = z
   .regex(/^\+?[0-9\s-]{10,20}$/, 'Numero de telephone invalide')
 
 // Client type enum (aligned with existing CRM types)
-export const clientTypeSchema = z.enum(['complet', 'direct-one', 'ponctuel'])
+export const clientTypeSchema = z.enum(['complet', 'direct_one', 'ponctuel'])
 
 // Schema for creating a new client
 export const createClientSchema = z.object({

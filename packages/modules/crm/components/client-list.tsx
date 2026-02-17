@@ -16,7 +16,7 @@ interface ClientListProps {
 // Type badge variants and labels
 const clientTypeConfig: Record<ClientType, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
   'complet': { label: 'Complet', variant: 'default' },
-  'direct-one': { label: 'Direct One', variant: 'secondary' },
+  'direct_one': { label: 'Direct One', variant: 'secondary' },
   'ponctuel': { label: 'Ponctuel', variant: 'outline' }
 }
 

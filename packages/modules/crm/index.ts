@@ -42,6 +42,7 @@ export { SuspendClientDialog } from './components/suspend-client-dialog'
 export { ClientLifecycleActions } from './components/client-lifecycle-actions'
 export { CloseClientDialog } from './components/close-client-dialog'
 export { ArchivedBanner } from './components/archived-banner'
+export { UpgradeClientDialog } from './components/upgrade-client-dialog'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -86,6 +87,7 @@ export { getTimePerClient } from './actions/get-time-per-client'
 export { suspendClient } from './actions/suspend-client'
 export { reactivateClient } from './actions/reactivate-client'
 export { closeClient } from './actions/close-client'
+export { upgradeClient } from './actions/upgrade-client'
 
 // Utils
 export {
@@ -143,4 +145,5 @@ export type {
   SuspendClientInput,
   ReactivateClientInput,
   CloseClientInput,
+  UpgradeClientInput,
 } from './types/crm.types'

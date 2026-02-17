@@ -1,6 +1,6 @@
 # Story 2.9c: Upgrader un client Ponctuel vers Lab ou One
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -22,32 +22,32 @@ So that **je peux faire évoluer la relation client selon ses besoins**.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Server Action (AC: #3)
-  - [ ] 1.1 `actions/upgrade-client.ts` — Upgrade client_type + client_configs + activity log
-  - [ ] 1.2 Si Lab : créer parcours via logique partagée avec Story 2.4
-  - [ ] 1.3 Si One : mettre à jour active_modules et dashboard_type='one'
+- [x] Task 1 — Server Action (AC: #3)
+  - [x] 1.1 `actions/upgrade-client.ts` — Upgrade client_type + client_configs + activity log
+  - [x] 1.2 Si Lab : créer parcours via logique partagée avec Story 2.4
+  - [x] 1.3 Si One : mettre à jour active_modules et dashboard_type='one'
 
-- [ ] Task 2 — Types TypeScript (AC: #2)
-  - [ ] 2.1 Type `UpgradeClientInput` (clientId, targetType: 'complet' | 'direct_one', parcoursConfig?, modules?)
-  - [ ] 2.2 Schéma Zod
+- [x] Task 2 — Types TypeScript (AC: #2)
+  - [x] 2.1 Type `UpgradeClientInput` (clientId, targetType: 'complet' | 'direct_one', parcoursConfig?, modules?)
+  - [x] 2.2 Schéma Zod
 
-- [ ] Task 3 — Composants UI (AC: #1, #2)
-  - [ ] 3.1 `components/upgrade-client-dialog.tsx` — Dialog avec deux onglets/modes : Lab ou One
-  - [ ] 3.2 Mode Lab : réutiliser composants parcours de Story 2.4 (`ParcoursStageList`, sélection template)
-  - [ ] 3.3 Mode One : liste de modules activables avec checkboxes (modules depuis `module_registry`)
-  - [ ] 3.4 Boutons upgrade conditionnels sur la fiche client
+- [x] Task 3 — Composants UI (AC: #1, #2)
+  - [x] 3.1 `components/upgrade-client-dialog.tsx` — Dialog avec deux onglets/modes : Lab ou One
+  - [x] 3.2 Mode Lab : réutiliser composants parcours de Story 2.4 (`ParcoursStageList`, sélection template)
+  - [x] 3.3 Mode One : liste de modules activables avec checkboxes (modules depuis `module_registry`)
+  - [x] 3.4 Boutons upgrade conditionnels sur la fiche client
 
-- [ ] Task 4 — Intégration (AC: #1)
-  - [ ] 4.1 Ajouter les boutons upgrade dans la fiche client, section actions
-  - [ ] 4.2 Visible uniquement si `client_type === 'ponctuel'`
+- [x] Task 4 — Intégration (AC: #1)
+  - [x] 4.1 Ajouter les boutons upgrade dans la fiche client, section actions
+  - [x] 4.2 Visible uniquement si `client_type === 'ponctuel'`
 
-- [ ] Task 5 — Tests (AC: #4)
-  - [ ] 5.1 Tests Server Action upgradeClient : vers Lab, vers One, client non-ponctuel rejeté
-  - [ ] 5.2 Tests composant UpgradeClientDialog : modes, soumission
-  - [ ] 5.3 Tests edge cases : upgrade vers Lab sans templates, modules invalides
+- [x] Task 5 — Tests (AC: #4)
+  - [x] 5.1 Tests Server Action upgradeClient : vers Lab, vers One, client non-ponctuel rejeté
+  - [x] 5.2 Tests composant UpgradeClientDialog : modes, soumission
+  - [x] 5.3 Tests edge cases : upgrade vers Lab sans templates, modules invalides
 
-- [ ] Task 6 — Documentation (AC: #4)
-  - [ ] 6.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 6 — Documentation (AC: #4)
+  - [x] 6.1 MAJ `docs/guide.md`, `faq.md`, `flows.md`
 
 ## Dev Notes
 
@@ -147,8 +147,64 @@ La liste des modules activables vient du `module_registry` (auto-découverte). P
 
 ### Agent Model Used
 
+claude-sonnet-4-5-20250929
+
 ### Debug Log References
+
+Aucun blocage. Test d'hoisting corrigé en remplaçant le pattern `vi.fn().mockResolvedValue(variable)` par une factory closure `vi.fn(() => Promise.resolve(...))`.
 
 ### Completion Notes List
 
+- ✅ **Task 1** : `actions/upgrade-client.ts` — Server Action complète avec deux branches (Lab/One). Réutilise la logique d'insertion parcours de Story 2.4. Validation serveur : reject si `client_type !== 'ponctuel'`. Activity log `client_upgraded` inséré. `revalidatePath` sur `/crm` et `/crm/clients/{id}`.
+- ✅ **Task 2** : `UpgradeClientInput` Zod schema ajouté dans `crm.types.ts`. Type union `complet | direct_one` pour `targetType`. `parcoursConfig` et `modules` optionnels.
+- ✅ **Task 3** : `components/upgrade-client-dialog.tsx` — Dialog avec `Tabs` Lab/One. Mode Lab réutilise `ParcoursStageList` + template selection de `AssignParcoursDialog`. Mode One affiche les modules disponibles via `AVAILABLE_MODULES` (constant interne, core-dashboard requis).
+- ✅ **Task 4** : `ClientLifecycleActions` modifié — boutons "Upgrader vers Lab" et "Upgrader vers One" conditionnels sur `clientType === 'ponctuel'` et `status === 'active'`.
+- ✅ **Task 5** : 13 tests unitaires `upgradeClient`, 7 tests `UpgradeClientDialog`, 8 tests types `UpgradeClientInput`, 3 tests supplémentaires `ClientLifecycleActions`. Total 508 tests, 0 régression.
+- ✅ **Task 6** : `guide.md`, `faq.md`, `flows.md` mis à jour avec flux Mermaid complet et 6 nouvelles questions FAQ.
+
 ### File List
+
+- `packages/modules/crm/actions/upgrade-client.ts` (créé)
+- `packages/modules/crm/actions/upgrade-client.test.ts` (créé)
+- `packages/modules/crm/components/upgrade-client-dialog.tsx` (créé)
+- `packages/modules/crm/components/upgrade-client-dialog.test.tsx` (créé)
+- `packages/modules/crm/types/crm.types.ts` (modifié — UpgradeClientInput ajouté)
+- `packages/modules/crm/types/crm.types.test.ts` (modifié — tests UpgradeClientInput)
+- `packages/modules/crm/components/client-lifecycle-actions.tsx` (modifié — boutons upgrade)
+- `packages/modules/crm/components/client-lifecycle-actions.test.tsx` (modifié — 3 tests ajoutés)
+- `packages/modules/crm/index.ts` (modifié — exports UpgradeClientDialog, upgradeClient, UpgradeClientInput)
+- `packages/modules/crm/docs/guide.md` (modifié)
+- `packages/modules/crm/docs/faq.md` (modifié)
+- `packages/modules/crm/docs/flows.md` (modifié)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (modifié — in-progress → done)
+
+### Code Review Record
+
+**Reviewer model**: claude-sonnet-4-5-20250929 (adversarial code review workflow)
+
+**8 findings — all fixed:**
+
+1. **HIGH — Missing duplicate parcours check** : `upgradeToLab()` n'avait pas de vérification de parcours `en_cours` existant (contrairement à `assign-parcours.ts`). Ajout d'un `maybeSingle` check avant insertion.
+2. **HIGH — Missing template existence validation** : `upgradeToLab()` n'avait pas de vérification que le `templateId` existe dans `parcours_templates`. Ajout d'un `single()` fetch avec gestion d'erreur `NOT_FOUND`.
+3. **MEDIUM — Missing template name in parcours_config** : `parcours_config` ne contenait pas le `name` du template. Ajout de `name: template.name` pour cohérence avec `assign-parcours.ts`.
+4. **MEDIUM — No server-side status check** : L'action ne vérifiait pas `status === 'active'` côté serveur. Ajout de la colonne `status` au SELECT + rejet si non-actif.
+5. **MEDIUM — Tabs mock too simplistic** : Le mock `TabsContent` rendait tous les contenus simultanément. Corrigé avec un `currentTabValue` module-level pour ne rendre que l'onglet actif.
+6. **MEDIUM — AVAILABLE_MODULES hardcoded** : Violation de l'anti-pattern « NE PAS hardcoder la liste des modules ». Remplacé par `getModulesForTarget('client-one')` du module registry.
+7. **LOW — Weak test assertion for default modules** : `expect(mockConfigUpdate).toHaveBeenCalled()` trop faible. Renforcé avec `expect.objectContaining({ active_modules: ['core-dashboard'] })`.
+8. **LOW — Pre-existing ClientTypeEnum `direct-one` vs `direct_one`** : Mismatch entre DB migration (`direct_one`) et TypeScript enum (`direct-one`). Corrigé dans 14 fichiers à travers le codebase.
+
+**Fichiers supplémentaires modifiés par le code review (fix #8):**
+- `packages/modules/crm/components/client-filters-panel.tsx`
+- `packages/modules/crm/components/client-form.tsx`
+- `packages/modules/crm/components/client-info-tab.tsx`
+- `packages/modules/crm/components/client-header.tsx`
+- `packages/modules/crm/components/client-list.tsx`
+- `packages/modules/crm/components/client-list.test.tsx`
+- `packages/modules/crm/components/time-per-client-table.tsx`
+- `packages/modules/crm/components/time-per-client-table.test.tsx`
+- `packages/modules/crm/actions/get-portfolio-stats.ts`
+- `packages/modules/crm/actions/get-portfolio-stats.test.ts`
+- `packages/modules/crm/actions/get-time-per-client.test.ts`
+- `packages/utils/src/validation-schemas.ts`
+
+**Final test run**: 109 test files, 1086 tests, 0 failures, 45 skipped (RLS)

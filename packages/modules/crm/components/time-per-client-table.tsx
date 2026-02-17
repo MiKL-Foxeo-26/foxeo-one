@@ -19,7 +19,7 @@ function formatDuration(totalSeconds: number): string {
 
 const TYPE_LABELS: Record<ClientType, string> = {
   complet: 'Complet',
-  'direct-one': 'Direct One',
+  'direct_one': 'Direct One',
   ponctuel: 'Ponctuel',
 }
 
