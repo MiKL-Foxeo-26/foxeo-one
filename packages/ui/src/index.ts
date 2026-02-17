@@ -13,6 +13,8 @@ export { useTranslations } from './hooks/use-translations'
 export { LocaleProvider } from './providers/locale-provider'
 
 // Composants
+export * from './avatar'
+export * from './scroll-area'
 export * from './alert'
 export * from './alert-dialog'
 export * from './badge'

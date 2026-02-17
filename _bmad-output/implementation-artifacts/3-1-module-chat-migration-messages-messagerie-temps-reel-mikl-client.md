@@ -1,6 +1,6 @@
 # Story 3.1: Module Chat — Migration messages & messagerie temps réel MiKL-client
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -26,57 +26,57 @@ So that **je peux poser mes questions et recevoir des réponses directes de MiKL
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00022_create_messages.sql`
-  - [ ] 1.2 Table `messages` avec tous les champs
-  - [ ] 1.3 Index `idx_messages_client_id_created_at`
-  - [ ] 1.4 RLS policies : select_owner, select_operator, insert_authenticated
-  - [ ] 1.5 Trigger Supabase Realtime (publication sur la table messages)
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00022_create_messages.sql`
+  - [x] 1.2 Table `messages` avec tous les champs
+  - [x] 1.3 Index `idx_messages_client_id_created_at`
+  - [x] 1.4 RLS policies : select_owner, select_operator, insert_authenticated
+  - [x] 1.5 Trigger Supabase Realtime (publication sur la table messages)
 
-- [ ] Task 2 — Module Chat scaffold (AC: #2)
-  - [ ] 2.1 Créer `packages/modules/chat/manifest.ts`
-  - [ ] 2.2 Créer `packages/modules/chat/index.ts`
-  - [ ] 2.3 Créer `packages/modules/chat/types/chat.types.ts`
-  - [ ] 2.4 Créer `packages/modules/chat/package.json`, `tsconfig.json`
-  - [ ] 2.5 Créer `packages/modules/chat/docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 2 — Module Chat scaffold (AC: #2)
+  - [x] 2.1 Créer `packages/modules/chat/manifest.ts`
+  - [x] 2.2 Créer `packages/modules/chat/index.ts`
+  - [x] 2.3 Créer `packages/modules/chat/types/chat.types.ts`
+  - [x] 2.4 Créer `packages/modules/chat/package.json`, `tsconfig.json`
+  - [x] 2.5 Créer `packages/modules/chat/docs/guide.md`, `faq.md`, `flows.md`
 
-- [ ] Task 3 — Server Actions (AC: #4)
-  - [ ] 3.1 `actions/send-message.ts` — Insert message avec sender_type
-  - [ ] 3.2 `actions/get-messages.ts` — Récupérer messages d'une conversation, ordonnés ASC
-  - [ ] 3.3 `actions/get-conversations.ts` — Liste conversations pour MiKL (dernier message, non lu count)
-  - [ ] 3.4 `actions/mark-messages-read.ts` — Marquer messages comme lus (set read_at)
+- [x] Task 3 — Server Actions (AC: #4)
+  - [x] 3.1 `actions/send-message.ts` — Insert message avec sender_type
+  - [x] 3.2 `actions/get-messages.ts` — Récupérer messages d'une conversation, ordonnés ASC
+  - [x] 3.3 `actions/get-conversations.ts` — Liste conversations pour MiKL (dernier message, non lu count)
+  - [x] 3.4 `actions/mark-messages-read.ts` — Marquer messages comme lus (set read_at)
 
-- [ ] Task 4 — Hooks TanStack Query (AC: #3, #5, #6)
-  - [ ] 4.1 `hooks/use-chat-messages.ts` — queryKey `['messages', clientId]`, optimistic update sur send
-  - [ ] 4.2 `hooks/use-conversations.ts` — queryKey `['conversations']` (pour Hub MiKL)
-  - [ ] 4.3 `hooks/use-chat-realtime.ts` — Supabase Realtime subscription → `queryClient.invalidateQueries()`
+- [x] Task 4 — Hooks TanStack Query (AC: #3, #5, #6)
+  - [x] 4.1 `hooks/use-chat-messages.ts` — queryKey `['messages', clientId]`, optimistic update sur send
+  - [x] 4.2 `hooks/use-conversations.ts` — queryKey `['conversations']` (pour Hub MiKL)
+  - [x] 4.3 `hooks/use-chat-realtime.ts` — Supabase Realtime subscription → `queryClient.invalidateQueries()`
 
-- [ ] Task 5 — Composants UI (AC: #3, #5)
-  - [ ] 5.1 `components/chat-window.tsx` — Fenêtre chat : liste messages + input + scroll auto
-  - [ ] 5.2 `components/chat-message.tsx` — Bulle message (gauche/droite selon sender, heure, lu/non lu)
-  - [ ] 5.3 `components/chat-input.tsx` — Champ saisie + bouton envoyer (Enter pour envoyer)
-  - [ ] 5.4 `components/chat-list.tsx` — Liste conversations MiKL : avatar, nom client, dernier msg, badge non lu
-  - [ ] 5.5 `components/chat-skeleton.tsx` — Skeleton loader pour fenêtre chat
-  - [ ] 5.6 `components/unread-badge.tsx` — Badge compteur non lus pour sidebar
+- [x] Task 5 — Composants UI (AC: #3, #5)
+  - [x] 5.1 `components/chat-window.tsx` — Fenêtre chat : liste messages + input + scroll auto
+  - [x] 5.2 `components/chat-message.tsx` — Bulle message (gauche/droite selon sender, heure, lu/non lu)
+  - [x] 5.3 `components/chat-input.tsx` — Champ saisie + bouton envoyer (Enter pour envoyer)
+  - [x] 5.4 `components/chat-list.tsx` — Liste conversations MiKL : avatar, nom client, dernier msg, badge non lu
+  - [x] 5.5 `components/chat-skeleton.tsx` — Skeleton loader pour fenêtre chat
+  - [x] 5.6 `components/unread-badge.tsx` — Badge compteur non lus pour sidebar
 
-- [ ] Task 6 — Routes (AC: #3, #5)
-  - [ ] 6.1 Hub : `apps/hub/app/(dashboard)/modules/chat/page.tsx` — Layout deux colonnes (liste + fenêtre)
-  - [ ] 6.2 Hub : `apps/hub/app/(dashboard)/modules/chat/[clientId]/page.tsx` — Conversation spécifique
-  - [ ] 6.3 Client : `apps/client/app/(dashboard)/modules/chat/page.tsx` — Fenêtre chat unique (1 seul interlocuteur)
-  - [ ] 6.4 Loading.tsx et error.tsx pour chaque route
+- [x] Task 6 — Routes (AC: #3, #5)
+  - [x] 6.1 Hub : `apps/hub/app/(dashboard)/modules/chat/page.tsx` — Layout deux colonnes (liste + fenêtre)
+  - [x] 6.2 Hub : `apps/hub/app/(dashboard)/modules/chat/[clientId]/page.tsx` — Conversation spécifique
+  - [x] 6.3 Client : `apps/client/app/(dashboard)/modules/chat/page.tsx` — Fenêtre chat unique (1 seul interlocuteur)
+  - [x] 6.4 Loading.tsx et error.tsx pour chaque route
 
-- [ ] Task 7 — Realtime (AC: #6)
-  - [ ] 7.1 Setup Supabase Realtime channel `chat:room:{clientId}` dans `use-chat-realtime.ts`
-  - [ ] 7.2 On `INSERT` → invalidateQueries `['messages', clientId]`
-  - [ ] 7.3 On `UPDATE` (read_at) → invalidateQueries `['messages', clientId]`
-  - [ ] 7.4 Badge non lus dans sidebar Hub, invalidé en realtime
+- [x] Task 7 — Realtime (AC: #6)
+  - [x] 7.1 Setup Supabase Realtime channel `chat:room:{clientId}` dans `use-chat-realtime.ts`
+  - [x] 7.2 On `INSERT` → invalidateQueries `['messages', clientId]`
+  - [x] 7.3 On `UPDATE` (read_at) → invalidateQueries `['messages', clientId]`
+  - [x] 7.4 Badge non lus dans sidebar Hub, invalidé en realtime
 
-- [ ] Task 8 — Tests (AC: #7)
-  - [ ] 8.1 Tests Server Actions : sendMessage, getMessages, markMessagesRead
-  - [ ] 8.2 Tests composants : ChatWindow, ChatMessage, ChatInput, ChatList
-  - [ ] 8.3 Tests hooks : useChatMessages, useConversations
-  - [ ] 8.4 Tests RLS : client A ne voit pas messages client B
-  - [ ] 8.5 Tests optimistic update : message visible immédiatement avant confirmation serveur
+- [x] Task 8 — Tests (AC: #7)
+  - [x] 8.1 Tests Server Actions : sendMessage, getMessages, markMessagesRead
+  - [x] 8.2 Tests composants : ChatWindow, ChatMessage, ChatInput, ChatList
+  - [x] 8.3 Tests hooks : useChatMessages, useConversations
+  - [x] 8.4 Tests RLS : client A ne voit pas messages client B
+  - [x] 8.5 Tests optimistic update : message visible immédiatement avant confirmation serveur
 
 ## Dev Notes
 
@@ -277,8 +277,88 @@ packages/modules/chat/
 
 ### Agent Model Used
 
+claude-sonnet-4-5-20250929
+
 ### Debug Log References
+
+- Fix mock chain `get-messages.test.ts` : `.eq().order()` vs `.eq().eq().order()` — suppression du deuxième `.eq()` inutile
+- Fix tests composants : remplacement de `vi.mocked(await import(...))` dans les `it()` par des mocks `vi.fn()` déclarés au niveau module
+- `Avatar` et `ScrollArea` absents de `@foxeo/ui` — ajout des composants shadcn + deps radix (`@radix-ui/react-avatar`, `@radix-ui/react-scroll-area`)
 
 ### Completion Notes List
 
+- ✅ Task 1 — Migration `00022_create_messages.sql` créée avec table, index, 4 RLS policies (select_owner, select_operator, insert_authenticated, update_operator) et publication Realtime
+- ✅ Task 2 — Module chat scaffoldé : manifest.ts, index.ts, types, package.json, tsconfig.json, docs (guide/faq/flows)
+- ✅ Task 3 — 4 Server Actions : sendMessage, getMessages, getConversations, markMessagesRead — pattern `{ data, error }`, jamais de throw
+- ✅ Task 4 — 3 hooks TanStack Query : useChatMessages (avec optimistic update), useConversations, useChatRealtime
+- ✅ Task 5 — 6 composants : ChatWindow, ChatMessage, ChatInput, ChatList, ChatSkeleton, UnreadBadge
+- ✅ Task 6 — Routes Hub (`/modules/chat` + `/modules/chat/[clientId]`) et Client (`/modules/chat`) avec loading.tsx et error.tsx
+- ✅ Task 7 — Realtime : channel `chat:room:{clientId}`, INSERT+UPDATE → invalidateQueries(['messages', clientId]) + invalidateQueries(['conversations'])
+- ✅ Task 8 — 50 tests unitaires, 0 régression sur 1187 tests totaux. Tests RLS `message-isolation.test.ts` créés.
+- ✅ Composants `Avatar` et `ScrollArea` ajoutés à `@foxeo/ui` (shadcn pattern, Radix primitives)
+
 ### File List
+
+**Nouveau — Migration**
+- `supabase/migrations/00022_create_messages.sql`
+
+**Nouveau — Module Chat**
+- `packages/modules/chat/manifest.ts`
+- `packages/modules/chat/index.ts`
+- `packages/modules/chat/package.json`
+- `packages/modules/chat/tsconfig.json`
+- `packages/modules/chat/types/chat.types.ts`
+- `packages/modules/chat/docs/guide.md`
+- `packages/modules/chat/docs/faq.md`
+- `packages/modules/chat/docs/flows.md`
+- `packages/modules/chat/actions/send-message.ts`
+- `packages/modules/chat/actions/send-message.test.ts`
+- `packages/modules/chat/actions/get-messages.ts`
+- `packages/modules/chat/actions/get-messages.test.ts`
+- `packages/modules/chat/actions/get-conversations.ts`
+- `packages/modules/chat/actions/mark-messages-read.ts`
+- `packages/modules/chat/actions/mark-messages-read.test.ts`
+- `packages/modules/chat/hooks/use-chat-messages.ts`
+- `packages/modules/chat/hooks/use-chat-messages.test.ts`
+- `packages/modules/chat/hooks/use-conversations.ts`
+- `packages/modules/chat/hooks/use-conversations.test.ts`
+- `packages/modules/chat/hooks/use-chat-realtime.ts`
+- `packages/modules/chat/components/chat-window.tsx`
+- `packages/modules/chat/components/chat-window.test.tsx`
+- `packages/modules/chat/components/chat-message.tsx`
+- `packages/modules/chat/components/chat-message.test.tsx`
+- `packages/modules/chat/components/chat-input.tsx`
+- `packages/modules/chat/components/chat-input.test.tsx`
+- `packages/modules/chat/components/chat-list.tsx`
+- `packages/modules/chat/components/chat-list.test.tsx`
+- `packages/modules/chat/components/chat-skeleton.tsx`
+- `packages/modules/chat/components/unread-badge.tsx`
+
+**Nouveau — Routes Hub**
+- `apps/hub/app/(dashboard)/modules/chat/page.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/chat-page-client.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/loading.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/error.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/[clientId]/page.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/[clientId]/chat-conversation-client.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/[clientId]/loading.tsx`
+- `apps/hub/app/(dashboard)/modules/chat/[clientId]/error.tsx`
+
+**Nouveau — Routes Client**
+- `apps/client/app/(dashboard)/modules/chat/page.tsx`
+- `apps/client/app/(dashboard)/modules/chat/chat-client-page-client.tsx`
+- `apps/client/app/(dashboard)/modules/chat/loading.tsx`
+- `apps/client/app/(dashboard)/modules/chat/error.tsx`
+
+**Nouveau — Tests RLS**
+- `tests/rls/message-isolation.test.ts`
+
+**Modifié — @foxeo/ui (ajout composants)**
+- `packages/ui/src/avatar.tsx`
+- `packages/ui/src/scroll-area.tsx`
+- `packages/ui/src/index.ts`
+- `packages/ui/package.json`
+
+## Change Log
+
+- 2026-02-17 — Story 3.1 implémentée : module chat complet avec migration DB, Server Actions, hooks TanStack Query, composants UI, routes Hub+Client, Realtime, 50 tests unitaires
