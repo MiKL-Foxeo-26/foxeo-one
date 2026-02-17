@@ -389,6 +389,74 @@ Pour faire évoluer un client Ponctuel vers un accompagnement plus complet, util
 
 **Note :** À ce stade du développement, peu de modules supplémentaires sont disponibles. Le module Core Dashboard est activé par défaut et ne peut pas être désactivé.
 
-## Prochaines fonctionnalités
+## Alertes inactivité Lab
 
-- Alertes inactivité Lab & import clients CSV (Story 2.10)
+### Détection automatique
+
+Le système détecte automatiquement les clients Lab inactifs. Une Edge Function quotidienne (8h) vérifie si un client Lab n'a eu aucune activité (login, message, soumission) depuis X jours.
+
+**Seuil configurable :** Par défaut 7 jours. Chaque opérateur peut ajuster ce seuil dans ses préférences (colonne `inactivity_threshold_days`).
+
+**Notification :**
+Lorsqu'un client est détecté comme inactif, une notification est créée avec :
+- Nom du client
+- Nombre de jours d'inactivité
+- Date de la dernière activité
+- Lien direct vers la fiche client
+
+**Alerte unique :** L'alerte n'est envoyée qu'une fois par période d'inactivité. Si le client redevient actif (nouvelle activité loguée), le flag est automatiquement réinitialisé.
+
+### Actions sur une alerte d'inactivité
+
+Depuis la notification, vous pouvez :
+1. **Voir la fiche** — Ouvrir directement la fiche client
+2. **À traiter plus tard** — Reporter le traitement (Story 2.6)
+3. **Ignorer** — Marquer la notification comme lue
+
+## Import clients CSV
+
+### Importer des clients en masse
+
+1. Depuis la liste des clients, cliquez sur le bouton **"Import CSV"** (à côté de "Créer un client")
+2. **Étape 1 — Upload :** Sélectionnez un fichier CSV ou téléchargez le template
+3. **Étape 2 — Aperçu :** Vérifiez les données avant import
+   - Lignes valides : fond vert
+   - Lignes en erreur : fond rouge avec détail des erreurs
+   - Décochez les lignes valides que vous souhaitez exclure
+4. **Étape 3 — Résultat :** Résumé "X clients importés, Y ignorés"
+
+### Format du fichier CSV
+
+Colonnes attendues :
+
+| Colonne | Obligatoire | Description |
+|---------|:-----------:|-------------|
+| `nom` | Oui | Nom du client |
+| `email` | Oui | Email (doit être unique par opérateur) |
+| `entreprise` | Non | Nom de l'entreprise |
+| `telephone` | Non | Numéro de téléphone |
+| `secteur` | Non | Secteur d'activité |
+| `type_client` | Non | complet, direct_one, ponctuel (défaut: ponctuel) |
+
+**Template :** Cliquez sur "Télécharger le template CSV" pour obtenir un fichier pré-rempli avec les colonnes correctes et des exemples.
+
+### Validation automatique
+
+Avant l'import, le système vérifie :
+- Présence des champs obligatoires (nom, email)
+- Format email valide
+- Type client valide (complet, direct_one, ponctuel)
+- Pas de doublons d'email dans le fichier
+- Pas de doublons avec les clients existants en base
+
+### Après l'import
+
+- Chaque client reçoit automatiquement une `client_config` par défaut (module `core-dashboard`, dashboard Lab ou One selon le type)
+- Le cache de la liste clients est invalidé automatiquement
+- L'import est tracé dans les logs d'activité
+
+### Limitations
+
+- Maximum 500 lignes par import
+- Les lignes en erreur sont ignorées (pas de blocage)
+- Pas de librairie CSV externe — le parser gère les guillemets, virgules dans les valeurs, et l'encodage UTF-8 avec BOM

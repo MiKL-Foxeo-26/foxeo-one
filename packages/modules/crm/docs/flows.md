@@ -544,6 +544,144 @@ flowchart TD
     CloseDialogOne --> End
 ```
 
+## Flux : Détection inactivité Lab (Edge Function cron)
+
+```mermaid
+flowchart TD
+    Start([pg_cron — 8h quotidien]) --> InvokeEdge[Appel Edge Function check-inactivity]
+    InvokeEdge --> LoadOperators[Charger tous les opérateurs + threshold]
+
+    LoadOperators --> ForEachOp[Pour chaque opérateur]
+    ForEachOp --> CalcCutoff[Calculer date cutoff = NOW - threshold_days]
+    CalcCutoff --> RPC[RPC get_inactive_lab_clients]
+
+    RPC --> HasInactive{Clients inactifs trouvés ?}
+    HasInactive -->|Non| NextOp[Opérateur suivant]
+    HasInactive -->|Oui| ForEachClient[Pour chaque client inactif]
+
+    ForEachClient --> CreateNotif[INSERT notification inactivity_alert]
+    CreateNotif --> SetFlag[UPDATE client_configs inactivity_alert_sent = true]
+    SetFlag --> NextClient[Client suivant]
+    NextClient --> ForEachClient
+
+    NextOp --> ForEachOp
+    ForEachClient -->|Tous traités| NextOp
+
+    NextOp -->|Tous traités| Response[Retourner { success: true }]
+    Response --> End([Fin])
+```
+
+```mermaid
+sequenceDiagram
+    participant Cron as pg_cron
+    participant EF as Edge Function
+    participant DB as Supabase DB
+
+    Cron->>EF: POST /functions/v1/check-inactivity
+    EF->>DB: SELECT operators (id, threshold)
+
+    loop Pour chaque opérateur
+        EF->>DB: RPC get_inactive_lab_clients(operator_id, cutoff_date)
+        DB-->>EF: Liste clients inactifs
+
+        loop Pour chaque client inactif
+            EF->>DB: INSERT notifications (inactivity_alert)
+            EF->>DB: UPDATE client_configs SET inactivity_alert_sent = true
+        end
+    end
+
+    EF-->>Cron: 200 { success: true }
+```
+
+## Flux : Reset automatique du flag d'inactivité
+
+```mermaid
+flowchart LR
+    Activity[Nouvelle activité client] --> Trigger[Trigger fn_reset_inactivity_alert]
+    Trigger --> CheckFlag{inactivity_alert_sent = true ?}
+    CheckFlag -->|Oui| ResetFlag[UPDATE client_configs SET inactivity_alert_sent = false]
+    CheckFlag -->|Non| NoOp[Rien à faire]
+```
+
+## Flux : Import CSV — Upload, validation et exécution
+
+```mermaid
+flowchart TD
+    Start([MiKL clique "Import CSV"]) --> OpenDialog[Ouvrir ImportCsvDialog]
+    OpenDialog --> ShowUpload[Étape 1 : Upload]
+
+    ShowUpload --> DownloadTemplate[Optionnel : Télécharger template CSV]
+    ShowUpload --> SelectFile[MiKL sélectionne un fichier .csv]
+
+    SelectFile --> ParseCSV[parseCsv côté client]
+    ParseCSV --> ValidateRows[validateCsvRows — email, champs requis, types]
+    ValidateRows --> ShowPreview[Étape 2 : Aperçu tableau]
+
+    ShowPreview --> ColoredRows[Lignes vertes = valides, rouges = erreurs]
+    ColoredRows --> ExcludeRows[MiKL peut exclure des lignes via checkbox]
+    ExcludeRows --> ClickImport[Cliquer "Importer X clients"]
+
+    ClickImport --> ServerAction[Server Action importClientsCsv]
+    ServerAction --> AuthCheck{Authentifié ?}
+    AuthCheck -->|Non| ErrorAuth[Erreur UNAUTHORIZED]
+    AuthCheck -->|Oui| ZodValidation{Validation Zod ?}
+
+    ZodValidation -->|Erreur| ErrorValidation[Erreur VALIDATION_ERROR]
+    ZodValidation -->|OK| CheckEmails[Batch query emails existants]
+
+    CheckEmails --> FilterDuplicates[Exclure emails déjà en base]
+    FilterDuplicates --> HasValid{Lignes valides restantes ?}
+
+    HasValid -->|Non| AllIgnored[Retourner importedCount: 0]
+    HasValid -->|Oui| BatchInsert[INSERT batch clients]
+
+    BatchInsert --> InsertConfigs[INSERT batch client_configs]
+    InsertConfigs --> LogActivity[INSERT activity_logs action=csv_import]
+    LogActivity --> Revalidate[revalidatePath /modules/crm]
+    Revalidate --> ShowResult[Étape 3 : Résumé]
+
+    ShowResult --> ResultSummary[X importés, Y ignorés]
+    ResultSummary --> CloseDialog[Fermer dialog]
+    CloseDialog --> End([Fin])
+```
+
+```mermaid
+sequenceDiagram
+    participant UI as ImportCsvDialog
+    participant Parser as csv-parser (client)
+    participant Validator as csv-validator (client)
+    participant TQ as TanStack Query
+    participant SA as Server Action
+    participant SB as Supabase
+
+    UI->>UI: MiKL sélectionne fichier CSV
+    UI->>Parser: parseCsv(fileContent)
+    Parser-->>UI: CsvImportRow[]
+
+    UI->>Validator: validateCsvRows(rows)
+    Validator-->>UI: CsvValidationResult[] (valid/errors)
+
+    UI->>UI: Afficher aperçu coloré
+    UI->>UI: MiKL exclut lignes optionnelles
+    UI->>UI: MiKL clique "Importer"
+
+    UI->>TQ: useImportCsv.mutate(validRows)
+    TQ->>SA: importClientsCsv({ rows })
+    SA->>SB: SELECT emails déjà existants (batch IN)
+    SB-->>SA: Emails existants
+
+    SA->>SA: Filtrer lignes avec emails dupliqués
+    SA->>SB: INSERT batch clients
+    SB-->>SA: Clients insérés avec IDs
+
+    SA->>SB: INSERT batch client_configs
+    SA->>SB: INSERT activity_logs (csv_import)
+    SA-->>TQ: { data: { importedCount, ignoredCount }, error: null }
+
+    TQ->>TQ: invalidateQueries(['clients'])
+    TQ-->>UI: Afficher résumé
+```
+
 ## Notes
 
 - La recherche utilise un debounce de 300ms pour éviter les requêtes excessives
@@ -555,3 +693,7 @@ flowchart TD
 - La clôture nécessite une double validation (saisie nom client) pour éviter les erreurs
 - Les clients archivés sont exclus par défaut de la liste (filtre "Clôturés" disponible)
 - La réactivation (suspendu/archivé → actif) est immédiate sans confirmation
+- L'Edge Function d'inactivité utilise la `service_role_key` pour bypasser le RLS
+- Le flag `inactivity_alert_sent` est auto-reset par un trigger PostgreSQL sur `activity_logs`
+- Le parsing CSV est 100% côté client (pas de round-trip serveur pour l'aperçu)
+- L'import CSV utilise un batch insert (pas d'insertion ligne par ligne)

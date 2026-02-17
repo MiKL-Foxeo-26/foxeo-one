@@ -481,3 +481,90 @@ export const UpgradeClientInput = z.object({
 })
 
 export type UpgradeClientInput = z.infer<typeof UpgradeClientInput>
+
+// ============================================================
+// Notification types (Story 2.10)
+// ============================================================
+
+export const NotificationTypeEnum = z.enum(['inactivity_alert', 'csv_import_complete'])
+
+export const Notification = z.object({
+  id: z.string().uuid(),
+  operatorId: z.string().uuid(),
+  type: NotificationTypeEnum,
+  title: z.string(),
+  message: z.string().nullable(),
+  entityType: z.string().nullable(),
+  entityId: z.string().uuid().nullable(),
+  read: z.boolean(),
+  createdAt: z.string().datetime(),
+})
+
+export type Notification = z.infer<typeof Notification>
+export type NotificationType = z.infer<typeof NotificationTypeEnum>
+
+// DB type (snake_case)
+export type NotificationDB = {
+  id: string
+  operator_id: string
+  type: string
+  title: string
+  message: string | null
+  entity_type: string | null
+  entity_id: string | null
+  read: boolean
+  created_at: string
+}
+
+// ============================================================
+// CSV Import types (Story 2.10)
+// ============================================================
+
+export const CsvClientTypeEnum = z.enum(['complet', 'direct_one', 'ponctuel'])
+
+export const CsvImportRow = z.object({
+  lineNumber: z.number().int().positive(),
+  name: z.string(),
+  email: z.string(),
+  company: z.string(),
+  phone: z.string(),
+  sector: z.string(),
+  clientType: z.string(),
+})
+
+export type CsvImportRow = z.infer<typeof CsvImportRow>
+
+export const CsvValidationResult = z.object({
+  row: CsvImportRow,
+  valid: z.boolean(),
+  errors: z.array(z.string()),
+})
+
+export type CsvValidationResult = z.infer<typeof CsvValidationResult>
+
+export const CsvImportResult = z.object({
+  imported: z.number().int().nonnegative(),
+  ignored: z.number().int().nonnegative(),
+  errors: z.array(z.string()),
+})
+
+export type CsvImportResult = z.infer<typeof CsvImportResult>
+
+// Input schema for CSV import server action
+export const ImportCsvInput = z.object({
+  rows: z.array(CsvImportRow).min(1, 'Au moins une ligne est requise').max(500, 'Maximum 500 lignes par import'),
+})
+
+export type ImportCsvInput = z.infer<typeof ImportCsvInput>
+
+// Validated row ready for DB insertion
+export const ValidatedCsvRow = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  company: z.string(),
+  phone: z.string(),
+  sector: z.string(),
+  clientType: CsvClientTypeEnum,
+})
+
+export type ValidatedCsvRow = z.infer<typeof ValidatedCsvRow>

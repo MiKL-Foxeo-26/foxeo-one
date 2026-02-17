@@ -43,6 +43,10 @@ export { ClientLifecycleActions } from './components/client-lifecycle-actions'
 export { CloseClientDialog } from './components/close-client-dialog'
 export { ArchivedBanner } from './components/archived-banner'
 export { UpgradeClientDialog } from './components/upgrade-client-dialog'
+export { ImportCsvDialog } from './components/import-csv-dialog'
+export { CsvPreviewTable } from './components/csv-preview-table'
+export { CsvTemplateDownload } from './components/csv-template-download'
+export { NotificationItem } from './components/notification-item'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -56,6 +60,7 @@ export { useClientNotes } from './hooks/use-client-notes'
 export { useReminders, useCreateReminder, useUpdateReminder, useToggleReminderComplete, useDeleteReminder } from './hooks/use-reminders'
 export { usePortfolioStats, useGraduationRate } from './hooks/use-portfolio-stats'
 export { useTimePerClient } from './hooks/use-time-per-client'
+export { useNotifications, useMarkNotificationRead, useImportCsv } from './hooks/use-notifications'
 
 // Actions
 export { getClients } from './actions/get-clients'
@@ -88,6 +93,9 @@ export { suspendClient } from './actions/suspend-client'
 export { reactivateClient } from './actions/reactivate-client'
 export { closeClient } from './actions/close-client'
 export { upgradeClient } from './actions/upgrade-client'
+export { importClientsCsv } from './actions/import-clients-csv'
+export { getNotifications } from './actions/get-notifications'
+export { markNotificationRead } from './actions/mark-notification-read'
 
 // Utils
 export {
@@ -99,6 +107,11 @@ export {
 } from './utils/cursor-integration'
 export { TIME_ESTIMATES } from './utils/time-estimates'
 export type { TimeEstimateConfig } from './utils/time-estimates'
+export { parseCsv, generateCsvTemplate } from './utils/csv-parser'
+export { validateCsvRows, validateCsvRow, isValidEmail, markDuplicateEmails } from './utils/csv-validator'
+
+// Zod Schemas (re-exported as values for external validation)
+export { ImportCsvInput as ImportCsvInputSchema, CsvImportRow as CsvImportRowSchema } from './types/crm.types'
 
 // Types
 export type {
@@ -146,4 +159,12 @@ export type {
   ReactivateClientInput,
   CloseClientInput,
   UpgradeClientInput,
+  Notification,
+  NotificationType,
+  NotificationDB,
+  CsvImportRow,
+  CsvValidationResult,
+  CsvImportResult,
+  ImportCsvInput,
+  ValidatedCsvRow,
 } from './types/crm.types'

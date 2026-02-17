@@ -65,7 +65,7 @@ development_status:
   2-9a-suspendre-reactiver-un-client: done
   2-9b-cloturer-un-client-archiver-les-donnees: done
   2-9c-upgrader-un-client-ponctuel-vers-lab-ou-one: done
-  2-10-alertes-inactivite-lab-import-clients-csv: ready-for-dev
+  2-10-alertes-inactivite-lab-import-clients-csv: done
   epic-2-retrospective: optional
 
   # Epic 3: Communication Temps Reel & Notifications (7 stories)

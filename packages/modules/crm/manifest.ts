@@ -29,6 +29,6 @@ export const manifest: ModuleManifest = {
       component: 'StatsDashboard'
     }
   ],
-  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates', 'client_notes', 'reminders', 'activity_logs'],
+  requiredTables: ['clients', 'client_configs', 'parcours', 'parcours_templates', 'client_notes', 'reminders', 'activity_logs', 'notifications'],
   dependencies: []
 }

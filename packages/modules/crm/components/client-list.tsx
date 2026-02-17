@@ -3,6 +3,7 @@
 import { DataTable, type ColumnDef } from '@foxeo/ui'
 import { Badge } from '@foxeo/ui'
 import { CreateClientDialog } from './create-client-dialog'
+import { ImportCsvDialog } from './import-csv-dialog'
 import { PinButton } from './pin-button'
 import { ClientStatusBadge } from './client-status-badge'
 import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
@@ -99,7 +100,8 @@ export function ClientList({ clients, onRowClick, showCreateButton = true }: Cli
   return (
     <div className="space-y-4">
       {showCreateButton && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <ImportCsvDialog />
           <CreateClientDialog />
         </div>
       )}

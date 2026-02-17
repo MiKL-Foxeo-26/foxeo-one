@@ -9,9 +9,14 @@ vi.mock('next/navigation', () => ({
 }))
 vi.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  useMutation: () => ({ mutate: vi.fn(), isPending: false }),
+  useQuery: () => ({ data: [], isLoading: false }),
 }))
 vi.mock('../actions/create-client', () => ({
   createClient: vi.fn().mockResolvedValue({ data: null, error: null }),
+}))
+vi.mock('../actions/import-clients-csv', () => ({
+  importClientsCsv: vi.fn().mockResolvedValue({ data: null, error: null }),
 }))
 
 describe('ClientList', () => {

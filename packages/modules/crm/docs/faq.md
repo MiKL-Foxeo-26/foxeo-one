@@ -143,6 +143,49 @@ R: Non, un client clôturé perd tout accès à son dashboard (Lab ou One). Il n
 **Q: Puis-je supprimer définitivement un client au lieu de le clôturer ?**
 R: Non, le système ne permet pas la suppression définitive des clients. La clôture est l'action la plus forte disponible. Si vous devez réellement supprimer des données client (conformité RGPD), cela sera géré via le module d'export/anonymisation (Epic 9).
 
+### Alertes d'inactivité
+
+**Q: Qu'est-ce qu'une alerte d'inactivité ?**
+R: Lorsqu'un client Lab n'a aucune activité (login, message, soumission) depuis un certain nombre de jours, une notification est automatiquement créée pour vous alerter. Cela évite qu'un client Lab ne tombe dans l'oubli.
+
+**Q: Comment configurer le seuil d'inactivité ?**
+R: Le seuil est configurable par opérateur (défaut : 7 jours). Modifiez la valeur `inactivity_threshold_days` dans vos paramètres opérateur. La détection est exécutée quotidiennement à 8h via une Edge Function Supabase.
+
+**Q: Est-ce que je recevrai plusieurs alertes pour le même client ?**
+R: Non, une seule alerte est envoyée par période d'inactivité. Un flag `inactivity_alert_sent` empêche les doublons. Si le client redevient actif (nouvelle entrée dans les logs d'activité), le flag est automatiquement réinitialisé.
+
+**Q: Que puis-je faire depuis une notification d'inactivité ?**
+R: Quatre actions sont possibles : ouvrir la fiche client, envoyer un message via Chat (lien préparé, Epic 3), reporter le client ("À traiter plus tard", Story 2.6), ou ignorer l'alerte (la marquer comme lue).
+
+**Q: Les alertes concernent-elles tous les types de clients ?**
+R: Non, seuls les clients Lab actifs (avec un `dashboard_type` incluant "lab") sont concernés par les alertes d'inactivité.
+
+### Import CSV
+
+**Q: Quel format de fichier est accepté pour l'import ?**
+R: Uniquement les fichiers CSV (`.csv`). Un template téléchargeable est disponible via le bouton "Télécharger le template CSV" dans le dialog d'import.
+
+**Q: Quelles sont les colonnes du template CSV ?**
+R: `nom` (obligatoire), `email` (obligatoire), `entreprise`, `telephone`, `secteur`, `type_client` (complet, direct_one, ponctuel — défaut : ponctuel).
+
+**Q: Que se passe-t-il si un email existe déjà ?**
+R: Avant l'import, les emails sont vérifiés en batch côté serveur. Les lignes avec des emails déjà présents pour votre compte opérateur sont marquées comme "Email déjà existant" et sont ignorées lors de l'import.
+
+**Q: Comment sont gérées les erreurs dans le CSV ?**
+R: L'aperçu affiche chaque ligne avec un code couleur : vert (valide), rouge (erreur). Les erreurs détaillées sont visibles par ligne (email invalide, champ obligatoire manquant, type client invalide). Vous pouvez exclure les lignes en erreur avant de confirmer l'import.
+
+**Q: Puis-je exclure des lignes valides de l'import ?**
+R: Oui, dans l'aperçu, chaque ligne valide dispose d'une case à cocher. Décochez les lignes que vous ne souhaitez pas importer.
+
+**Q: Y a-t-il une limite au nombre de lignes ?**
+R: Aucune limite stricte. Au-delà de 500 lignes, le traitement peut être plus long. L'import est effectué en batch pour garantir de bonnes performances.
+
+**Q: Quelles configurations sont créées automatiquement pour les clients importés ?**
+R: Chaque client importé reçoit automatiquement une `client_configs` avec les modules par défaut (`core-dashboard`) et un `dashboard_type` correspondant à son type client (lab pour complet, one pour direct_one).
+
+**Q: Le parsing du CSV gère-t-il les cas spéciaux ?**
+R: Oui, le parser gère : l'encodage UTF-8 avec BOM, les retours chariot Windows (`\r\n`), les valeurs entre guillemets contenant des virgules, les guillemets échappés (`""`), et les lignes vides.
+
 ### Intégration Cursor
 
 **Q: Comment ouvrir le dossier BMAD d'un client dans Cursor ?**
