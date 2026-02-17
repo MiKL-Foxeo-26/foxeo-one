@@ -4,6 +4,7 @@ import type { Client } from '../types/crm.types'
 
 const testOperatorId = '550e8400-e29b-41d4-a716-446655440000'
 const testClientId = '550e8400-e29b-41d4-a716-446655440099'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440098'
 
 // Mock next/cache
 vi.mock('next/cache', () => ({
@@ -20,10 +21,21 @@ const mockNeq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }))
 const mockSelectEq2 = vi.fn(() => ({ neq: mockNeq }))
 const mockSelectEq1 = vi.fn(() => ({ eq: mockSelectEq2 }))
 const mockSelectChain = vi.fn(() => ({ eq: mockSelectEq1 }))
-const mockFrom = vi.fn(() => ({
-  select: mockSelectChain,
-  update: mockUpdate,
-}))
+
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
+  return {
+    select: mockSelectChain,
+    update: mockUpdate,
+  }
+})
 const mockGetUser = vi.fn()
 
 vi.mock('@foxeo/supabase', () => ({
@@ -37,6 +49,7 @@ describe('updateClient Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.resetModules()
+    mockOpSingle.mockResolvedValue({ data: { id: testOperatorId }, error: null })
   })
 
   it('should return VALIDATION_ERROR for invalid clientId (not UUID)', async () => {
@@ -67,7 +80,7 @@ describe('updateClient Server Action', () => {
 
   it('should return VALIDATION_ERROR for invalid input', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -82,7 +95,7 @@ describe('updateClient Server Action', () => {
 
   it('should return EMAIL_ALREADY_EXISTS when email is used by another client', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -102,7 +115,7 @@ describe('updateClient Server Action', () => {
 
   it('should return DB_ERROR when email uniqueness check fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -122,7 +135,7 @@ describe('updateClient Server Action', () => {
 
   it('should update client fields successfully', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -160,7 +173,7 @@ describe('updateClient Server Action', () => {
 
   it('should include operator_id filter in update query', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -193,7 +206,7 @@ describe('updateClient Server Action', () => {
 
   it('should return DB_ERROR when update fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -226,7 +239,7 @@ describe('updateClient Server Action', () => {
 
   it('should skip email uniqueness check when email is not in update', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 

@@ -34,20 +34,20 @@ ALTER TABLE client_notes ENABLE ROW LEVEL SECURITY;
 -- Operators can only see their own notes
 CREATE POLICY client_notes_select_operator ON client_notes
   FOR SELECT
-  USING (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id));
 
 -- Operators can insert their own notes
 CREATE POLICY client_notes_insert_operator ON client_notes
   FOR INSERT
-  WITH CHECK (operator_id = auth.uid() AND is_operator());
+  WITH CHECK (is_operator(operator_id));
 
 -- Operators can update their own notes
 CREATE POLICY client_notes_update_operator ON client_notes
   FOR UPDATE
-  USING (operator_id = auth.uid() AND is_operator())
-  WITH CHECK (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id))
+  WITH CHECK (is_operator(operator_id));
 
 -- Operators can delete their own notes
 CREATE POLICY client_notes_delete_operator ON client_notes
   FOR DELETE
-  USING (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id));

@@ -129,12 +129,47 @@ Le protocole `cursor://` n'est pas détectable de manière fiable. Stratégie :
 - [Source: _bmad-output/planning-artifacts/epics/epic-2-*.md#Story 2.5]
 - [Source: docs/project-context.md]
 
+## Senior Developer Review (AI)
+
+### Review Model
+claude-opus-4-6 (adversarial code review)
+
+### Issues Found: 3 (0 Critical, 0 High, 1 Medium, 2 Low)
+
+| # | Severity | Issue | Resolution |
+|---|----------|-------|------------|
+| 1 | MEDIUM | Dev Agent Record completely empty — no File List, no Completion Notes | Fixed: Populated record |
+| 2 | LOW | `folderExists` prop defaults to `true` but there's no actual folder detection mechanism | Accepted: Per AC2, this is a prop for the parent to set |
+| 3 | LOW | `toKebabCase` local implementation vs `@foxeo/utils` — minor duplication | Accepted: Module-local to avoid cross-package dependency for simple utility |
+
+### Verdict
+**PASS** — Clean implementation, well-tested utilities and component. No security or logic issues.
+
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+Aucun blocage rencontré.
 
 ### Completion Notes List
+- Task 1: `cursor-integration.ts` — `toKebabCase` avec normalisation NFD (accents), `buildClientSlug`, `buildBmadPath`, `buildCursorUrl`. `BMAD_BASE_PATH` configurable via env var.
+- Task 2: `cursor-button.tsx` — Bouton "Ouvrir dans Cursor" avec 3 états (normal, folder missing, protocol fallback). Clipboard API + toast. Timeout 1.5s pour détection protocole.
+- Task 3: Intégré dans `client-header.tsx`.
+- Task 4: 22 tests (16 utils + 6 composant). Edge cases: accents, caractères spéciaux, clipboard errors.
+- Task 5: `guide.md` et `faq.md` mis à jour.
 
 ### File List
+
+**Créés:**
+- `packages/modules/crm/utils/cursor-integration.ts`
+- `packages/modules/crm/utils/cursor-integration.test.ts`
+- `packages/modules/crm/components/cursor-button.tsx`
+- `packages/modules/crm/components/cursor-button.test.tsx`
+
+**Modifiés:**
+- `packages/modules/crm/components/client-header.tsx` (ajout CursorButton)
+- `packages/modules/crm/index.ts` (exports)
+- `packages/modules/crm/docs/guide.md` (section Cursor)
+- `packages/modules/crm/docs/faq.md` (FAQ Cursor)

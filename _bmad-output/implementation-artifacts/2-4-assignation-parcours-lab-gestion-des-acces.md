@@ -1,6 +1,6 @@
 # Story 2.4: Assignation parcours Lab & gestion des accès
 
-Status: review
+Status: done
 
 ## Story
 
@@ -323,6 +323,26 @@ Référence : `_bmad-output/planning-artifacts/prd/systme-de-parcours-flexibles.
 - [Source: packages/modules/crm/hooks/use-clients.ts] — Pattern Hook TanStack Query
 - [Source: packages/modules/crm/types/crm.types.ts] — Types existants
 
+## Senior Developer Review (AI)
+
+### Review Model
+claude-opus-4-6 (adversarial code review)
+
+### Issues Found: 7 (1 Critical, 3 High, 2 Medium, 1 Low)
+
+| # | Severity | Issue | Resolution |
+|---|----------|-------|------------|
+| 1 | **CRITICAL** | `toggle-access.ts:117` — `status: 'suspendu'` viole CHECK constraint DB (`'active','suspended','archived'`) | Fixed: Changed to `'suspended'` |
+| 2 | **HIGH** | `toggle-access.ts:71-72` — Pas de gestion du cas `dashboard_type = 'hub'` | Fixed: Ajout commentaire clarifiant que hub → both OFF (correct) |
+| 3 | **HIGH** | `get-client-parcours.ts` — Retourne le parcours le plus récent, pas l'actif (parcours terminé remonté) | Fixed: Ajout `.in('status', ['en_cours', 'suspendu'])` + fix mock test |
+| 4 | **HIGH** | File List incomplète — 6 fichiers dans git absents de la story | Fixed: Ajout fichiers manquants dans la File List |
+| 5 | MEDIUM | Hook `useParcourTemplates` manque un 's' (incohérence naming) | Fixed: Renommé `useParcoursTemplates` dans 8 fichiers |
+| 6 | MEDIUM | `assign-parcours.ts` — Config update failure silencieusement ignoré, parcours créé sans dashboard_type correct | Fixed: Rollback du parcours si config update échoue |
+| 7 | LOW | `client-info-tab.tsx:204` — AccessToggles cachés si pas de client_configs | Accepted: Cas défensif acceptable |
+
+### Verdict
+**PASS** — All CRITICAL and HIGH issues fixed. 1280/1280 tests pass.
+
 ## Dev Agent Record
 
 ### Agent Model Used
@@ -359,6 +379,8 @@ Aucun blocage rencontré. 199/199 tests passent.
 - `packages/modules/crm/actions/toggle-access.test.ts`
 - `packages/modules/crm/actions/suspend-parcours.ts`
 - `packages/modules/crm/actions/suspend-parcours.test.ts`
+- `packages/modules/crm/actions/get-client-parcours.ts`
+- `packages/modules/crm/actions/get-client-parcours.test.ts`
 - `packages/modules/crm/hooks/use-parcours-templates.ts`
 - `packages/modules/crm/hooks/use-parcours-templates.test.tsx`
 - `packages/modules/crm/hooks/use-client-parcours.ts`
@@ -371,6 +393,7 @@ Aucun blocage rencontré. 199/199 tests passent.
 - `packages/modules/crm/components/access-toggles.test.tsx`
 - `packages/modules/crm/components/parcours-status-badge.tsx`
 - `packages/modules/crm/components/parcours-status-badge.test.tsx`
+- `packages/ui/src/switch.tsx`
 
 **Modifiés:**
 - `packages/modules/crm/types/crm.types.ts` (ajout types parcours)
@@ -378,6 +401,10 @@ Aucun blocage rencontré. 199/199 tests passent.
 - `packages/modules/crm/index.ts` (ajout exports)
 - `packages/modules/crm/manifest.ts` (ajout requiredTables parcours/parcours_templates)
 - `packages/modules/crm/components/client-info-tab.tsx` (intégration section Parcours & Accès)
+- `packages/modules/crm/components/client-header.tsx` (ajout badge parcours)
 - `packages/modules/crm/docs/guide.md` (doc assignation parcours et accès)
 - `packages/modules/crm/docs/faq.md` (FAQ parcours et accès)
 - `packages/modules/crm/docs/flows.md` (flux assignation et toggle)
+- `packages/ui/src/index.ts` (export Switch)
+- `tests/rls/helpers/seed-rls-test-data.ts` (seed data parcours)
+- `tests/rls/operator-isolation.test.ts` (tests RLS parcours)

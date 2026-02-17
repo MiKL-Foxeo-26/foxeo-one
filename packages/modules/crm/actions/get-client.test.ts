@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ActionResponse } from '@foxeo/types'
 import type { Client } from '../types/crm.types'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client with chainable eq()
 const mockSingle = vi.fn()
 const mockEq = vi.fn(function mockEqFn() {
@@ -13,7 +16,16 @@ const mockEq = vi.fn(function mockEqFn() {
   return chain
 })
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
-const mockFrom = vi.fn(() => ({ select: mockSelect }))
+
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') return { select: mockOpSelect }
+  return { select: mockSelect }
+})
 const mockGetUser = vi.fn()
 
 vi.mock('@foxeo/supabase', () => ({
@@ -26,6 +38,7 @@ vi.mock('@foxeo/supabase', () => ({
 describe('getClient Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
   })
 
   it('should return INVALID_INPUT for non-UUID clientId', async () => {
@@ -61,7 +74,7 @@ describe('getClient Server Action', () => {
 
   it('should return NOT_FOUND when client does not exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -80,14 +93,14 @@ describe('getClient Server Action', () => {
 
   it('should return client in correct camelCase format with all fields', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
         name: 'Jean Dupont',
         company: 'Acme Corp',
         email: 'jean@acme.com',
@@ -117,7 +130,7 @@ describe('getClient Server Action', () => {
 
     const client = result.data!
     expect(client).toHaveProperty('id', '550e8400-e29b-41d4-a716-446655440001')
-    expect(client).toHaveProperty('operatorId', '550e8400-e29b-41d4-a716-446655440000')
+    expect(client).toHaveProperty('operatorId', validOperatorUuid)
     expect(client).toHaveProperty('name', 'Jean Dupont')
     expect(client).toHaveProperty('company', 'Acme Corp')
     expect(client).toHaveProperty('email', 'jean@acme.com')
@@ -144,7 +157,7 @@ describe('getClient Server Action', () => {
 
   it('should return DATABASE_ERROR when Supabase query fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -163,14 +176,14 @@ describe('getClient Server Action', () => {
 
   it('should return ActionResponse format with data or error', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
         name: 'Test',
         company: 'Test Inc',
         email: 'test@test.com',
@@ -201,11 +214,10 @@ describe('getClient Server Action', () => {
   })
 
   it('should use operator_id filter to enforce ownership', async () => {
-    const operatorId = '550e8400-e29b-41d4-a716-446655440000'
     const clientId = '550e8400-e29b-41d4-a716-446655440001'
 
     mockGetUser.mockResolvedValue({
-      data: { user: { id: operatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -215,19 +227,19 @@ describe('getClient Server Action', () => {
     await getClient(clientId)
 
     expect(mockFrom).toHaveBeenCalledWith('clients')
-    expect(mockEq).toHaveBeenCalledWith('operator_id', operatorId)
+    expect(mockEq).toHaveBeenCalledWith('operator_id', validOperatorUuid)
   })
 
   it('should handle optional fields correctly', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockSingle.mockResolvedValue({
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
         name: 'Jean Dupont',
         company: 'Acme Corp',
         email: 'jean@acme.com',

@@ -34,7 +34,7 @@ export function DeferDialog({ clientId, currentDeferredUntil, open, onOpenChange
     startTransition(async () => {
       const result = await deferClient({
         clientId,
-        deferredUntil: new Date(deferDate).toISOString(),
+        deferredUntil: new Date(deferDate + 'T12:00:00').toISOString(),
       })
 
       if (result.error) {

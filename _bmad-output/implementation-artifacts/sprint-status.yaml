@@ -53,13 +53,13 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Gestion de la Relation Client — CRM Hub (12 stories)
-  epic-2: in-progress
+  epic-2: done
   2-1-module-crm-liste-clients-filtres-recherche-rapide: done
   2-2-creation-edition-de-fiche-client: done
   2-3-fiche-client-complete-vue-detaillee-multi-onglets: done
-  2-4-assignation-parcours-lab-gestion-des-acces: review
-  2-5-integration-cursor-ouverture-dossier-bmad-client: review
-  2-6-notes-privees-epinglage-a-traiter-plus-tard: review
+  2-4-assignation-parcours-lab-gestion-des-acces: done
+  2-5-integration-cursor-ouverture-dossier-bmad-client: done
+  2-6-notes-privees-epinglage-a-traiter-plus-tard: done
   2-7-rappels-personnels-calendrier-deadlines: done
   2-8-statistiques-globales-temps-passe-par-client: done
   2-9a-suspendre-reactiver-un-client: done
@@ -70,8 +70,8 @@ development_status:
 
   # Epic 3: Communication Temps Reel & Notifications (7 stories)
   epic-3: in-progress
-  3-1-module-chat-migration-messages-messagerie-temps-reel-mikl-client: review
-  3-2-module-notifications-infrastructure-in-app-temps-reel: review
+  3-1-module-chat-migration-messages-messagerie-temps-reel-mikl-client: done
+  3-2-module-notifications-infrastructure-in-app-temps-reel: done
   3-3-notifications-email-transactionnelles: done
   3-4-preferences-de-notification-client-mikl: ready-for-dev
   3-5-indicateur-de-presence-en-ligne: ready-for-dev

@@ -506,7 +506,7 @@ flowchart TD
     ClickLab --> OpenDialog[Ouvrir UpgradeClientDialog - onglet Lab]
     ClickOne --> OpenDialogOne[Ouvrir UpgradeClientDialog - onglet One]
 
-    OpenDialog --> LoadTemplates[Charger templates via useParcourTemplates]
+    OpenDialog --> LoadTemplates[Charger templates via useParcoursTemplates]
     LoadTemplates --> HasTemplates{Templates disponibles ?}
 
     HasTemplates -->|Non| EmptyState[Afficher "Aucun template de parcours"]

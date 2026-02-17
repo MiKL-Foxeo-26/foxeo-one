@@ -7,10 +7,20 @@ const mockSelect = vi.fn()
 const mockSingle = vi.fn()
 const mockEqOperator = vi.fn()
 const mockEqId = vi.fn()
-const mockFrom = vi.fn(() => ({
-  update: mockUpdate,
-}))
 
+// Operator lookup chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
+  return { update: mockUpdate }
+})
+
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
 const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440001'
 
 vi.mock('@foxeo/supabase', () => ({
@@ -18,7 +28,7 @@ vi.mock('@foxeo/supabase', () => ({
     from: mockFrom,
     auth: {
       getUser: vi.fn(() => Promise.resolve({
-        data: { user: { id: validOperatorUuid } },
+        data: { user: { id: validAuthUuid } },
         error: null,
       })),
     },
@@ -30,6 +40,7 @@ describe('updateReminder', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
     // Chain: .update().eq('id', ...).eq('operator_id', ...).select().single()
     mockUpdate.mockReturnValue({ eq: mockEqId })
     mockEqId.mockReturnValue({ eq: mockEqOperator })
@@ -65,6 +76,7 @@ describe('updateReminder', () => {
     expect(mockUpdate).toHaveBeenCalledWith({ title: 'Updated Title' })
     expect(mockEqId).toHaveBeenCalledWith('id', validReminderUuid)
     expect(mockEqOperator).toHaveBeenCalledWith('operator_id', validOperatorUuid)
+    expect(mockFrom).toHaveBeenCalledWith('operators')
   })
 
   it('should update reminder description and dueDate', async () => {
@@ -163,5 +175,17 @@ describe('updateReminder', () => {
     expect(result.data).toBeNull()
     expect(result.error).toBeTruthy()
     expect(result.error?.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('should return NOT_FOUND if operator lookup fails', async () => {
+    mockOpSingle.mockResolvedValue({ data: null, error: { message: 'Not found' } })
+
+    const result = await updateReminder({
+      reminderId: validReminderUuid,
+      title: 'Test',
+    })
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('NOT_FOUND')
   })
 })

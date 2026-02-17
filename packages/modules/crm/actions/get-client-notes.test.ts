@@ -1,20 +1,32 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { getClientNotes } from './get-client-notes'
 
 const validClientUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
 const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440001'
 
 const mockOrder = vi.fn()
 const mockEq = vi.fn(() => ({ eq: mockEq, order: mockOrder }))
-const mockSelect = vi.fn(() => ({ eq: mockEq }))
-const mockFrom = vi.fn(() => ({ select: mockSelect }))
+const mockNoteSelect = vi.fn(() => ({ eq: mockEq }))
+
+// Operator lookup chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
+  return { select: mockNoteSelect }
+})
 
 vi.mock('@foxeo/supabase', () => ({
   createServerSupabaseClient: vi.fn(() => ({
     from: mockFrom,
     auth: {
       getUser: vi.fn(() => Promise.resolve({
-        data: { user: { id: validOperatorUuid } },
+        data: { user: { id: validAuthUuid } },
         error: null,
       })),
     },
@@ -22,6 +34,11 @@ vi.mock('@foxeo/supabase', () => ({
 }))
 
 describe('getClientNotes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
+  })
+
   it('should fetch notes successfully', async () => {
     const mockNotesDB = [
       {
@@ -52,6 +69,7 @@ describe('getClientNotes', () => {
     expect(result.error).toBeNull()
     expect(result.data).toHaveLength(2)
     expect(result.data?.[0]?.content).toBe('Note 1')
+    expect(mockFrom).toHaveBeenCalledWith('operators')
     expect(mockFrom).toHaveBeenCalledWith('client_notes')
   })
 
@@ -65,5 +83,14 @@ describe('getClientNotes', () => {
 
     expect(result.error).toBeNull()
     expect(result.data).toEqual([])
+  })
+
+  it('should return NOT_FOUND if operator lookup fails', async () => {
+    mockOpSingle.mockResolvedValue({ data: null, error: { message: 'Not found' } })
+
+    const result = await getClientNotes(validClientUuid)
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('NOT_FOUND')
   })
 })

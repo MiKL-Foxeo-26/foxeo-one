@@ -23,7 +23,7 @@ import {
 } from '@foxeo/ui'
 import { getModulesForTarget } from '@foxeo/utils'
 import { ParcoursStageList } from './parcours-stage-list'
-import { useParcourTemplates } from '../hooks/use-parcours-templates'
+import { useParcoursTemplates } from '../hooks/use-parcours-templates'
 import { upgradeClient } from '../actions/upgrade-client'
 import type { ParcoursTemplate } from '../types/crm.types'
 
@@ -64,7 +64,7 @@ export function UpgradeClientDialog({
   onOpenChange,
   defaultMode = 'lab',
 }: UpgradeClientDialogProps) {
-  const { data: templates, isPending: isLoadingTemplates } = useParcourTemplates()
+  const { data: templates, isPending: isLoadingTemplates } = useParcoursTemplates()
   const availableModules = getAvailableOneModules()
   const [activeTab, setActiveTab] = useState<UpgradeMode>(defaultMode)
   const [selectedTemplate, setSelectedTemplate] = useState<ParcoursTemplate | null>(null)

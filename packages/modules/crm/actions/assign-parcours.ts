@@ -119,7 +119,13 @@ export async function assignParcours(input: AssignParcoursInput): Promise<Action
 
     if (configError) {
       console.error('[CRM:ASSIGN_PARCOURS] Config update error:', configError)
-      // Parcours created but config update failed — log but don't fail
+      // Parcours created but config update failed — rollback parcours to maintain consistency
+      await supabase.from('parcours').delete().eq('id', parcours.id)
+      return errorResponse(
+        'Impossible de mettre à jour la configuration client',
+        'DATABASE_ERROR',
+        configError
+      )
     }
 
     // Log activity

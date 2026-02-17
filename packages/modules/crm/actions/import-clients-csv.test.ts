@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { CsvImportRow } from '../types/crm.types'
 
 const testOperatorId = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
 
 // Mock next/cache
 vi.mock('next/cache', () => ({
@@ -22,6 +23,15 @@ vi.mock('@foxeo/supabase', () => ({
     auth: { getUser: mockGetUser },
   })),
 }))
+
+// Helper to build the operators mock chain
+const makeOpChain = () => ({
+  select: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      single: vi.fn().mockResolvedValue({ data: { id: testOperatorId }, error: null }),
+    })),
+  })),
+})
 
 const validRow: CsvImportRow = {
   lineNumber: 2,
@@ -54,8 +64,15 @@ describe('importClientsCsv Server Action', () => {
 
   it('should return VALIDATION_ERROR for empty rows array', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
+    })
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {}
     })
 
     const { importClientsCsv } = await import('./import-clients-csv')
@@ -67,12 +84,15 @@ describe('importClientsCsv Server Action', () => {
 
   it('should skip rows with existing emails and import the rest', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     // Email check — "existing@test.com" already exists
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({
@@ -117,11 +137,14 @@ describe('importClientsCsv Server Action', () => {
 
   it('should return success with all ignored when all emails exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({
@@ -152,20 +175,25 @@ describe('importClientsCsv Server Action', () => {
 
   it('should return DB_ERROR when email check fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
-    mockFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          in: vi.fn().mockResolvedValue({
-            data: null,
-            error: { message: 'DB connection failed' },
-          }),
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            in: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'DB connection failed' },
+            }),
+          })),
         })),
-      })),
-    }))
+      }
+    })
 
     const { importClientsCsv } = await import('./import-clients-csv')
     const result = await importClientsCsv({ rows: [validRow] })
@@ -176,11 +204,14 @@ describe('importClientsCsv Server Action', () => {
 
   it('should return DB_ERROR when batch insert fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({

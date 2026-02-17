@@ -32,23 +32,23 @@ ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 -- Operators can only see their own reminders
 CREATE POLICY reminders_select_operator ON reminders
   FOR SELECT
-  USING (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id));
 
 -- Operators can insert their own reminders
 CREATE POLICY reminders_insert_operator ON reminders
   FOR INSERT
-  WITH CHECK (operator_id = auth.uid() AND is_operator());
+  WITH CHECK (is_operator(operator_id));
 
 -- Operators can update their own reminders
 CREATE POLICY reminders_update_operator ON reminders
   FOR UPDATE
-  USING (operator_id = auth.uid() AND is_operator())
-  WITH CHECK (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id))
+  WITH CHECK (is_operator(operator_id));
 
 -- Operators can delete their own reminders
 CREATE POLICY reminders_delete_operator ON reminders
   FOR DELETE
-  USING (operator_id = auth.uid() AND is_operator());
+  USING (is_operator(operator_id));
 
 -- Atomic toggle function for completed status (avoids race condition)
 CREATE OR REPLACE FUNCTION toggle_reminder_completed(p_reminder_id UUID)
@@ -60,6 +60,6 @@ AS $$
   UPDATE reminders
   SET completed = NOT completed
   WHERE id = p_reminder_id
-    AND operator_id = auth.uid()
+    AND operator_id = (SELECT id FROM operators WHERE auth_user_id = auth.uid())
   RETURNING *;
 $$;

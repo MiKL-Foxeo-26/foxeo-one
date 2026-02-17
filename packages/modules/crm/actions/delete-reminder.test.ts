@@ -5,10 +5,20 @@ import { deleteReminder } from './delete-reminder'
 const mockDelete = vi.fn()
 const mockEqId = vi.fn()
 const mockEqOperator = vi.fn()
-const mockFrom = vi.fn(() => ({
-  delete: mockDelete,
-}))
 
+// Operator lookup chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
+  return { delete: mockDelete }
+})
+
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
 const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440001'
 
 vi.mock('@foxeo/supabase', () => ({
@@ -16,7 +26,7 @@ vi.mock('@foxeo/supabase', () => ({
     from: mockFrom,
     auth: {
       getUser: vi.fn(() => Promise.resolve({
-        data: { user: { id: validOperatorUuid } },
+        data: { user: { id: validAuthUuid } },
         error: null,
       })),
     },
@@ -28,6 +38,7 @@ describe('deleteReminder', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
     // Chain: .delete().eq('id', ...).eq('operator_id', ...)
     mockDelete.mockReturnValue({ eq: mockEqId })
     mockEqId.mockReturnValue({ eq: mockEqOperator })
@@ -45,6 +56,7 @@ describe('deleteReminder', () => {
 
     expect(result.error).toBeNull()
     expect(result.data).toEqual({ success: true })
+    expect(mockFrom).toHaveBeenCalledWith('operators')
     expect(mockFrom).toHaveBeenCalledWith('reminders')
     expect(mockEqId).toHaveBeenCalledWith('id', validReminderUuid)
     expect(mockEqOperator).toHaveBeenCalledWith('operator_id', validOperatorUuid)
@@ -84,5 +96,16 @@ describe('deleteReminder', () => {
     expect(result.data).toBeNull()
     expect(result.error).toBeTruthy()
     expect(result.error?.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('should return NOT_FOUND if operator lookup fails', async () => {
+    mockOpSingle.mockResolvedValue({ data: null, error: { message: 'Not found' } })
+
+    const result = await deleteReminder({
+      reminderId: validReminderUuid,
+    })
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('NOT_FOUND')
   })
 })

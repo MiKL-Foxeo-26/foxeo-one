@@ -32,6 +32,7 @@ export async function getClientParcours(clientId: string): Promise<ActionRespons
       .from('parcours')
       .select('*')
       .eq('client_id', clientId)
+      .in('status', ['en_cours', 'suspendu'])
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()

@@ -30,7 +30,18 @@ export async function getTimePerClient(): Promise<ActionResponse<ClientTimeEstim
       return errorResponse('Non authentifié', 'UNAUTHORIZED')
     }
 
-    const operatorId = user.id
+    // Lookup operator record (operators.id ≠ auth.uid())
+    const { data: operator, error: opError } = await supabase
+      .from('operators')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (opError || !operator) {
+      return errorResponse('Opérateur non trouvé', 'NOT_FOUND')
+    }
+
+    const operatorId = operator.id
 
     // Step 1: Get all clients for this operator
     const { data: clients, error: clientsError } = await supabase

@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ActionResponse } from '@foxeo/types'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client
 const mockFetchSingle = vi.fn()
 const mockUpdateEqSecond = vi.fn()
@@ -8,7 +11,15 @@ const mockUpdateEq = vi.fn(() => ({ eq: mockUpdateEqSecond }))
 const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }))
 const mockInsert = vi.fn().mockResolvedValue({ error: null })
 
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
 const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
   if (table === 'clients') {
     return {
       select: vi.fn(() => ({
@@ -39,6 +50,7 @@ vi.mock('next/cache', () => ({
 describe('suspendClient Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
   })
 
   it('should return INVALID_INPUT for non-UUID clientId', async () => {
@@ -67,7 +79,7 @@ describe('suspendClient Server Action', () => {
 
   it('should return NOT_FOUND when client does not exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -87,7 +99,7 @@ describe('suspendClient Server Action', () => {
 
   it('should return ALREADY_SUSPENDED if client is already suspended', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -95,7 +107,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'suspended',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })
@@ -111,7 +123,7 @@ describe('suspendClient Server Action', () => {
 
   it('should return INVALID_STATUS if client is not active', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -119,7 +131,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'archived',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })
@@ -135,7 +147,7 @@ describe('suspendClient Server Action', () => {
 
   it('should successfully suspend an active client', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -143,7 +155,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'active',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })
@@ -164,7 +176,7 @@ describe('suspendClient Server Action', () => {
 
   it('should log activity with reason metadata', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -172,7 +184,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'active',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })
@@ -195,7 +207,7 @@ describe('suspendClient Server Action', () => {
 
   it('should handle optional reason field', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -203,7 +215,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'active',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })
@@ -221,7 +233,7 @@ describe('suspendClient Server Action', () => {
 
   it('should return DATABASE_ERROR when update fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -229,7 +241,7 @@ describe('suspendClient Server Action', () => {
       data: {
         id: '550e8400-e29b-41d4-a716-446655440001',
         status: 'active',
-        operator_id: '550e8400-e29b-41d4-a716-446655440000',
+        operator_id: validOperatorUuid,
       },
       error: null,
     })

@@ -3,6 +3,9 @@ import type { ActionResponse } from '@foxeo/types'
 import type { ClientTimeEstimate } from '../types/crm.types'
 import { TIME_ESTIMATES } from '../utils/time-estimates'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client
 const mockGetUser = vi.fn()
 const mockFrom = vi.fn()
@@ -13,6 +16,15 @@ vi.mock('@foxeo/supabase', () => ({
     auth: { getUser: mockGetUser },
   })),
 }))
+
+// Helper to build the operators mock chain
+const makeOpChain = () => ({
+  select: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      single: vi.fn().mockResolvedValue({ data: { id: validOperatorUuid }, error: null }),
+    })),
+  })),
+})
 
 describe('getTimePerClient Server Action', () => {
   beforeEach(() => {
@@ -34,7 +46,7 @@ describe('getTimePerClient Server Action', () => {
 
   it('should calculate time estimates from activity logs', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -75,6 +87,9 @@ describe('getTimePerClient Server Action', () => {
     }
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         // Chain: select → eq (no limit)
         return {
@@ -121,15 +136,20 @@ describe('getTimePerClient Server Action', () => {
 
   it('should return empty array when no clients exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
-    mockFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-      })),
-    }))
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+        })),
+      }
+    })
 
     const { getTimePerClient } = await import('./get-time-per-client')
     const result: ActionResponse<ClientTimeEstimate[]> = await getTimePerClient()
@@ -140,11 +160,14 @@ describe('getTimePerClient Server Action', () => {
 
   it('should handle clients with no activity logs', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({
@@ -186,18 +209,23 @@ describe('getTimePerClient Server Action', () => {
 
   it('should return DATABASE_ERROR when clients query fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
-    mockFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn().mockResolvedValue({
-          data: null,
-          error: { message: 'Connection refused' },
-        }),
-      })),
-    }))
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn().mockResolvedValue({
+            data: null,
+            error: { message: 'Connection refused' },
+          }),
+        })),
+      }
+    })
 
     const { getTimePerClient } = await import('./get-time-per-client')
     const result: ActionResponse<ClientTimeEstimate[]> = await getTimePerClient()
@@ -214,11 +242,14 @@ describe('getTimePerClient Server Action', () => {
 
   it('should handle visio without duration_seconds in event_data', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({

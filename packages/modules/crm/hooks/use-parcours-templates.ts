@@ -5,7 +5,7 @@ import type { ActionResponse } from '@foxeo/types'
 import type { ParcoursTemplate } from '../types/crm.types'
 import { getParcoursTemplates } from '../actions/get-parcours-templates'
 
-export function useParcourTemplates() {
+export function useParcoursTemplates() {
   return useQuery({
     queryKey: ['parcours-templates'],
     queryFn: async () => {

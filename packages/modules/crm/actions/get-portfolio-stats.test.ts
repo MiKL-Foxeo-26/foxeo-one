@@ -2,10 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ActionResponse } from '@foxeo/types'
 import type { PortfolioStats } from '../types/crm.types'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client
 const mockEq = vi.fn()
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
-const mockFrom = vi.fn(() => ({ select: mockSelect }))
+
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') return { select: mockOpSelect }
+  return { select: mockSelect }
+})
 const mockGetUser = vi.fn()
 
 vi.mock('@foxeo/supabase', () => ({
@@ -18,6 +30,7 @@ vi.mock('@foxeo/supabase', () => ({
 describe('getPortfolioStats Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
   })
 
   it('should return UNAUTHORIZED when user is not authenticated', async () => {
@@ -35,7 +48,7 @@ describe('getPortfolioStats Server Action', () => {
 
   it('should return correct aggregated stats for mixed portfolio', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -79,7 +92,7 @@ describe('getPortfolioStats Server Action', () => {
 
   it('should return zero stats when no clients exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -102,7 +115,7 @@ describe('getPortfolioStats Server Action', () => {
 
   it('should return DATABASE_ERROR when Supabase query fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -120,7 +133,7 @@ describe('getPortfolioStats Server Action', () => {
 
   it('should return camelCase fields only (no snake_case leak)', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -148,7 +161,7 @@ describe('getPortfolioStats Server Action', () => {
 
   it('should query clients with operator_id filter', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -158,6 +171,6 @@ describe('getPortfolioStats Server Action', () => {
     await getPortfolioStats()
 
     expect(mockFrom).toHaveBeenCalledWith('clients')
-    expect(mockEq).toHaveBeenCalledWith('operator_id', '550e8400-e29b-41d4-a716-446655440000')
+    expect(mockEq).toHaveBeenCalledWith('operator_id', validOperatorUuid)
   })
 })

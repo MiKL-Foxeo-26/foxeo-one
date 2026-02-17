@@ -68,6 +68,7 @@ export async function toggleAccess(input: ToggleAccessInput): Promise<ActionResp
     // Derive current access state from dashboard_type
     // 'lab' means both Lab and One are accessible (Lab takes priority)
     // 'one' means only One is accessible
+    // 'hub' means operator-only view — neither Lab nor One active for client
     const currentLabOn = config.dashboard_type === 'lab'
     const currentOneOn = config.dashboard_type === 'one' || config.dashboard_type === 'lab'
 
@@ -113,7 +114,7 @@ export async function toggleAccess(input: ToggleAccessInput): Promise<ActionResp
     if (!newLabOn && !newOneOn) {
       const { error: suspendError } = await supabase
         .from('clients')
-        .update({ status: 'suspendu' })
+        .update({ status: 'suspended' })
         .eq('id', clientId)
 
       if (suspendError) {

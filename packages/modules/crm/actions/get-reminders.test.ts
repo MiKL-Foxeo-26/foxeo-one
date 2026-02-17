@@ -6,11 +6,21 @@ const mockEq = vi.fn()
 const mockGte = vi.fn()
 const mockLt = vi.fn()
 const mockOrder = vi.fn()
-const mockSelect = vi.fn()
-const mockFrom = vi.fn(() => ({
-  select: mockSelect,
-}))
+const mockNoteSelect = vi.fn()
 
+// Operator lookup chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
+  return { select: mockNoteSelect }
+})
+
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
 const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440001'
 
 vi.mock('@foxeo/supabase', () => ({
@@ -18,7 +28,7 @@ vi.mock('@foxeo/supabase', () => ({
     from: mockFrom,
     auth: {
       getUser: vi.fn(() => Promise.resolve({
-        data: { user: { id: validOperatorUuid } },
+        data: { user: { id: validAuthUuid } },
         error: null,
       })),
     },
@@ -28,7 +38,8 @@ vi.mock('@foxeo/supabase', () => ({
 describe('getReminders', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSelect.mockReturnValue({ eq: mockEq })
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
+    mockNoteSelect.mockReturnValue({ eq: mockEq })
     mockEq.mockReturnValue({ order: mockOrder })
     mockOrder.mockReturnValue({ gte: mockGte, then: vi.fn() })
     mockGte.mockReturnValue({ lt: mockLt })
@@ -60,6 +71,7 @@ describe('getReminders', () => {
     expect(result.data).toHaveLength(1)
     expect(result.data![0].title).toBe('Reminder 1')
 
+    expect(mockFrom).toHaveBeenCalledWith('operators')
     expect(mockFrom).toHaveBeenCalledWith('reminders')
     expect(mockEq).toHaveBeenCalledWith('operator_id', validOperatorUuid)
   })
@@ -154,5 +166,14 @@ describe('getReminders', () => {
     expect(result.data).toBeNull()
     expect(result.error).toBeTruthy()
     expect(result.error?.code).toBe('FETCH_FAILED')
+  })
+
+  it('should return NOT_FOUND if operator lookup fails', async () => {
+    mockOpSingle.mockResolvedValue({ data: null, error: { message: 'Not found' } })
+
+    const result = await getReminders()
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('NOT_FOUND')
   })
 })

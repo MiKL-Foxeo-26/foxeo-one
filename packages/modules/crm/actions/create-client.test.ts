@@ -4,6 +4,7 @@ import type { Client } from '../types/crm.types'
 
 const testOperatorId = '550e8400-e29b-41d4-a716-446655440000'
 const testClientId = '550e8400-e29b-41d4-a716-446655440099'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440098'
 
 // Mock next/cache
 vi.mock('next/cache', () => ({
@@ -17,7 +18,16 @@ const mockMaybeSingle = vi.fn()
 const mockSelectEq2 = vi.fn(() => ({ maybeSingle: mockMaybeSingle }))
 const mockSelectEq1 = vi.fn(() => ({ eq: mockSelectEq2 }))
 const mockSelectChain = vi.fn(() => ({ eq: mockSelectEq1 }))
+
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
 const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') {
+    return { select: mockOpSelect }
+  }
   if (table === 'client_configs') {
     return { insert: vi.fn().mockResolvedValue({ error: null }) }
   }
@@ -39,6 +49,7 @@ describe('createClient Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.resetModules()
+    mockOpSingle.mockResolvedValue({ data: { id: testOperatorId }, error: null })
   })
 
   it('should return UNAUTHORIZED when user is not authenticated', async () => {
@@ -60,7 +71,7 @@ describe('createClient Server Action', () => {
 
   it('should return VALIDATION_ERROR for invalid input', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -77,7 +88,7 @@ describe('createClient Server Action', () => {
 
   it('should return EMAIL_ALREADY_EXISTS when email is duplicate for operator', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -99,7 +110,7 @@ describe('createClient Server Action', () => {
 
   it('should return DB_ERROR when email uniqueness check fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -121,7 +132,7 @@ describe('createClient Server Action', () => {
 
   it('should create client and client_configs on valid input', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -171,7 +182,7 @@ describe('createClient Server Action', () => {
 
   it('should return DB_ERROR when insert fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: testOperatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 

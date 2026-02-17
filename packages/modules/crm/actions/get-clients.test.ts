@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ActionResponse } from '@foxeo/types'
 import type { ClientListItem } from '../types/crm.types'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client
 const mockLimit = vi.fn()
 const mockOrder2 = vi.fn(() => ({ limit: mockLimit }))
@@ -10,7 +13,16 @@ const mockIn = vi.fn(() => ({ order: mockOrder1 }))
 const mockNeq = vi.fn(() => ({ order: mockOrder1, in: mockIn }))
 const mockEq = vi.fn(() => ({ neq: mockNeq, order: mockOrder1, in: mockIn }))
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
-const mockFrom = vi.fn(() => ({ select: mockSelect }))
+
+// Operator lookup mock chain
+const mockOpSingle = vi.fn()
+const mockOpEq = vi.fn(() => ({ single: mockOpSingle }))
+const mockOpSelect = vi.fn(() => ({ eq: mockOpEq }))
+
+const mockFrom = vi.fn((table: string) => {
+  if (table === 'operators') return { select: mockOpSelect }
+  return { select: mockSelect }
+})
 const mockGetUser = vi.fn()
 
 vi.mock('@foxeo/supabase', () => ({
@@ -23,6 +35,7 @@ vi.mock('@foxeo/supabase', () => ({
 describe('getClients Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockOpSingle.mockResolvedValue({ data: { id: validOperatorUuid }, error: null })
   })
 
   it('should return UNAUTHORIZED when user is not authenticated', async () => {
@@ -41,7 +54,7 @@ describe('getClients Server Action', () => {
 
   it('should return clients in correct camelCase format', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -49,7 +62,7 @@ describe('getClients Server Action', () => {
       data: [
         {
           id: '550e8400-e29b-41d4-a716-446655440001',
-          operator_id: '550e8400-e29b-41d4-a716-446655440000',
+          operator_id: validOperatorUuid,
           name: 'Jean Dupont',
           company: 'Acme Corp',
           email: 'jean@acme.com',
@@ -82,7 +95,7 @@ describe('getClients Server Action', () => {
 
   it('should return DATABASE_ERROR when Supabase query fails', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -101,7 +114,7 @@ describe('getClients Server Action', () => {
 
   it('should return empty array when no data', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -119,7 +132,7 @@ describe('getClients Server Action', () => {
 
   it('should return ActionResponse format with data or error', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -145,10 +158,8 @@ describe('getClients Server Action', () => {
   })
 
   it('should use operator_id from authenticated session', async () => {
-    const operatorId = '550e8400-e29b-41d4-a716-446655440000'
-
     mockGetUser.mockResolvedValue({
-      data: { user: { id: operatorId } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -158,12 +169,12 @@ describe('getClients Server Action', () => {
     await getClients()
 
     expect(mockFrom).toHaveBeenCalledWith('clients')
-    expect(mockEq).toHaveBeenCalledWith('operator_id', operatorId)
+    expect(mockEq).toHaveBeenCalledWith('operator_id', validOperatorUuid)
   })
 
   it('should exclude archived clients by default', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -177,7 +188,7 @@ describe('getClients Server Action', () => {
 
   it('should include archived clients when archived filter is active', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -192,7 +203,7 @@ describe('getClients Server Action', () => {
 
   it('should apply clientType filter when provided', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -206,7 +217,7 @@ describe('getClients Server Action', () => {
 
   it('should apply status filter when provided', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 

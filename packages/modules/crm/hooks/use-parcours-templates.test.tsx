@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useParcourTemplates } from './use-parcours-templates'
+import { useParcoursTemplates } from './use-parcours-templates'
 import * as getParcoursTemplatesModule from '../actions/get-parcours-templates'
 
 const createWrapper = () => {
@@ -19,9 +19,9 @@ const createWrapper = () => {
   )
 }
 
-describe('useParcourTemplates', () => {
+describe('useParcoursTemplates', () => {
   it('should return query state shape', () => {
-    const { result } = renderHook(() => useParcourTemplates(), {
+    const { result } = renderHook(() => useParcoursTemplates(), {
       wrapper: createWrapper(),
     })
 
@@ -39,7 +39,7 @@ describe('useParcourTemplates', () => {
       },
     })
 
-    const { result } = renderHook(() => useParcourTemplates(), {
+    const { result } = renderHook(() => useParcoursTemplates(), {
       wrapper: createWrapper(),
     })
 
@@ -71,7 +71,7 @@ describe('useParcourTemplates', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useParcourTemplates(), {
+    const { result } = renderHook(() => useParcoursTemplates(), {
       wrapper: createWrapper(),
     })
 
@@ -88,7 +88,7 @@ describe('useParcourTemplates', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useParcourTemplates(), {
+    const { result } = renderHook(() => useParcoursTemplates(), {
       wrapper: createWrapper(),
     })
 

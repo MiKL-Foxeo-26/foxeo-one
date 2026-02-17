@@ -455,26 +455,26 @@ describe('Migration 00018: client_notes table and pinning/deferring', () => {
   it('creates RLS policy for SELECT (operator owns note)', () => {
     expect(sql).toContain('CREATE POLICY client_notes_select_operator ON client_notes')
     expect(sql).toContain('FOR SELECT')
-    expect(sql).toContain('operator_id = auth.uid() AND is_operator()')
+    expect(sql).toContain('is_operator(operator_id)')
   })
 
   it('creates RLS policy for INSERT (operator can insert own notes)', () => {
     expect(sql).toContain('CREATE POLICY client_notes_insert_operator ON client_notes')
     expect(sql).toContain('FOR INSERT')
-    expect(sql).toContain('WITH CHECK (operator_id = auth.uid() AND is_operator())')
+    expect(sql).toContain('WITH CHECK (is_operator(operator_id))')
   })
 
   it('creates RLS policy for UPDATE (operator owns note)', () => {
     expect(sql).toContain('CREATE POLICY client_notes_update_operator ON client_notes')
     expect(sql).toContain('FOR UPDATE')
-    expect(sql).toContain('USING (operator_id = auth.uid() AND is_operator())')
-    expect(sql).toContain('WITH CHECK (operator_id = auth.uid() AND is_operator())')
+    expect(sql).toContain('USING (is_operator(operator_id))')
+    expect(sql).toContain('WITH CHECK (is_operator(operator_id))')
   })
 
   it('creates RLS policy for DELETE (operator owns note)', () => {
     expect(sql).toContain('CREATE POLICY client_notes_delete_operator ON client_notes')
     expect(sql).toContain('FOR DELETE')
-    expect(sql).toContain('USING (operator_id = auth.uid() AND is_operator())')
+    expect(sql).toContain('USING (is_operator(operator_id))')
   })
 
   it('has exactly 4 RLS policies (SELECT, INSERT, UPDATE, DELETE)', () => {

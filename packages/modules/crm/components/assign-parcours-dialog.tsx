@@ -16,7 +16,7 @@ import {
 } from '@foxeo/ui'
 import { EmptyState } from '@foxeo/ui'
 import { ParcoursStageList } from './parcours-stage-list'
-import { useParcourTemplates } from '../hooks/use-parcours-templates'
+import { useParcoursTemplates } from '../hooks/use-parcours-templates'
 import { assignParcours } from '../actions/assign-parcours'
 import type { ParcoursTemplate } from '../types/crm.types'
 
@@ -27,7 +27,7 @@ interface AssignParcoursDialogProps {
 }
 
 export function AssignParcoursDialog({ clientId, open, onOpenChange }: AssignParcoursDialogProps) {
-  const { data: templates, isPending: isLoadingTemplates } = useParcourTemplates()
+  const { data: templates, isPending: isLoadingTemplates } = useParcoursTemplates()
   const [selectedTemplate, setSelectedTemplate] = useState<ParcoursTemplate | null>(null)
   const [activeStages, setActiveStages] = useState<{ key: string; active: boolean }[]>([])
   const [isPending, startTransition] = useTransition()

@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ActionResponse } from '@foxeo/types'
 import type { GraduationRate } from '../types/crm.types'
 
+const validOperatorUuid = '550e8400-e29b-41d4-a716-446655440000'
+const validAuthUuid = '550e8400-e29b-41d4-a716-446655440099'
+
 // Mock Supabase server client
 const mockFrom = vi.fn()
 const mockGetUser = vi.fn()
@@ -12,6 +15,15 @@ vi.mock('@foxeo/supabase', () => ({
     auth: { getUser: mockGetUser },
   })),
 }))
+
+// Helper to build the operators mock chain
+const makeOpChain = () => ({
+  select: vi.fn(() => ({
+    eq: vi.fn(() => ({
+      single: vi.fn().mockResolvedValue({ data: { id: validOperatorUuid }, error: null }),
+    })),
+  })),
+})
 
 describe('getGraduationRate Server Action', () => {
   beforeEach(() => {
@@ -33,11 +45,14 @@ describe('getGraduationRate Server Action', () => {
 
   it('should calculate graduation rate from activity logs filtered by client_id', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         // Chain: select → eq(operator_id) → eq(client_type)
         return {
@@ -87,17 +102,22 @@ describe('getGraduationRate Server Action', () => {
 
   it('should return 0% when no Lab clients exist', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
-    mockFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+          })),
         })),
-      })),
-    }))
+      }
+    })
 
     const { getGraduationRate } = await import('./get-graduation-rate')
     const result: ActionResponse<GraduationRate> = await getGraduationRate()
@@ -111,20 +131,25 @@ describe('getGraduationRate Server Action', () => {
 
   it('should return DATABASE_ERROR on Supabase failure', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
-    mockFrom.mockImplementation(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn().mockResolvedValue({
-            data: null,
-            error: { message: 'Connection refused' },
-          }),
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'Connection refused' },
+            }),
+          })),
         })),
-      })),
-    }))
+      }
+    })
 
     const { getGraduationRate } = await import('./get-graduation-rate')
     const result: ActionResponse<GraduationRate> = await getGraduationRate()
@@ -135,7 +160,7 @@ describe('getGraduationRate Server Action', () => {
 
   it('should filter activity_logs by client_id not operator_id', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: '550e8400-e29b-41d4-a716-446655440000' } },
+      data: { user: { id: validAuthUuid } },
       error: null,
     })
 
@@ -145,6 +170,9 @@ describe('getGraduationRate Server Action', () => {
     })
 
     mockFrom.mockImplementation((table: string) => {
+      if (table === 'operators') {
+        return makeOpChain()
+      }
       if (table === 'clients') {
         return {
           select: vi.fn(() => ({

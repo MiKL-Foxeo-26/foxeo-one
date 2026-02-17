@@ -26,6 +26,17 @@ export async function updateReminder(
       return errorResponse('Non authentifié', 'UNAUTHORIZED')
     }
 
+    // Lookup operator record (operators.id ≠ auth.uid())
+    const { data: operator, error: opError } = await supabase
+      .from('operators')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (opError || !operator) {
+      return errorResponse('Opérateur non trouvé', 'NOT_FOUND')
+    }
+
     // Server-side validation
     const parsed = UpdateReminderSchema.safeParse(input)
     if (!parsed.success) {
@@ -66,7 +77,7 @@ export async function updateReminder(
       .from('reminders')
       .update(updateData)
       .eq('id', reminderId)
-      .eq('operator_id', user.id)
+      .eq('operator_id', operator.id)
       .select()
       .single()
 

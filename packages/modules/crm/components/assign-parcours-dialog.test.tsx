@@ -6,7 +6,7 @@ import { AssignParcoursDialog } from './assign-parcours-dialog'
 
 // Mock hooks and actions
 vi.mock('../hooks/use-parcours-templates', () => ({
-  useParcourTemplates: vi.fn(),
+  useParcoursTemplates: vi.fn(),
 }))
 
 vi.mock('../actions/assign-parcours', () => ({
@@ -27,11 +27,11 @@ const createWrapper = () => {
 
 describe('AssignParcoursDialog', () => {
   it('should render dialog with title when open', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: [],
       isPending: false,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog
@@ -46,11 +46,11 @@ describe('AssignParcoursDialog', () => {
   })
 
   it('should show loading skeletons when templates are loading', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: undefined,
       isPending: true,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog
@@ -65,11 +65,11 @@ describe('AssignParcoursDialog', () => {
   })
 
   it('should show empty state when no templates exist', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: [],
       isPending: false,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog
@@ -84,9 +84,9 @@ describe('AssignParcoursDialog', () => {
   })
 
   it('should show templates when available', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
     const now = new Date().toISOString()
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: [
         {
           id: '550e8400-e29b-41d4-a716-446655440002',
@@ -101,7 +101,7 @@ describe('AssignParcoursDialog', () => {
         },
       ],
       isPending: false,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog
@@ -117,9 +117,9 @@ describe('AssignParcoursDialog', () => {
   })
 
   it('should have Assigner button disabled when no template selected', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
     const now = new Date().toISOString()
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: [
         {
           id: '550e8400-e29b-41d4-a716-446655440002',
@@ -134,7 +134,7 @@ describe('AssignParcoursDialog', () => {
         },
       ],
       isPending: false,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog
@@ -150,11 +150,11 @@ describe('AssignParcoursDialog', () => {
   })
 
   it('should have Annuler and Assigner buttons', async () => {
-    const { useParcourTemplates } = await import('../hooks/use-parcours-templates')
-    vi.mocked(useParcourTemplates).mockReturnValue({
+    const { useParcoursTemplates } = await import('../hooks/use-parcours-templates')
+    vi.mocked(useParcoursTemplates).mockReturnValue({
       data: [],
       isPending: false,
-    } as ReturnType<typeof useParcourTemplates>)
+    } as ReturnType<typeof useParcoursTemplates>)
 
     render(
       <AssignParcoursDialog

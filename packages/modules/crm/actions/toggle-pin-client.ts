@@ -24,7 +24,18 @@ export async function togglePinClient(
       return errorResponse('Non authentifié', 'UNAUTHORIZED')
     }
 
-    const operatorId = user.id
+    // Lookup operator record (operators.id ≠ auth.uid())
+    const { data: operator, error: opError } = await supabase
+      .from('operators')
+      .select('id')
+      .eq('auth_user_id', user.id)
+      .single()
+
+    if (opError || !operator) {
+      return errorResponse('Opérateur non trouvé', 'NOT_FOUND')
+    }
+
+    const operatorId = operator.id
 
     // Validate UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
