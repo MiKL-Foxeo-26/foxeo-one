@@ -72,7 +72,7 @@ development_status:
   epic-3: in-progress
   3-1-module-chat-migration-messages-messagerie-temps-reel-mikl-client: review
   3-2-module-notifications-infrastructure-in-app-temps-reel: review
-  3-3-notifications-email-transactionnelles: ready-for-dev
+  3-3-notifications-email-transactionnelles: done
   3-4-preferences-de-notification-client-mikl: ready-for-dev
   3-5-indicateur-de-presence-en-ligne: ready-for-dev
   3-6-gestion-des-conflits-de-modification-concurrente: ready-for-dev
