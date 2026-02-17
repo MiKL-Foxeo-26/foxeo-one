@@ -44,13 +44,13 @@ describe('getNotifications Server Action', () => {
       data: [
         {
           id: 'notif-1',
-          operator_id: 'test-operator-id',
+          recipient_type: 'operator',
+          recipient_id: 'test-operator-id',
           type: 'inactivity_alert',
           title: 'Client inactif',
-          message: 'Test message',
-          entity_type: 'client',
-          entity_id: 'client-1',
-          read: false,
+          body: 'Test message',
+          link: null,
+          read_at: null,
           created_at: '2026-02-17T10:00:00Z',
         },
       ],
@@ -62,12 +62,12 @@ describe('getNotifications Server Action', () => {
 
     expect(result.error).toBeNull()
     expect(result.data).toHaveLength(1)
-    expect(result.data?.[0]).toHaveProperty('operatorId')
-    expect(result.data?.[0]).toHaveProperty('entityType')
-    expect(result.data?.[0]).toHaveProperty('entityId')
+    expect(result.data?.[0]).toHaveProperty('recipientType')
+    expect(result.data?.[0]).toHaveProperty('recipientId')
+    expect(result.data?.[0]).toHaveProperty('body')
     expect(result.data?.[0]).toHaveProperty('createdAt')
-    expect(result.data?.[0]).not.toHaveProperty('operator_id')
-    expect(result.data?.[0]).not.toHaveProperty('entity_type')
+    expect(result.data?.[0]).not.toHaveProperty('recipient_type')
+    expect(result.data?.[0]).not.toHaveProperty('recipient_id')
   })
 
   it('should return empty array when no notifications', async () => {

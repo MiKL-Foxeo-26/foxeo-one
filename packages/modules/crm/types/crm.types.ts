@@ -483,36 +483,48 @@ export const UpgradeClientInput = z.object({
 export type UpgradeClientInput = z.infer<typeof UpgradeClientInput>
 
 // ============================================================
-// Notification types (Story 2.10)
+// Notification types (Story 2.10 → evolved by Story 3.2)
 // ============================================================
 
-export const NotificationTypeEnum = z.enum(['inactivity_alert', 'csv_import_complete'])
+export const NotificationTypeEnum = z.enum([
+  'inactivity_alert',
+  'csv_import_complete',
+  'message',
+  'validation',
+  'alert',
+  'system',
+  'graduation',
+  'payment',
+])
+
+export const RecipientTypeEnum = z.enum(['client', 'operator'])
 
 export const Notification = z.object({
   id: z.string().uuid(),
-  operatorId: z.string().uuid(),
+  recipientType: RecipientTypeEnum,
+  recipientId: z.string().uuid(),
   type: NotificationTypeEnum,
   title: z.string(),
-  message: z.string().nullable(),
-  entityType: z.string().nullable(),
-  entityId: z.string().uuid().nullable(),
-  read: z.boolean(),
+  body: z.string().nullable(),
+  link: z.string().nullable(),
+  readAt: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
 })
 
 export type Notification = z.infer<typeof Notification>
 export type NotificationType = z.infer<typeof NotificationTypeEnum>
+export type RecipientType = z.infer<typeof RecipientTypeEnum>
 
 // DB type (snake_case)
 export type NotificationDB = {
   id: string
-  operator_id: string
+  recipient_type: string
+  recipient_id: string
   type: string
   title: string
-  message: string | null
-  entity_type: string | null
-  entity_id: string | null
-  read: boolean
+  body: string | null
+  link: string | null
+  read_at: string | null
   created_at: string
 }
 

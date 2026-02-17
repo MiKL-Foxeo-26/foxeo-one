@@ -1,5 +1,7 @@
 import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
 import { discoverModules, getModulesForTarget } from '@foxeo/utils'
+import { createServerSupabaseClient } from '@foxeo/supabase'
+import { NotificationBadge } from '@foxeo/modules-notifications'
 import { LogoutButton } from './logout-button'
 
 async function HubSidebar() {
@@ -10,12 +12,16 @@ async function HubSidebar() {
   return <ModuleSidebar target="hub" modules={modules} />
 }
 
-function HubHeader() {
+async function HubHeader() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id ?? ''
+
   return (
     <div className="flex w-full items-center justify-between">
       <span className="text-sm font-medium">Hub Operateur</span>
       <div className="flex items-center gap-2">
-        {/* Notifications, profile — future stories */}
+        {userId && <NotificationBadge recipientId={userId} />}
         <ThemeToggle />
         <LogoutButton />
       </div>

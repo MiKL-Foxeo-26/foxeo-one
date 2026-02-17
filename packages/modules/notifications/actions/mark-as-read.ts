@@ -6,15 +6,16 @@ import {
   successResponse,
   errorResponse,
 } from '@foxeo/types'
+import { MarkAsReadInput } from '../types/notification.types'
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-export async function markNotificationRead(
-  notificationId: string
+export async function markAsRead(
+  input: MarkAsReadInput
 ): Promise<ActionResponse<{ id: string }>> {
   try {
-    if (!notificationId || !UUID_REGEX.test(notificationId)) {
-      return errorResponse('Identifiant notification invalide', 'INVALID_INPUT')
+    const parsed = MarkAsReadInput.safeParse(input)
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Données invalides'
+      return errorResponse(firstError, 'VALIDATION_ERROR', parsed.error.issues)
     }
 
     const supabase = await createServerSupabaseClient()
@@ -31,12 +32,12 @@ export async function markNotificationRead(
     const { data, error } = await supabase
       .from('notifications')
       .update({ read_at: new Date().toISOString() })
-      .eq('id', notificationId)
+      .eq('id', parsed.data.notificationId)
       .select('id')
       .single()
 
     if (error) {
-      console.error('[CRM:MARK_NOTIFICATION_READ] Supabase error:', error)
+      console.error('[NOTIFICATIONS:MARK_READ] Supabase error:', error)
       return errorResponse(
         'Impossible de marquer la notification comme lue',
         'DATABASE_ERROR',
@@ -50,7 +51,7 @@ export async function markNotificationRead(
 
     return successResponse({ id: data.id })
   } catch (error) {
-    console.error('[CRM:MARK_NOTIFICATION_READ] Unexpected error:', error)
+    console.error('[NOTIFICATIONS:MARK_READ] Unexpected error:', error)
     return errorResponse(
       'Une erreur inattendue est survenue',
       'INTERNAL_ERROR',

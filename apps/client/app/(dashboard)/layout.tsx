@@ -1,5 +1,7 @@
 import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
 import { discoverModules, getModulesForTarget } from '@foxeo/utils'
+import { createServerSupabaseClient } from '@foxeo/supabase'
+import { NotificationBadge } from '@foxeo/modules-notifications'
 import { LogoutButton } from './logout-button'
 
 async function ClientSidebar() {
@@ -11,12 +13,16 @@ async function ClientSidebar() {
   return <ModuleSidebar target="client-lab" modules={modules} />
 }
 
-function ClientHeader() {
+async function ClientHeader() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id ?? ''
+
   return (
     <div className="flex w-full items-center justify-between">
       <span className="text-sm font-medium">Mon espace</span>
       <div className="flex items-center gap-2">
-        {/* Notifications, profile, Elio chat — future stories */}
+        {userId && <NotificationBadge recipientId={userId} />}
         <ThemeToggle />
         <LogoutButton />
       </div>

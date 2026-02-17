@@ -6,12 +6,11 @@ import {
   successResponse,
   errorResponse,
 } from '@foxeo/types'
-import type { Notification } from '../types/crm.types'
-
-const PAGE_SIZE = 20
+import type { Notification } from '../types/notification.types'
+import { GetNotificationsInput } from '../types/notification.types'
 
 export async function getNotifications(
-  offset: number = 0
+  input: GetNotificationsInput
 ): Promise<ActionResponse<Notification[]>> {
   try {
     const supabase = await createServerSupabaseClient()
@@ -25,15 +24,27 @@ export async function getNotifications(
       return errorResponse('Non authentifié', 'UNAUTHORIZED')
     }
 
+    const parsed = GetNotificationsInput.safeParse(input)
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message ?? 'Données invalides'
+      return errorResponse(firstError, 'VALIDATION_ERROR', parsed.error.issues)
+    }
+
+    const { recipientId, offset, limit } = parsed.data
+
+    if (recipientId !== user.id) {
+      return errorResponse('Accès interdit', 'FORBIDDEN')
+    }
+
     const { data, error } = await supabase
       .from('notifications')
       .select('id, recipient_type, recipient_id, type, title, body, link, read_at, created_at')
-      .eq('recipient_id', user.id)
+      .eq('recipient_id', recipientId)
       .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1)
+      .range(offset, offset + limit - 1)
 
     if (error) {
-      console.error('[CRM:GET_NOTIFICATIONS] Supabase error:', error)
+      console.error('[NOTIFICATIONS:GET] Supabase error:', error)
       return errorResponse(
         'Impossible de charger les notifications',
         'DATABASE_ERROR',
@@ -45,7 +56,6 @@ export async function getNotifications(
       return successResponse([])
     }
 
-    // Transform snake_case → camelCase
     const notifications: Notification[] = data.map((n) => ({
       id: n.id,
       recipientType: n.recipient_type as Notification['recipientType'],
@@ -60,7 +70,7 @@ export async function getNotifications(
 
     return successResponse(notifications)
   } catch (error) {
-    console.error('[CRM:GET_NOTIFICATIONS] Unexpected error:', error)
+    console.error('[NOTIFICATIONS:GET] Unexpected error:', error)
     return errorResponse(
       'Une erreur inattendue est survenue',
       'INTERNAL_ERROR',

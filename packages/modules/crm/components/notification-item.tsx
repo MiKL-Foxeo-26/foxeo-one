@@ -1,13 +1,12 @@
 'use client'
 
-import { Button, Badge } from '@foxeo/ui'
+import { Button } from '@foxeo/ui'
 import { useMarkNotificationRead } from '../hooks/use-notifications'
 import type { Notification } from '../types/crm.types'
 
 interface NotificationItemProps {
   notification: Notification
-  onViewClient?: (clientId: string) => void
-  onDeferClient?: (clientId: string) => void
+  onViewLink?: (link: string) => void
 }
 
 const formatRelativeDate = (isoDate: string): string => {
@@ -28,28 +27,20 @@ const formatRelativeDate = (isoDate: string): string => {
 
 export function NotificationItem({
   notification,
-  onViewClient,
-  onDeferClient,
+  onViewLink,
 }: NotificationItemProps) {
   const markRead = useMarkNotificationRead()
+
+  const isUnread = !notification.readAt
 
   const handleMarkRead = () => {
     markRead.mutate(notification.id)
   }
 
-  const handleViewClient = () => {
-    if (notification.entityId) {
-      onViewClient?.(notification.entityId)
-      if (!notification.read) {
-        markRead.mutate(notification.id)
-      }
-    }
-  }
-
-  const handleDefer = () => {
-    if (notification.entityId) {
-      onDeferClient?.(notification.entityId)
-      if (!notification.read) {
+  const handleViewLink = () => {
+    if (notification.link) {
+      onViewLink?.(notification.link)
+      if (isUnread) {
         markRead.mutate(notification.id)
       }
     }
@@ -58,21 +49,21 @@ export function NotificationItem({
   return (
     <div
       className={`rounded-lg border p-3 space-y-2 ${
-        notification.read ? 'opacity-60' : 'border-primary/30'
+        !isUnread ? 'opacity-60' : 'border-primary/30'
       }`}
       data-testid={`notification-item-${notification.id}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            {!notification.read && (
+            {isUnread && (
               <span className="h-2 w-2 rounded-full bg-primary" />
             )}
             <p className="text-sm font-medium">{notification.title}</p>
           </div>
-          {notification.message && (
+          {notification.body && (
             <p className="text-xs text-muted-foreground">
-              {notification.message}
+              {notification.body}
             </p>
           )}
         </div>
@@ -81,37 +72,29 @@ export function NotificationItem({
         </span>
       </div>
 
-      {notification.type === 'inactivity_alert' && notification.entityId && (
-        <div className="flex gap-2">
+      <div className="flex gap-2">
+        {notification.link && (
           <Button
             variant="outline"
             size="sm"
-            onClick={handleViewClient}
-            data-testid="notification-view-client"
+            onClick={handleViewLink}
+            data-testid="notification-view-link"
           >
-            Voir la fiche
+            Voir le détail
           </Button>
+        )}
+        {isUnread && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleDefer}
-            data-testid="notification-defer-client"
+            onClick={handleMarkRead}
+            disabled={markRead.isPending}
+            data-testid="notification-mark-read"
           >
-            À traiter plus tard
+            Ignorer
           </Button>
-          {!notification.read && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleMarkRead}
-              disabled={markRead.isPending}
-              data-testid="notification-mark-read"
-            >
-              Ignorer
-            </Button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
