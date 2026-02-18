@@ -13,7 +13,9 @@ vi.mock('next/cache', () => ({
 
 // Mock Supabase
 const mockSingle = vi.fn()
-const mockUpdateEqOperator = vi.fn(() => ({ select: vi.fn(() => ({ single: mockSingle })) }))
+const mockSelect = vi.fn(() => ({ single: mockSingle }))
+const mockEqUpdatedAt = vi.fn(() => ({ select: mockSelect }))
+const mockUpdateEqOperator = vi.fn(() => ({ eq: mockEqUpdatedAt, select: mockSelect }))
 const mockUpdateEqId = vi.fn(() => ({ eq: mockUpdateEqOperator }))
 const mockUpdate = vi.fn(() => ({ eq: mockUpdateEqId }))
 const mockMaybeSingle = vi.fn()
@@ -235,6 +237,102 @@ describe('updateClient Server Action', () => {
 
     expect(result).toHaveProperty('data')
     expect(result).toHaveProperty('error')
+  })
+
+  it('should return CONFLICT when updatedAt is provided and row was modified (PGRST116)', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    mockSingle.mockResolvedValue({
+      data: null,
+      error: { message: 'No rows found', code: 'PGRST116' },
+    })
+
+    const { updateClient } = await import('./update-client')
+    const result = await updateClient(
+      testClientId,
+      { name: 'Nouveau Nom' },
+      { updatedAt: '2026-02-13T10:00:00Z' }
+    )
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('CONFLICT')
+    expect(result.error?.message).toContain('modifi')
+  })
+
+  it('should add updated_at eq filter when updatedAt option is provided', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    mockSingle.mockResolvedValue({
+      data: {
+        id: testClientId,
+        operator_id: testOperatorId,
+        name: 'Nouveau Nom',
+        company: 'Acme Corp',
+        email: 'jean@acme.com',
+        client_type: 'complet',
+        status: 'lab-actif',
+        sector: null,
+        phone: null,
+        website: null,
+        notes: null,
+        created_at: '2026-02-13T10:00:00Z',
+        updated_at: '2026-02-13T12:00:00Z',
+      },
+      error: null,
+    })
+
+    const { updateClient } = await import('./update-client')
+    await updateClient(
+      testClientId,
+      { name: 'Nouveau Nom' },
+      { updatedAt: '2026-02-13T10:00:00Z' }
+    )
+
+    expect(mockEqUpdatedAt).toHaveBeenCalledWith('updated_at', '2026-02-13T10:00:00Z')
+  })
+
+  it('should skip updated_at check when force option is true', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    mockSingle.mockResolvedValue({
+      data: {
+        id: testClientId,
+        operator_id: testOperatorId,
+        name: 'Forcé',
+        company: 'Acme Corp',
+        email: 'jean@acme.com',
+        client_type: 'complet',
+        status: 'lab-actif',
+        sector: null,
+        phone: null,
+        website: null,
+        notes: null,
+        created_at: '2026-02-13T10:00:00Z',
+        updated_at: '2026-02-13T14:00:00Z',
+      },
+      error: null,
+    })
+
+    const { updateClient } = await import('./update-client')
+    const result = await updateClient(
+      testClientId,
+      { name: 'Forcé' },
+      { updatedAt: '2026-02-13T10:00:00Z', force: true }
+    )
+
+    expect(result.error).toBeNull()
+    expect(result.data?.name).toBe('Forcé')
+    // updated_at eq should NOT have been called
+    expect(mockEqUpdatedAt).not.toHaveBeenCalledWith('updated_at', expect.anything())
   })
 
   it('should skip email uniqueness check when email is not in update', async () => {

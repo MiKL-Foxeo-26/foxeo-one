@@ -12,7 +12,8 @@ import type { Client, UpdateClientInput } from '../types/crm.types'
 
 export async function updateClient(
   clientId: string,
-  input: UpdateClientInput
+  input: UpdateClientInput,
+  options?: { updatedAt?: string; force?: boolean }
 ): Promise<ActionResponse<Client>> {
   try {
     // Validate clientId as UUID
@@ -88,15 +89,27 @@ export async function updateClient(
     if (updateData.clientType !== undefined) dbUpdate.client_type = updateData.clientType
 
     // Update client — double check operator ownership + RLS
-    const { data: clientData, error: updateError } = await supabase
+    let query = supabase
       .from('clients')
       .update(dbUpdate)
       .eq('id', clientId)
       .eq('operator_id', operatorId)
-      .select()
-      .single()
+
+    // Optimistic lock: check updated_at unless force mode
+    if (options?.updatedAt && !options.force) {
+      query = query.eq('updated_at', options.updatedAt)
+    }
+
+    const { data: clientData, error: updateError } = await query.select().single()
 
     if (updateError || !clientData) {
+      // PGRST116 = no rows found → conflict (updated_at mismatch)
+      if (updateError?.code === 'PGRST116' && options?.updatedAt) {
+        return errorResponse(
+          'Les données ont été modifiées par un autre utilisateur. Veuillez recharger.',
+          'CONFLICT'
+        )
+      }
       console.error('[CRM:UPDATE] Update error:', updateError)
       return errorResponse(
         'Erreur lors de la mise à jour du client',

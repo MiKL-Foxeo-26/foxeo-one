@@ -46,3 +46,4 @@ export {
   type Locale,
 } from './constants/i18n'
 export { t, loadMessages } from './i18n/translate'
+export { withOptimisticLock } from './optimistic-lock'

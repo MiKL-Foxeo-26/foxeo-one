@@ -7,6 +7,7 @@
 export * from './use-mobile'
 export { useOnline } from './hooks/use-online'
 export { useConfirmDialog } from './hooks/use-confirm-dialog'
+export { useOptimisticLock } from './hooks/use-optimistic-lock'
 export { useTranslations } from './hooks/use-translations'
 
 // Providers
@@ -61,3 +62,6 @@ export * from './components/toast-utils'
 
 // Consent
 export { ConsentCheckbox } from './components/consent-checkbox'
+
+// Conflict
+export { ConflictDialog, type ConflictDialogProps } from './components/conflict-dialog'

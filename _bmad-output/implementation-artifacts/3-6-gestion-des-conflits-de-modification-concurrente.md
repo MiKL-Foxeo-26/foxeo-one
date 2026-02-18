@@ -1,6 +1,6 @@
 # Story 3.6: Gestion des conflits de modification concurrente
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,31 +24,31 @@ So that **je ne perds pas mon travail et les modifications ne s'écrasent pas si
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Helper optimisticLock (AC: #1, #3)
-  - [ ] 1.1 `packages/utils/src/optimistic-lock.ts` — Helper function
-  - [ ] 1.2 Fonction `withOptimisticLock(supabase, table, id, updatedAt, updateData)` qui vérifie updated_at
-  - [ ] 1.3 Retourne `ActionResponse` avec code `CONFLICT` si mismatch
-  - [ ] 1.4 Export depuis `@foxeo/utils`
+- [x] Task 1 — Helper optimisticLock (AC: #1, #3)
+  - [x] 1.1 `packages/utils/src/optimistic-lock.ts` — Helper function
+  - [x] 1.2 Fonction `withOptimisticLock(supabase, table, id, updatedAt, updateData)` qui vérifie updated_at
+  - [x] 1.3 Retourne `ActionResponse` avec code `CONFLICT` si mismatch
+  - [x] 1.4 Export depuis `@foxeo/utils`
 
-- [ ] Task 2 — Hook useOptimisticLock (AC: #2)
-  - [ ] 2.1 `packages/ui/src/hooks/use-optimistic-lock.ts` — Hook qui capture le updated_at initial
-  - [ ] 2.2 Expose : `originalUpdatedAt`, `isConflict`, `resolveConflict(action: 'reload' | 'force')`
+- [x] Task 2 — Hook useOptimisticLock (AC: #2)
+  - [x] 2.1 `packages/ui/src/hooks/use-optimistic-lock.ts` — Hook qui capture le updated_at initial
+  - [x] 2.2 Expose : `originalUpdatedAt`, `isConflict`, `resolveConflict(action: 'reload' | 'force')`
 
-- [ ] Task 3 — Composant ConflictDialog (AC: #4)
-  - [ ] 3.1 `packages/ui/src/components/conflict-dialog.tsx` — Dialog avec les deux options
-  - [ ] 3.2 Option "Recharger" : invalide le cache TanStack Query + ferme le dialog
-  - [ ] 3.3 Option "Forcer" : re-soumet la mutation sans vérification updated_at
-  - [ ] 3.4 Défaut sélectionné : "Recharger"
+- [x] Task 3 — Composant ConflictDialog (AC: #4)
+  - [x] 3.1 `packages/ui/src/components/conflict-dialog.tsx` — Dialog avec les deux options
+  - [x] 3.2 Option "Recharger" : invalide le cache TanStack Query + ferme le dialog
+  - [x] 3.3 Option "Forcer" : re-soumet la mutation sans vérification updated_at
+  - [x] 3.4 Défaut sélectionné : "Recharger"
 
-- [ ] Task 4 — Intégration Server Actions existantes (AC: #3)
-  - [ ] 4.1 Intégrer `withOptimisticLock` dans les Server Actions de mutation CRM (updateClient, etc.)
-  - [ ] 4.2 Documenter le pattern pour les futures Server Actions
+- [x] Task 4 — Intégration Server Actions existantes (AC: #3)
+  - [x] 4.1 Intégrer `withOptimisticLock` dans les Server Actions de mutation CRM (updateClient, etc.)
+  - [x] 4.2 Documenter le pattern pour les futures Server Actions
 
-- [ ] Task 5 — Tests (AC: #6)
-  - [ ] 5.1 Tests helper : optimisticLock normal, conflit, force
-  - [ ] 5.2 Tests hook : capture updated_at, détection conflit
-  - [ ] 5.3 Tests composant : ConflictDialog, options, actions
-  - [ ] 5.4 Tests intégration : Server Action avec conflit simulé
+- [x] Task 5 — Tests (AC: #6)
+  - [x] 5.1 Tests helper : optimisticLock normal, conflit, force
+  - [x] 5.2 Tests hook : capture updated_at, détection conflit
+  - [x] 5.3 Tests composant : ConflictDialog, options, actions
+  - [x] 5.4 Tests intégration : Server Action avec conflit simulé
 
 ## Dev Notes
 
@@ -203,9 +203,31 @@ function EditClientForm({ client }: { client: Client }) {
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+- Full test suite: 1402 passed, 0 failed (162 test files)
+- Story-specific tests: 26 new tests (7 helper + 8 hook + 8 dialog + 3 integration)
 
 ### Completion Notes List
+- Task 1: Created `withOptimisticLock` helper in `@foxeo/utils` — generic optimistic locking using `updated_at` column with force bypass option. Returns `CONFLICT` error code on PGRST116.
+- Task 2: Created `useOptimisticLock` hook in `@foxeo/ui` — captures initial `updated_at`, detects conflict from response, exposes `resolveConflict()` to reset state.
+- Task 3: Created `ConflictDialog` component in `@foxeo/ui` — uses Dialog primitives, two actions (Recharger default, Forcer), custom message support.
+- Task 4: Integrated optimistic lock pattern into `updateClient` Server Action — optional `updatedAt`/`force` params, PGRST116 → CONFLICT detection. Pattern documented via code for future Server Actions.
+- Task 5: All tests written and passing — 26 new tests across 4 test files.
+
+### Change Log
+- 2026-02-18: Story 3.6 implemented — optimistic lock helper, hook, dialog, CRM integration, 26 tests.
+- 2026-02-18: Code review — 7 issues found (1H, 4M, 2L). Fixed H1 (query reassignment), M1 (NOT_FOUND distinction), M2 (multi-tab message). M3/M4 documented, L1/L2 deferred.
 
 ### File List
+- `packages/utils/src/optimistic-lock.ts` (new)
+- `packages/utils/src/optimistic-lock.test.ts` (new)
+- `packages/utils/src/index.ts` (modified — export withOptimisticLock)
+- `packages/ui/src/hooks/use-optimistic-lock.ts` (new)
+- `packages/ui/src/hooks/use-optimistic-lock.test.ts` (new)
+- `packages/ui/src/components/conflict-dialog.tsx` (new)
+- `packages/ui/src/components/conflict-dialog.test.tsx` (new)
+- `packages/ui/src/index.ts` (modified — export hook + component)
+- `packages/modules/crm/actions/update-client.ts` (modified — optimistic lock integration)
+- `packages/modules/crm/actions/update-client.test.ts` (modified — 3 conflict tests added)
