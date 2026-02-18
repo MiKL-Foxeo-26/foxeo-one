@@ -47,3 +47,12 @@ export {
 } from './constants/i18n'
 export { t, loadMessages } from './i18n/translate'
 export { withOptimisticLock } from './optimistic-lock'
+export {
+  MAX_FILE_SIZE,
+  ALLOWED_FILE_TYPES,
+  MIME_TYPE_MAP,
+  validateFile,
+  formatFileSize,
+  type AllowedFileType,
+  type FileValidationResult,
+} from './file-validation'

@@ -1,0 +1,25 @@
+{
+  "name": "@foxeo/module-documents",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@foxeo/supabase": "workspace:*",
+    "@foxeo/types": "workspace:*",
+    "@foxeo/ui": "workspace:*",
+    "@foxeo/utils": "workspace:*",
+    "@tanstack/react-query": "^5.90.0",
+    "react": "^19.0.0",
+    "zod": "*"
+  },
+  "devDependencies": {
+    "@foxeo/tsconfig": "workspace:*",
+    "@testing-library/react": "*",
+    "vitest": "*"
+  }
+}

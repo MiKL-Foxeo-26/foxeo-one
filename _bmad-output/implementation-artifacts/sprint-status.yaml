@@ -80,8 +80,8 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Gestion Documentaire (7 stories)
-  epic-4: backlog
-  4-1-module-documents-migration-structure-upload-avec-validation: ready-for-dev
+  epic-4: in-progress
+  4-1-module-documents-migration-structure-upload-avec-validation: done
   4-2-visualisation-documents-viewer-html-telechargement-pdf: ready-for-dev
   4-3-partage-de-documents-mikl-client-visibilite: ready-for-dev
   4-4-organisation-en-dossiers-recherche-dans-les-documents: ready-for-dev
