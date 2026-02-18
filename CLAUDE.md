@@ -264,3 +264,4 @@ Full config: `_bmad/_config/model-routing.yaml`
 | Project Overview (existing code) | `docs/project-overview.md` |
 | Existing Architecture (code) | `docs/architecture.md` |
 | Internationalization (i18n) | `docs/i18n.md` |
+| **Orpheus — Velocity Reference** | `_orpheus/velocity-reference.md` |
