@@ -136,6 +136,19 @@ Full reference: `_bmad-output/planning-artifacts/design-system-themes.css`
 - **Typography**: Poppins (headings/UI) + Inter (body)
 - **Theme generator**: [tweakcn.com](https://tweakcn.com)
 
+### Visual Assets (`image foxeo/`)
+
+| Asset | File | Usage |
+|-------|------|-------|
+| Logo Hub | `logo foxeo hub.png` | Dashboard shell header (Hub) |
+| Logo Lab | `logo foxeo lab.png` | Dashboard shell header (Lab) |
+| Logo One | `logo foxeo one.png` | Dashboard shell header (One) |
+| Élio Lab | `Image Elio lab.png` | Agent Élio — version Lab |
+| Élio One | `Image Elio one.png` | Agent Élio — version One |
+| Élio One+ | `Image Elio one +.png` | Agent Élio — variante One |
+
+**Intégration prévue** : déplacer dans `packages/ui/public/logos/` et `packages/ui/public/elio/` lors de l'implémentation du dashboard shell et du chat Élio. Formats PNG transparents. Des variantes supplémentaires (poses, animations) seront générées selon les besoins d'intégration (états idle/thinking/speaking, transitions).
+
 ### Key UI Patterns
 
 - **Dashboard shell** shared across apps (`@foxeo/ui/dashboard-shell`) with content slot
@@ -184,6 +197,27 @@ npm run build         # Production build (turbo build)
 npm run lint          # Lint all (turbo lint)
 npm run clean         # Clean builds (turbo clean)
 ```
+
+## Story Pipeline — Enchainement automatique (MUST follow)
+
+Quand le Dev Agent execute une story via `ds` (dev-story workflow), il DOIT enchainer **automatiquement** toutes les etapes suivantes sans attendre d'instruction utilisateur entre chaque etape :
+
+1. **Dev Story** — Implementer toutes les tasks/subtasks de la story
+2. **Tests** — Lancer `npx vitest run` et verifier 0 echec
+3. **Code Review** — Executer le workflow `code-review` (adversarial, trouver 3-10 issues)
+4. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander
+5. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
+6. **Mettre a jour** — Story file (status → done, completion notes, file list) + sprint-status.yaml
+7. **Commit** — `git add` + `git commit` avec message format : `feat: Story X.Y — Description, code review fixes (N tests)`
+8. **Push** — `git push` vers origin
+
+**Regles pipeline :**
+- Si les tests echouent a l'etape 2 ou 5, corriger et re-tester avant de continuer
+- Le code review doit trouver des issues (jamais "looks good") — c'est adversarial par design
+- Les issues LOW du code review sont documentees mais pas forcement fixees
+- Si un fix cree une regression, iterer jusqu'a 0 echec
+- Le commit message suit le pattern des commits existants (voir `git log --oneline -5`)
+- Ne JAMAIS s'arreter entre les etapes pour demander confirmation — le pipeline est autonome
 
 ## Model Routing — BMAD Agents & Workflows (MUST follow)
 
