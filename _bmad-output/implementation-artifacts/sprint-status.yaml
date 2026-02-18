@@ -76,7 +76,7 @@ development_status:
   3-4-preferences-de-notification-client-mikl: done
   3-5-indicateur-de-presence-en-ligne: done
   3-6-gestion-des-conflits-de-modification-concurrente: done
-  3-7-support-client-signalement-de-problemes-aide-en-ligne: ready-for-dev
+  3-7-support-client-signalement-de-problemes-aide-en-ligne: done
   epic-3-retrospective: optional
 
   # Epic 4: Gestion Documentaire (7 stories)

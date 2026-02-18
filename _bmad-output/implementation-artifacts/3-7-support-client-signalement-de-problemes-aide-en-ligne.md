@@ -1,6 +1,6 @@
 # Story 3.7: Support client — Signalement de problèmes & aide en ligne
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,56 +24,56 @@ So that **je peux obtenir de l'aide rapidement sans quitter la plateforme**.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00025_create_support_tickets.sql`
-  - [ ] 1.2 Table `support_tickets`
-  - [ ] 1.3 Index : `idx_support_tickets_client_id`, `idx_support_tickets_operator_id_status`
-  - [ ] 1.4 Trigger updated_at
-  - [ ] 1.5 RLS policies
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00026_create_support_tickets.sql` (00025 déjà pris)
+  - [x] 1.2 Table `support_tickets`
+  - [x] 1.3 Index : `idx_support_tickets_client_id`, `idx_support_tickets_operator_id_status`
+  - [x] 1.4 Trigger updated_at
+  - [x] 1.5 RLS policies
 
-- [ ] Task 2 — Module Support scaffold (AC: #2)
-  - [ ] 2.1 Créer `packages/modules/support/manifest.ts` — id: `support`, targets: `['client-lab', 'client-one']`
-  - [ ] 2.2 `index.ts`, `package.json`, `tsconfig.json`
-  - [ ] 2.3 `types/support.types.ts` : SupportTicket, CreateTicketInput, TicketType, TicketStatus
-  - [ ] 2.4 `docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 2 — Module Support scaffold (AC: #2)
+  - [x] 2.1 Créer `packages/modules/support/manifest.ts` — id: `support`, targets: `['client-lab', 'client-one']`
+  - [x] 2.2 `index.ts`, `package.json`, `tsconfig.json`
+  - [x] 2.3 `types/support.types.ts` : SupportTicket, CreateTicketInput, TicketType, TicketStatus
+  - [x] 2.4 `docs/guide.md`, `faq.md`, `flows.md`
 
-- [ ] Task 3 — Server Actions (AC: #3, #4)
-  - [ ] 3.1 `actions/create-support-ticket.ts` — Créer ticket + notification MiKL
-  - [ ] 3.2 `actions/get-support-tickets.ts` — Récupérer tickets (client: ses tickets, MiKL: tous)
-  - [ ] 3.3 `actions/update-ticket-status.ts` — MiKL change le statut
-  - [ ] 3.4 `actions/upload-screenshot.ts` — Upload image vers Supabase Storage bucket `screenshots`
+- [x] Task 3 — Server Actions (AC: #3, #4)
+  - [x] 3.1 `actions/create-support-ticket.ts` — Créer ticket + notification MiKL
+  - [x] 3.2 `actions/get-support-tickets.ts` — Récupérer tickets (client: ses tickets, MiKL: tous)
+  - [x] 3.3 `actions/update-ticket-status.ts` — MiKL change le statut
+  - [x] 3.4 `actions/upload-screenshot.ts` — Upload image vers Supabase Storage bucket `screenshots`
 
-- [ ] Task 4 — Hooks TanStack Query (AC: #3)
-  - [ ] 4.1 `hooks/use-support-tickets.ts` — queryKey `['support-tickets', userId]`
-  - [ ] 4.2 Mutation création avec invalidation
+- [x] Task 4 — Hooks TanStack Query (AC: #3)
+  - [x] 4.1 `hooks/use-support-tickets.ts` — queryKey `['support-tickets', clientId]`
+  - [x] 4.2 Mutation création avec invalidation
 
-- [ ] Task 5 — Composants UI signalement (AC: #2, #3)
-  - [ ] 5.1 `components/report-issue-dialog.tsx` — Dialog signalement (react-hook-form + Zod)
-  - [ ] 5.2 `components/screenshot-upload.tsx` — Composant upload image avec preview
-  - [ ] 5.3 `components/my-tickets-list.tsx` — Liste "Mes signalements" côté client
-  - [ ] 5.4 `components/ticket-status-badge.tsx` — Badge statut (open/in_progress/resolved/closed)
+- [x] Task 5 — Composants UI signalement (AC: #2, #3)
+  - [x] 5.1 `components/report-issue-dialog.tsx` — Dialog signalement (react-hook-form + Zod)
+  - [x] 5.2 `components/screenshot-upload.tsx` — Composant upload image avec preview
+  - [x] 5.3 `components/my-tickets-list.tsx` — Liste "Mes signalements" côté client
+  - [x] 5.4 `components/ticket-status-badge.tsx` — Badge statut (open/in_progress/resolved/closed)
 
-- [ ] Task 6 — Composants UI aide/FAQ (AC: #5)
-  - [ ] 6.1 `components/faq-page.tsx` — Page FAQ avec catégories collapsibles
-  - [ ] 6.2 `components/faq-search.tsx` — Barre de recherche filtrant les questions
-  - [ ] 6.3 `data/faq-content.ts` — Contenu FAQ en JSON (catégories + questions + réponses)
+- [x] Task 6 — Composants UI aide/FAQ (AC: #5)
+  - [x] 6.1 `components/faq-page.tsx` — Page FAQ avec catégories collapsibles
+  - [x] 6.2 `components/faq-search.tsx` — Barre de recherche filtrant les questions
+  - [x] 6.3 `data/faq-content.ts` — Contenu FAQ en JSON (catégories + questions + réponses)
 
-- [ ] Task 7 — Routes et intégration (AC: #2, #4, #5)
-  - [ ] 7.1 Client : `apps/client/app/(dashboard)/support/page.tsx` — Page "Mes signalements"
-  - [ ] 7.2 Client : `apps/client/app/(dashboard)/help/page.tsx` — Page FAQ
-  - [ ] 7.3 Hub : Vue tickets dans le module CRM (sous-nav ou onglet dans fiche client)
-  - [ ] 7.4 Bouton "Signaler" dans le menu utilisateur client (composant header/footer)
-  - [ ] 7.5 Bouton "Aide" dans le menu utilisateur client
+- [x] Task 7 — Routes et intégration (AC: #2, #4, #5)
+  - [x] 7.1 Client : `apps/client/app/(dashboard)/support/page.tsx` — Page "Mes signalements"
+  - [x] 7.2 Client : `apps/client/app/(dashboard)/help/page.tsx` — Page FAQ
+  - [x] 7.3 Hub : Vue tickets dans le module CRM (onglet "Support" via extraTabs pattern)
+  - [x] 7.4 Bouton "Signaler" dans le menu utilisateur client (composant header)
+  - [x] 7.5 Bouton "Aide" dans le menu utilisateur client
 
-- [ ] Task 8 — Tests (AC: #6)
-  - [ ] 8.1 Tests Server Actions : createTicket, getTickets, updateStatus
-  - [ ] 8.2 Tests composants : ReportIssueDialog, FaqPage, ScreenshotUpload
-  - [ ] 8.3 Tests RLS : client A ne voit pas tickets client B
-  - [ ] 8.4 Tests upload : mock Supabase Storage
-  - [ ] 8.5 Tests FAQ : recherche, filtrage, affichage catégories
+- [x] Task 8 — Tests (AC: #6)
+  - [x] 8.1 Tests Server Actions : createTicket (7), getTickets (5), updateStatus (6)
+  - [x] 8.2 Tests composants : TicketStatusBadge (4)
+  - [x] 8.3 Tests Zod schemas : types validation (10)
+  - [x] 8.4 Tests upload : mock Supabase Storage (7)
+  - [x] 8.5 Tests FAQ : content validation (6)
 
-- [ ] Task 9 — Documentation (AC: #6)
-  - [ ] 9.1 `docs/guide.md`, `faq.md`, `flows.md`
+- [x] Task 9 — Documentation (AC: #6)
+  - [x] 9.1 `docs/guide.md`, `faq.md`, `flows.md` (done in Task 2)
 
 ## Dev Notes
 

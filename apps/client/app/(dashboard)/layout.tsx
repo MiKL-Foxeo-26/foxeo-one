@@ -1,4 +1,5 @@
-import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
+import Link from 'next/link'
+import { DashboardShell, ThemeToggle, ModuleSidebar, Button } from '@foxeo/ui'
 import { discoverModules, getModulesForTarget } from '@foxeo/utils'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import { NotificationBadge } from '@foxeo/modules-notifications'
@@ -19,6 +20,12 @@ function ClientHeader({ authUserId }: { authUserId: string }) {
     <div className="flex w-full items-center justify-between">
       <span className="text-sm font-medium">Mon espace</span>
       <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/help">Aide</Link>
+        </Button>
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/support">Signaler</Link>
+        </Button>
         {authUserId && <NotificationBadge recipientId={authUserId} />}
         <ThemeToggle />
         <LogoutButton />

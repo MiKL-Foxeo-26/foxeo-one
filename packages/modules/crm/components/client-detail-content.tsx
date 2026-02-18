@@ -7,12 +7,14 @@ import { EditClientDialog } from './edit-client-dialog'
 import { ArchivedBanner } from './archived-banner'
 import { useClient } from '../hooks/use-client'
 import type { Client } from '../types/crm.types'
+import type { ExtraTab } from './client-tabs'
 
 interface ClientDetailContentProps {
   client: Client
+  extraTabs?: ExtraTab[]
 }
 
-export function ClientDetailContent({ client: initialClient }: ClientDetailContentProps) {
+export function ClientDetailContent({ client: initialClient, extraTabs }: ClientDetailContentProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   // Use TanStack Query with initialData from Server Component
@@ -40,6 +42,7 @@ export function ClientDetailContent({ client: initialClient }: ClientDetailConte
         <ClientTabs
           clientId={displayClient.id}
           onEdit={isArchived ? undefined : () => setIsEditDialogOpen(true)}
+          extraTabs={extraTabs}
         />
       </div>
 

@@ -7,12 +7,19 @@ import { ClientTimeline } from './client-timeline'
 import { ClientDocumentsTab } from './client-documents-tab'
 import { ClientExchangesTab } from './client-exchanges-tab'
 
+export interface ExtraTab {
+  value: string
+  label: string
+  content: React.ReactNode
+}
+
 interface ClientTabsProps {
   clientId: string
   onEdit?: () => void
+  extraTabs?: ExtraTab[]
 }
 
-export function ClientTabs({ clientId, onEdit }: ClientTabsProps) {
+export function ClientTabs({ clientId, onEdit, extraTabs = [] }: ClientTabsProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -32,6 +39,9 @@ export function ClientTabs({ clientId, onEdit }: ClientTabsProps) {
         <TabsTrigger value="historique">Historique</TabsTrigger>
         <TabsTrigger value="documents">Documents</TabsTrigger>
         <TabsTrigger value="echanges">Échanges</TabsTrigger>
+        {extraTabs.map((tab) => (
+          <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
+        ))}
       </TabsList>
 
       <TabsContent value="informations">
@@ -49,6 +59,12 @@ export function ClientTabs({ clientId, onEdit }: ClientTabsProps) {
       <TabsContent value="echanges">
         <ClientExchangesTab clientId={clientId} />
       </TabsContent>
+
+      {extraTabs.map((tab) => (
+        <TabsContent key={tab.value} value={tab.value}>
+          {tab.content}
+        </TabsContent>
+      ))}
     </Tabs>
   )
 }
