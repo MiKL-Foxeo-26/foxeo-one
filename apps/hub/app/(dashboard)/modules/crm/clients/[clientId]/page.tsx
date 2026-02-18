@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getClient, ClientDetailContent } from '@foxeo/modules/crm'
+import { OperatorOverrideSection } from '@foxeo/modules-notifications'
 
 interface ClientDetailPageProps {
   params: Promise<{
@@ -35,5 +36,12 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
 
   const client = result.data
 
-  return <ClientDetailContent client={client} />
+  return (
+    <>
+      <ClientDetailContent client={client} />
+      <div className="container mx-auto px-6 pb-8">
+        <OperatorOverrideSection clientId={client.id} />
+      </div>
+    </>
+  )
 }

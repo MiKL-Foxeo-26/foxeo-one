@@ -1,6 +1,6 @@
 # Story 3.4: Préférences de notification (client & MiKL)
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,47 +24,47 @@ So that **je ne suis pas submergé par des notifications non pertinentes**.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00024_create_notification_preferences.sql`
-  - [ ] 1.2 Table `notification_preferences`
-  - [ ] 1.3 Colonne `operator_override` (BOOLEAN DEFAULT false) pour les overrides MiKL
-  - [ ] 1.4 Contrainte UNIQUE (user_type, user_id, notification_type)
-  - [ ] 1.5 Trigger updated_at
-  - [ ] 1.6 RLS policies : select/update propres préférences, opérateur peut override ses clients
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00025_create_notification_preferences.sql` (00024 déjà pris par email_notifications)
+  - [x] 1.2 Table `notification_preferences`
+  - [x] 1.3 Colonne `operator_override` (BOOLEAN DEFAULT false) pour les overrides MiKL
+  - [x] 1.4 Contrainte UNIQUE (user_type, user_id, notification_type)
+  - [x] 1.5 Trigger updated_at
+  - [x] 1.6 RLS policies : select/update propres préférences, opérateur peut override ses clients
 
-- [ ] Task 2 — Types TypeScript (AC: #2)
-  - [ ] 2.1 Types : `NotificationPreference`, `UpdatePreferenceInput`
-  - [ ] 2.2 Enum `NotificationType` partagé
-  - [ ] 2.3 Schémas Zod
+- [x] Task 2 — Types TypeScript (AC: #2)
+  - [x] 2.1 Types : `NotificationPreference`, `UpdatePreferenceInput`
+  - [x] 2.2 Enum `NotificationType` partagé
+  - [x] 2.3 Schémas Zod
 
-- [ ] Task 3 — Server Actions (AC: #3, #4, #5)
-  - [ ] 3.1 `actions/get-notification-prefs.ts` — Récupérer préférences utilisateur (créer defaults si inexistantes)
-  - [ ] 3.2 `actions/update-notification-prefs.ts` — Modifier une préférence (toggle)
-  - [ ] 3.3 `actions/set-operator-override.ts` — MiKL force une préférence pour un client
-  - [ ] 3.4 `actions/check-notification-allowed.ts` — Vérifier si notification autorisée (check prefs + overrides)
+- [x] Task 3 — Server Actions (AC: #3, #4, #5)
+  - [x] 3.1 `actions/get-notification-prefs.ts` — Récupérer préférences utilisateur (créer defaults si inexistantes)
+  - [x] 3.2 `actions/update-notification-prefs.ts` — Modifier une préférence (toggle)
+  - [x] 3.3 `actions/set-operator-override.ts` — MiKL force une préférence pour un client
+  - [x] 3.4 `actions/check-notification-allowed.ts` — Vérifier si notification autorisée (check prefs + overrides)
 
-- [ ] Task 4 — Hooks TanStack Query (AC: #2)
-  - [ ] 4.1 `hooks/use-notification-prefs.ts` — queryKey `['notification-prefs', userId]`
-  - [ ] 4.2 Mutation update avec invalidation
+- [x] Task 4 — Hooks TanStack Query (AC: #2)
+  - [x] 4.1 `hooks/use-notification-prefs.ts` — queryKey `['notification-prefs', userId]`
+  - [x] 4.2 Mutation update avec invalidation
 
-- [ ] Task 5 — Composants UI (AC: #2, #4)
-  - [ ] 5.1 `components/notification-prefs-page.tsx` — Page préférences avec grille types × canaux
-  - [ ] 5.2 `components/pref-toggle-row.tsx` — Ligne : label type + toggle email + toggle in-app
-  - [ ] 5.3 `components/operator-override-section.tsx` — Section Hub pour override MiKL sur fiche client
+- [x] Task 5 — Composants UI (AC: #2, #4)
+  - [x] 5.1 `components/notification-prefs-page.tsx` — Page préférences avec grille types × canaux
+  - [x] 5.2 `components/pref-toggle-row.tsx` — Ligne : label type + toggle email + toggle in-app
+  - [x] 5.3 `components/operator-override-section.tsx` — Section Hub pour override MiKL sur fiche client
 
-- [ ] Task 6 — Routes (AC: #2)
-  - [ ] 6.1 Client : `apps/client/app/(dashboard)/settings/notifications/page.tsx`
-  - [ ] 6.2 Hub : Section dans la fiche client (onglet ou section dédiée)
+- [x] Task 6 — Routes (AC: #2)
+  - [x] 6.1 Client : `apps/client/app/(dashboard)/settings/notifications/page.tsx`
+  - [x] 6.2 Hub : Section dédiée dans `apps/hub/.../crm/clients/[clientId]/page.tsx` (section dédiée, pas onglet — respect architecture inter-modules)
 
-- [ ] Task 7 — Intégration envoi (AC: #5)
-  - [ ] 7.1 Modifier le flow d'envoi de notification (Story 3.2/3.3) pour vérifier les préférences
-  - [ ] 7.2 `check-notification-allowed(recipientId, type)` → { inapp: bool, email: bool }
+- [x] Task 7 — Intégration envoi (AC: #5)
+  - [x] 7.1 Modifier `create-notification.ts` pour vérifier préférences avant création
+  - [x] 7.2 `check-notification-allowed(recipientId, type)` → { inapp: bool, email: bool }
 
-- [ ] Task 8 — Tests (AC: #6)
-  - [ ] 8.1 Tests Server Actions
-  - [ ] 8.2 Tests composants
-  - [ ] 8.3 Tests RLS
-  - [ ] 8.4 Tests logique override : préférence client vs override MiKL
+- [x] Task 8 — Tests (AC: #6)
+  - [x] 8.1 Tests Server Actions (4 actions × tests unitaires co-localisés)
+  - [x] 8.2 Tests composants (3 composants × tests)
+  - [x] 8.3 Tests RLS (`tests/rls/notification-prefs.test.ts`)
+  - [x] 8.4 Tests logique override : préférence client vs override MiKL
 
 ## Dev Notes
 
@@ -161,8 +161,59 @@ export async function checkNotificationAllowed(
 
 ### Agent Model Used
 
+Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
+
 ### Debug Log References
+
+- Migration 00024 déjà prise par `email_notifications.sql` → utilisé 00025
+- `@foxeo/modules/notifications` alias invalide dans CRM → respecté la règle "modules n'importent pas d'autres modules", `OperatorOverrideSection` injectée depuis la route Hub (app level)
+- Hook TanStack Query : erreur = état `isError`, `data=undefined` (pas `null`) → test ajusté
 
 ### Completion Notes List
 
+- ✅ AC1 : Migration 00025 créée avec table `notification_preferences`, index, trigger `updated_at`, 8 policies RLS (client + operator self + operator-on-client pour select/insert/update)
+- ✅ AC2 : Page préférences client avec grille 6 types × 2 canaux, toggles critiques (`system`, `graduation`) non désactivables avec badge "Critique"
+- ✅ AC3 : `updateNotificationPrefs()` — sauvegarde immédiate, toast Sonner "Préférences mises à jour", pattern `{ data, error }`
+- ✅ AC4 : `OperatorOverrideSection` dans fiche client Hub (section dédiée sous les onglets, pas onglet CRM — respect règle inter-modules)
+- ✅ AC5 : `checkNotificationAllowed()` intégré dans `createNotification()`, skip silencieux si `inapp=false`
+- ✅ AC6 : 96 tests (19 fichiers) dans `@foxeo/modules-notifications`, 0 régression CRM (573 tests), test RLS co-localisé dans `tests/rls/`
+- Décision : `channel_email` sur la future vérification du trigger DB (email trigger de Story 3.3) reste basé sur `email_notifications_enabled` pour cette story; `checkNotificationAllowed` prépare l'infrastructure pour une intégration future plus fine
+
 ### File List
+
+**Créés :**
+- `supabase/migrations/00025_create_notification_preferences.sql`
+- `packages/modules/notifications/types/notification-prefs.types.ts`
+- `packages/modules/notifications/types/notification-prefs.types.test.ts`
+- `packages/modules/notifications/types/notification-prefs-labels.ts`
+- `packages/modules/notifications/actions/get-notification-prefs.ts`
+- `packages/modules/notifications/actions/get-notification-prefs.test.ts`
+- `packages/modules/notifications/actions/update-notification-prefs.ts`
+- `packages/modules/notifications/actions/update-notification-prefs.test.ts`
+- `packages/modules/notifications/actions/set-operator-override.ts`
+- `packages/modules/notifications/actions/set-operator-override.test.ts`
+- `packages/modules/notifications/actions/check-notification-allowed.ts`
+- `packages/modules/notifications/actions/check-notification-allowed.test.ts`
+- `packages/modules/notifications/hooks/use-notification-prefs.ts`
+- `packages/modules/notifications/hooks/use-notification-prefs.test.ts`
+- `packages/modules/notifications/components/notification-prefs-page.tsx`
+- `packages/modules/notifications/components/notification-prefs-page.test.tsx`
+- `packages/modules/notifications/components/pref-toggle-row.tsx`
+- `packages/modules/notifications/components/pref-toggle-row.test.tsx`
+- `packages/modules/notifications/components/operator-override-section.tsx`
+- `packages/modules/notifications/components/operator-override-section.test.tsx`
+- `apps/client/app/(dashboard)/settings/notifications/page.tsx`
+- `tests/rls/notification-prefs.test.ts`
+
+**Modifiés :**
+- `packages/modules/notifications/manifest.ts` — `requiredTables` += `notification_preferences`
+- `packages/modules/notifications/index.ts` — exports nouvelles actions, composants, hooks, types
+- `packages/modules/notifications/actions/create-notification.ts` — intégration `checkNotificationAllowed`
+- `packages/modules/notifications/actions/create-notification.test.ts` — mock `checkNotificationAllowed` + test skip silencieux
+- `apps/hub/app/(dashboard)/modules/crm/clients/[clientId]/page.tsx` — section `OperatorOverrideSection`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — `3-4` → `review`
+
+## Change Log
+
+- 2026-02-18 : Story 3.4 implémentée (Claude Sonnet 4.5) — Préférences de notification client & MiKL, migration 00025, 4 Server Actions, 3 composants, route settings/notifications, intégration create-notification, 94 tests passants
+- 2026-02-18 : Code review adversariale (Claude Sonnet 4.5) — 7 issues corrigées (3 HIGH, 4 MEDIUM) : H1 retiré 'use server' de check-notification-allowed (fuite endpoint), H2 ajout vérification opérateur dans set-operator-override, H3 fix alias import @foxeo/modules-notifications, M1 optimisation getNotificationPrefs (select-first), M2 OperatorOverrideSection refactoré avec useMutation, M3 successResponse(null) au lieu de raw object, M4 extraction PREF_LABELS partagé. 96 tests passants, 0 régression CRM (573 tests).

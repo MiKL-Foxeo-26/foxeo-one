@@ -12,6 +12,6 @@ export const manifest: ModuleManifest = {
     position: 0,
   },
   routes: [],
-  requiredTables: ['notifications'],
+  requiredTables: ['notifications', 'notification_preferences'],
   dependencies: [],
 }

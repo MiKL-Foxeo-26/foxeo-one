@@ -7,6 +7,7 @@ import {
   errorResponse,
 } from '@foxeo/types'
 import { CreateNotificationInput, type Notification } from '../types/notification.types'
+import { checkNotificationAllowed } from './check-notification-allowed'
 
 export async function createNotification(
   input: CreateNotificationInput
@@ -30,6 +31,18 @@ export async function createNotification(
     }
 
     const { recipientType, recipientId, type, title, body, link } = parsed.data
+
+    // Vérifier les préférences avant envoi (AC5)
+    const allowed = await checkNotificationAllowed({
+      recipientId,
+      recipientType,
+      notificationType: type,
+    })
+
+    if (!allowed.inapp) {
+      // In-app désactivé par les préférences → skip silencieux, pas une erreur
+      return successResponse(null)
+    }
 
     const { data, error } = await supabase
       .from('notifications')

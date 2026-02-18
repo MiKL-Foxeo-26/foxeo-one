@@ -13,6 +13,12 @@ vi.mock('@foxeo/supabase', () => ({
   })),
 }))
 
+// Mock checkNotificationAllowed — default: allow all
+const mockCheckAllowed = vi.fn().mockResolvedValue({ inapp: true, email: true })
+vi.mock('./check-notification-allowed', () => ({
+  checkNotificationAllowed: (...args: unknown[]) => mockCheckAllowed(...args),
+}))
+
 describe('createNotification', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -94,5 +100,24 @@ describe('createNotification', () => {
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('DATABASE_ERROR')
+  })
+
+  it('should skip in-app creation when channel_inapp=false (preference check)', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null })
+    mockCheckAllowed.mockResolvedValueOnce({ inapp: false, email: true })
+
+    const { createNotification } = await import('./create-notification')
+    const result = await createNotification({
+      recipientType: 'client',
+      recipientId: '550e8400-e29b-41d4-a716-446655440001',
+      type: 'message',
+      title: 'Test',
+    })
+
+    // Silent skip: data=null, error=null
+    expect(result.data).toBeNull()
+    expect(result.error).toBeNull()
+    // No insert should have been called
+    expect(mockInsert).not.toHaveBeenCalled()
   })
 })

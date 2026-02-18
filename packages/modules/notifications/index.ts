@@ -18,6 +18,18 @@ export { getUnreadCount } from './actions/get-unread-count'
 export { markAsRead } from './actions/mark-as-read'
 export { markAllAsRead } from './actions/mark-all-as-read'
 export { createNotification } from './actions/create-notification'
+export { getNotificationPrefs } from './actions/get-notification-prefs'
+export { updateNotificationPrefs } from './actions/update-notification-prefs'
+export { setOperatorOverride } from './actions/set-operator-override'
+export { checkNotificationAllowed } from './actions/check-notification-allowed'
+
+// Components (prefs)
+export { NotificationPrefsPage } from './components/notification-prefs-page'
+export { OperatorOverrideSection } from './components/operator-override-section'
+export { PrefToggleRow } from './components/pref-toggle-row'
+
+// Hooks (prefs)
+export { useNotificationPrefs } from './hooks/use-notification-prefs'
 
 // Types
 export type {
@@ -31,3 +43,21 @@ export type {
 } from './types/notification.types'
 
 export { NOTIFICATION_ICONS } from './types/notification.types'
+
+export type {
+  NotificationPreference,
+  NotificationPreferenceDB,
+  UpdatePreferenceInput,
+  SetOperatorOverrideInput,
+  CheckNotificationAllowedInput,
+  NotificationAllowedResult,
+  NotificationPreferenceType,
+} from './types/notification-prefs.types'
+
+export {
+  PREFERENCE_NOTIFICATION_TYPES,
+  CRITICAL_INAPP_TYPES,
+  mapPreferenceFromDB,
+} from './types/notification-prefs.types'
+
+export { PREF_LABELS } from './types/notification-prefs-labels'
