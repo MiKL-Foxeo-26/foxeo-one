@@ -47,6 +47,7 @@ export default async function ClientDocumentsPage({ params }: Props) {
       uploadedBy="operator"
       initialDocuments={documents ?? []}
       showVisibility
+      viewerBaseHref={`/modules/documents/${clientId}`}
     />
   )
 }

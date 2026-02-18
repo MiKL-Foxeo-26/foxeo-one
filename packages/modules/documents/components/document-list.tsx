@@ -13,6 +13,7 @@ interface DocumentListProps {
   onDelete?: (documentId: string) => void
   isDeleting?: boolean
   showVisibility?: boolean
+  viewerBaseHref?: string
 }
 
 const formatDate = (isoDate: string): string => {
@@ -31,6 +32,7 @@ export function DocumentList({
   onDelete,
   isDeleting = false,
   showVisibility = true,
+  viewerBaseHref,
 }: DocumentListProps) {
   const columns: ColumnDef<Document>[] = [
     {
@@ -43,11 +45,21 @@ export function DocumentList({
       id: 'name',
       header: 'Nom',
       accessorKey: 'name',
-      cell: (doc) => (
-        <span className="font-medium truncate max-w-xs" title={doc.name}>
-          {doc.name}
-        </span>
-      ),
+      cell: (doc) =>
+        viewerBaseHref ? (
+          <a
+            href={`${viewerBaseHref}/${doc.id}`}
+            className="font-medium truncate max-w-xs text-primary hover:underline"
+            title={doc.name}
+            data-testid={`doc-link-${doc.id}`}
+          >
+            {doc.name}
+          </a>
+        ) : (
+          <span className="font-medium truncate max-w-xs" title={doc.name}>
+            {doc.name}
+          </span>
+        ),
     },
     {
       id: 'size',

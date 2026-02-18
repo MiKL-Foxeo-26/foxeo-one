@@ -7,14 +7,23 @@ export { DocumentList } from './components/document-list'
 export { DocumentIcon } from './components/document-icon'
 export { DocumentSkeleton } from './components/document-skeleton'
 export { DocumentsPageClient } from './components/documents-page-client'
+export { DocumentViewer } from './components/document-viewer'
+export { DocumentViewerSkeleton } from './components/document-viewer-skeleton'
+export { DocumentMetadataPreview } from './components/document-metadata-preview'
+export { DocumentDownloadButton } from './components/document-download-button'
+export { DocumentVisibilityBadge } from './components/document-visibility-badge'
+export { DocumentViewerPageClient } from './components/document-viewer-page-client'
 
 // Hooks
 export { useDocuments } from './hooks/use-documents'
+export { useDocumentViewer } from './hooks/use-document-viewer'
 
 // Actions
 export { uploadDocument } from './actions/upload-document'
 export { getDocuments } from './actions/get-documents'
 export { deleteDocument } from './actions/delete-document'
+export { getDocumentUrl } from './actions/get-document-url'
+export { generatePdf } from './actions/generate-pdf'
 
 // Types
 export type {
@@ -25,4 +34,6 @@ export type {
   UploadDocumentInput,
   GetDocumentsInput,
   DeleteDocumentInput,
+  GetDocumentUrlInput,
+  GeneratePdfInput,
 } from './types/document.types'

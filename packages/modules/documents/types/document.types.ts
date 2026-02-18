@@ -68,3 +68,13 @@ export const DeleteDocumentInput = z.object({
   documentId: z.string().uuid(),
 })
 export type DeleteDocumentInput = z.infer<typeof DeleteDocumentInput>
+
+export const GetDocumentUrlInput = z.object({
+  documentId: z.string().uuid(),
+})
+export type GetDocumentUrlInput = z.infer<typeof GetDocumentUrlInput>
+
+export const GeneratePdfInput = z.object({
+  documentId: z.string().uuid(),
+})
+export type GeneratePdfInput = z.infer<typeof GeneratePdfInput>

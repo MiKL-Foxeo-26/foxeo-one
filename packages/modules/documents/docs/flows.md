@@ -52,3 +52,32 @@ Document uploade par client → visibility = 'private' (defaut)
   → Operateur voit TOUJOURS (policy documents_select_operator)
   → Client ne voit que ses propres uploads + documents partages
 ```
+
+## Flow 5: Visualisation d'un document
+
+```
+Utilisateur clique sur un document dans la liste
+  → Navigation vers /modules/documents/[documentId]
+  → Server Action getDocumentUrl({ documentId })
+    → RLS verifie l'acces
+    → Genere signed URL (1h)
+  → Selon le type de fichier :
+    → Markdown → fetch contenu via signed URL → rendu HTML (react-markdown)
+    → PDF → affichage iframe avec signed URL
+    → Image → affichage <img> avec signed URL
+    → Autre → apercu metadonnees + bouton telecharger
+```
+
+## Flow 6: Telechargement / Generation PDF
+
+```
+Utilisateur clique "Telecharger" ou "Telecharger en PDF"
+  → Si PDF natif → telechargement direct via signed URL
+  → Si Markdown → Server Action generatePdf({ documentId })
+    → Telecharge contenu Markdown depuis Storage
+    → Convertit Markdown → HTML
+    → Enveloppe dans template PDF brande Foxeo
+    → Retourne HTML brande
+    → Telechargement cote client
+  → Toast "Document telecharge"
+```

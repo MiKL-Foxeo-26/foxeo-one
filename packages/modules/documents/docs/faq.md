@@ -28,3 +28,19 @@ L'erreur est retournee a l'utilisateur. Aucun enregistrement n'est cree en base.
 ## Que se passe-t-il si la DB echoue apres un upload Storage reussi ?
 
 Le fichier uploade est supprime automatiquement du Storage (cleanup). L'erreur DB est retournee.
+
+## Quels formats sont visualisables dans le viewer ?
+
+- **Markdown** (.md) : rendu HTML directement dans le dashboard
+- **PDF** (.pdf) : affiche dans un iframe embarque
+- **Images** (.png, .jpg, .jpeg, .svg) : affichage direct
+- **Autres** (.docx, .xlsx, .csv, .txt) : apercu des metadonnees avec bouton telecharger
+
+## Comment fonctionne le telechargement PDF ?
+
+- Si le document est deja un PDF, il est telecharge directement via signed URL Supabase Storage
+- Si le document est un Markdown, un PDF est genere cote serveur avec le branding Foxeo (header logo, footer date)
+
+## Qu'est-ce qu'un signed URL ?
+
+Une URL temporaire (expire apres 1h) generee cote serveur pour acceder a un fichier dans Supabase Storage. Les chemins internes ne sont jamais exposes au client.
