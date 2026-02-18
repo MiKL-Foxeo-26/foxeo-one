@@ -6,6 +6,7 @@ import type { Message } from '../types/chat.types'
 // Mock the hooks at the top level
 const mockUseChatMessages = vi.fn()
 const mockUseChatRealtime = vi.fn()
+const mockUsePresenceStatus = vi.fn()
 
 vi.mock('../hooks/use-chat-messages', () => ({
   useChatMessages: (...args: unknown[]) => mockUseChatMessages(...args),
@@ -13,6 +14,10 @@ vi.mock('../hooks/use-chat-messages', () => ({
 
 vi.mock('../hooks/use-chat-realtime', () => ({
   useChatRealtime: (...args: unknown[]) => mockUseChatRealtime(...args),
+}))
+
+vi.mock('../hooks/use-presence-status', () => ({
+  usePresenceStatus: (...args: unknown[]) => mockUsePresenceStatus(...args),
 }))
 
 const defaultHookReturn = {
@@ -38,6 +43,7 @@ describe('ChatWindow', () => {
     vi.clearAllMocks()
     mockUseChatMessages.mockReturnValue(defaultHookReturn)
     mockUseChatRealtime.mockReturnValue(undefined)
+    mockUsePresenceStatus.mockReturnValue('offline')
   })
 
   it('renders the chat window container', async () => {
@@ -96,5 +102,38 @@ describe('ChatWindow', () => {
       { wrapper }
     )
     expect(screen.getByText('Hello!')).toBeInTheDocument()
+  })
+
+  // AC3: Operator presence header tests
+  it('shows operator presence header when currentUserType is client', async () => {
+    mockUsePresenceStatus.mockReturnValue('online')
+    const { ChatWindow } = await import('./chat-window')
+    render(
+      <ChatWindow clientId="client-id" operatorId="op-id" currentUserType="client" />,
+      { wrapper }
+    )
+    expect(screen.getByTestId('operator-presence-header')).toBeInTheDocument()
+    expect(screen.getByText('Votre conseiller est en ligne')).toBeInTheDocument()
+  })
+
+  it('shows offline message when operator is offline (client view)', async () => {
+    mockUsePresenceStatus.mockReturnValue('offline')
+    const { ChatWindow } = await import('./chat-window')
+    render(
+      <ChatWindow clientId="client-id" operatorId="op-id" currentUserType="client" />,
+      { wrapper }
+    )
+    expect(screen.getByTestId('operator-presence-header')).toBeInTheDocument()
+    expect(screen.getByText('Votre conseiller vous répondra dès que possible')).toBeInTheDocument()
+  })
+
+  it('does NOT show operator presence header when currentUserType is operator', async () => {
+    mockUsePresenceStatus.mockReturnValue('online')
+    const { ChatWindow } = await import('./chat-window')
+    render(
+      <ChatWindow clientId="client-id" operatorId="op-id" currentUserType="operator" />,
+      { wrapper }
+    )
+    expect(screen.queryByTestId('operator-presence-header')).not.toBeInTheDocument()
   })
 })

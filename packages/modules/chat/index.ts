@@ -8,11 +8,16 @@ export { ChatInput } from './components/chat-input'
 export { ChatList } from './components/chat-list'
 export { ChatSkeleton } from './components/chat-skeleton'
 export { UnreadBadge } from './components/unread-badge'
+export { PresenceIndicator } from './components/presence-indicator'
+export { PresenceProvider, PresenceContext } from './components/presence-provider'
 
 // Hooks
 export { useChatMessages } from './hooks/use-chat-messages'
 export { useConversations } from './hooks/use-conversations'
 export { useChatRealtime } from './hooks/use-chat-realtime'
+export { useChatPresence } from './hooks/use-chat-presence'
+export { usePresenceStatus } from './hooks/use-presence-status'
+export { useOnlineUsers } from './hooks/use-online-users'
 
 // Actions
 export { sendMessage } from './actions/send-message'
@@ -30,3 +35,5 @@ export type {
   GetMessagesInput,
   MarkMessagesReadInput,
 } from './types/chat.types'
+
+export type { PresenceEntry, PresenceStateMap } from './types/presence.types'

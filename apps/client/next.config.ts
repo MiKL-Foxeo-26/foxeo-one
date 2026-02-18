@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     '@foxeo/supabase',
     '@foxeo/utils',
     '@foxeo/types',
+    '@foxeo/modules-chat',
   ],
 }
 

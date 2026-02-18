@@ -1,8 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Avatar, AvatarFallback, Badge, Skeleton } from '@foxeo/ui'
 import { cn } from '@foxeo/utils'
 import { useConversations } from '../hooks/use-conversations'
+import { useOnlineUsers } from '../hooks/use-online-users'
+import { PresenceIndicator } from './presence-indicator'
 import type { Conversation } from '../types/chat.types'
 
 interface ChatListProps {
@@ -39,10 +42,12 @@ function getInitials(name: string): string {
 function ConversationItem({
   conversation,
   isSelected,
+  isOnline,
   onClick,
 }: {
   conversation: Conversation
   isSelected: boolean
+  isOnline: boolean
   onClick: () => void
 }) {
   return (
@@ -56,9 +61,17 @@ function ConversationItem({
       data-testid="conversation-item"
       aria-selected={isSelected}
     >
-      <Avatar className="mt-0.5 h-10 w-10 shrink-0">
-        <AvatarFallback>{getInitials(conversation.clientName)}</AvatarFallback>
-      </Avatar>
+      <div className="relative mt-0.5 shrink-0">
+        <Avatar className="h-10 w-10">
+          <AvatarFallback>{getInitials(conversation.clientName)}</AvatarFallback>
+        </Avatar>
+        {/* AC4: Presence indicator on avatar */}
+        <PresenceIndicator
+          status={isOnline ? 'online' : 'offline'}
+          className="absolute -bottom-0.5 -right-0.5 ring-2 ring-background"
+          data-testid={`presence-${conversation.clientId}`}
+        />
+      </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
@@ -88,6 +101,9 @@ function ConversationItem({
 
 export function ChatList({ selectedClientId, onSelectClient }: ChatListProps) {
   const { data: conversations, isPending } = useConversations()
+  const onlineUsers = useOnlineUsers()
+  // AC4: Sort "En ligne d'abord" toggle
+  const [sortOnlineFirst, setSortOnlineFirst] = useState(false)
 
   if (isPending) {
     return (
@@ -113,16 +129,46 @@ export function ChatList({ selectedClientId, onSelectClient }: ChatListProps) {
     )
   }
 
+  const onlineSet = new Set(onlineUsers)
+
+  const sortedConversations = sortOnlineFirst
+    ? [...conversations].sort((a, b) => {
+        const aOnline = onlineSet.has(a.clientId) ? 1 : 0
+        const bOnline = onlineSet.has(b.clientId) ? 1 : 0
+        return bOnline - aOnline
+      })
+    : conversations
+
   return (
-    <div className="flex flex-col gap-0.5 p-2 overflow-y-auto" data-testid="chat-list">
-      {conversations.map((conversation) => (
-        <ConversationItem
-          key={conversation.clientId}
-          conversation={conversation}
-          isSelected={selectedClientId === conversation.clientId}
-          onClick={() => onSelectClient(conversation.clientId)}
-        />
-      ))}
+    <div className="flex flex-col gap-0" data-testid="chat-list">
+      {/* AC4: Sort toggle */}
+      <div className="flex items-center justify-end px-2 py-1">
+        <button
+          type="button"
+          onClick={() => setSortOnlineFirst((prev) => !prev)}
+          className={cn(
+            'text-xs px-2 py-0.5 rounded transition-colors',
+            sortOnlineFirst
+              ? 'bg-green-500/20 text-green-600'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+          data-testid="sort-online-first-toggle"
+          aria-pressed={sortOnlineFirst}
+        >
+          En ligne d'abord
+        </button>
+      </div>
+      <div className="flex flex-col gap-0.5 px-2 pb-2 overflow-y-auto">
+        {sortedConversations.map((conversation) => (
+          <ConversationItem
+            key={conversation.clientId}
+            conversation={conversation}
+            isSelected={selectedClientId === conversation.clientId}
+            isOnline={onlineSet.has(conversation.clientId)}
+            onClick={() => onSelectClient(conversation.clientId)}
+          />
+        ))}
+      </div>
     </div>
   )
 }

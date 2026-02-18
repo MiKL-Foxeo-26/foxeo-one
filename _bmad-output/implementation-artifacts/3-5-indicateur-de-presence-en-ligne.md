@@ -1,6 +1,6 @@
 # Story 3.5: Indicateur de présence en ligne
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,32 +24,32 @@ So that **je sais si je peux attendre une réponse rapide ou non**.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Hook Presence (AC: #1, #2, #5)
-  - [ ] 1.1 `packages/modules/chat/hooks/use-chat-presence.ts` — Track presence via Supabase Realtime
-  - [ ] 1.2 Sync état : { userId, userType, onlineAt }
-  - [ ] 1.3 Cleanup : unsubscribe on unmount
-  - [ ] 1.4 Heartbeat / reconnection avec timeout 30s
+- [x] Task 1 — Hook Presence (AC: #1, #2, #5)
+  - [x] 1.1 `packages/modules/chat/hooks/use-chat-presence.ts` — Track presence via Supabase Realtime
+  - [x] 1.2 Sync état : { userId, userType, onlineAt }
+  - [x] 1.3 Cleanup : unsubscribe on unmount
+  - [x] 1.4 Heartbeat / reconnection avec timeout 30s
 
-- [ ] Task 2 — Hook lecture présence (AC: #3, #4)
-  - [ ] 2.1 `hooks/use-presence-status.ts` — Lire le statut d'un utilisateur spécifique
-  - [ ] 2.2 `hooks/use-online-users.ts` — Lire la liste de tous les utilisateurs en ligne (pour MiKL)
+- [x] Task 2 — Hook lecture présence (AC: #3, #4)
+  - [x] 2.1 `hooks/use-presence-status.ts` — Lire le statut d'un utilisateur spécifique
+  - [x] 2.2 `hooks/use-online-users.ts` — Lire la liste de tous les utilisateurs en ligne (pour MiKL)
 
-- [ ] Task 3 — Composants UI (AC: #3, #4)
-  - [ ] 3.1 `components/presence-indicator.tsx` — Point vert/gris avec tooltip
-  - [ ] 3.2 Intégrer dans ChatWindow header (statut MiKL pour client)
-  - [ ] 3.3 Intégrer dans ChatList (statut chaque client pour MiKL)
-  - [ ] 3.4 Intégrer dans ClientList du CRM (point présence)
-  - [ ] 3.5 Message "MiKL vous répondra dès que possible" si hors ligne
+- [x] Task 3 — Composants UI (AC: #3, #4)
+  - [x] 3.1 `components/presence-indicator.tsx` — Point vert/gris avec tooltip
+  - [x] 3.2 Intégrer dans ChatWindow header (statut MiKL pour client)
+  - [x] 3.3 Intégrer dans ChatList (statut chaque client pour MiKL)
+  - [x] 3.4 Intégrer dans ClientList du CRM (point présence)
+  - [x] 3.5 Message "MiKL vous répondra dès que possible" si hors ligne
 
-- [ ] Task 4 — Provider Presence (AC: #2)
-  - [ ] 4.1 `components/presence-provider.tsx` — Provider à monter dans le layout dashboard
-  - [ ] 4.2 Track automatiquement la présence de l'utilisateur courant
-  - [ ] 4.3 Monte dans les layouts Hub et Client
+- [x] Task 4 — Provider Presence (AC: #2)
+  - [x] 4.1 `components/presence-provider.tsx` — Provider à monter dans le layout dashboard
+  - [x] 4.2 Track automatiquement la présence de l'utilisateur courant
+  - [x] 4.3 Monte dans les layouts Hub et Client
 
-- [ ] Task 5 — Tests (AC: #6)
-  - [ ] 5.1 Tests hooks : useChatPresence, usePresenceStatus
-  - [ ] 5.2 Tests composants : PresenceIndicator (online/offline states)
-  - [ ] 5.3 Tests edge cases : timeout, reconnexion, multiple onglets
+- [x] Task 5 — Tests (AC: #6)
+  - [x] 5.1 Tests hooks : useChatPresence, usePresenceStatus
+  - [x] 5.2 Tests composants : PresenceIndicator (online/offline states)
+  - [x] 5.3 Tests edge cases : timeout, reconnexion, multiple onglets
 
 ## Dev Notes
 
@@ -170,9 +170,58 @@ Le timeout est géré automatiquement par Supabase — quand la connexion WebSoc
 ## Dev Agent Record
 
 ### Agent Model Used
+claude-sonnet-4-5-20250929 (Amelia — Dev Agent)
 
 ### Debug Log References
+- `createBrowserSupabaseClient` n'existe pas dans `@foxeo/supabase` — le bon export est `createClient`. Corrigé dans tous les nouveaux fichiers.
+- Module isolation respectée : CRM ne peut pas importer depuis `@foxeo/modules-chat`. Solution : composant `PresenceDot` local + prop `onlineUserIds` passée par le parent.
+- Le module chat n'avait pas de `vitest.config.ts` — créé pour l'exécution locale des tests.
 
 ### Completion Notes List
+- **Task 1** : `use-chat-presence.ts` — gère le channel `presence:operator:{operatorId}`, track `{user_id, user_type, online_at}`, cleanup sur unmount. Config `presence.key = userId` gère le timeout 30s Supabase automatiquement.
+- **Task 2** : `use-presence-status.ts` + `use-online-users.ts` — lisent depuis `PresenceContext`, déduplication multi-onglets dans `useOnlineUsers`.
+- **Task 3** : `presence-indicator.tsx` (point vert/gris + aria-label), intégration `ChatWindow` (header opérateur pour client), `ChatList` (avatar overlay + tri "En ligne d'abord"), `ClientList` CRM (col Nom avec `PresenceDot` local).
+- **Task 4** : `presence-provider.tsx` monte une seule fois dans les layouts Hub et Client. Les layouts deviennent `async` pour récupérer `operatorId` côté serveur.
+- **Task 5** : 37 nouveaux tests (7 fichiers). 0 régression. Total suite : 1370 tests passés.
+- **Code Review Fixes** : 8 corrections (4 HIGH, 4 MEDIUM). +6 tests AC3/AC4 (chat-window, chat-list). `useMemo` ajouté (hooks). Layouts refactorisés (1 seul createServerSupabaseClient). CRM `onlineUserIds` câblé. "MiKL" → "Votre conseiller". PresenceIndicator spread rest props. Total : 1376 tests passés.
 
 ### File List
+**Créés :**
+- `packages/modules/chat/types/presence.types.ts`
+- `packages/modules/chat/hooks/use-chat-presence.ts`
+- `packages/modules/chat/hooks/use-chat-presence.test.ts`
+- `packages/modules/chat/hooks/use-presence-status.ts`
+- `packages/modules/chat/hooks/use-presence-status.test.ts`
+- `packages/modules/chat/hooks/use-online-users.ts`
+- `packages/modules/chat/hooks/use-online-users.test.ts`
+- `packages/modules/chat/hooks/use-online-users-dedup.test.ts`
+- `packages/modules/chat/components/presence-indicator.tsx`
+- `packages/modules/chat/components/presence-indicator.test.tsx`
+- `packages/modules/chat/components/presence-provider.tsx`
+- `packages/modules/chat/components/presence-provider.test.tsx`
+- `packages/modules/chat/vitest.config.ts`
+- `packages/modules/crm/components/presence-dot.tsx`
+- `packages/modules/crm/components/presence-dot.test.tsx`
+
+**Modifiés :**
+- `packages/modules/chat/components/chat-window.tsx`
+- `packages/modules/chat/components/chat-window.test.tsx`
+- `packages/modules/chat/components/chat-list.tsx`
+- `packages/modules/chat/components/chat-list.test.tsx`
+- `packages/modules/chat/components/presence-indicator.tsx`
+- `packages/modules/chat/hooks/use-online-users.ts`
+- `packages/modules/chat/hooks/use-presence-status.ts`
+- `packages/modules/chat/index.ts`
+- `packages/modules/crm/components/client-list.tsx`
+- `apps/hub/app/(dashboard)/layout.tsx`
+- `apps/client/app/(dashboard)/layout.tsx`
+- `apps/hub/app/(dashboard)/modules/crm/crm-page-client.tsx`
+- `apps/hub/package.json`
+- `apps/client/package.json`
+- `apps/hub/next.config.ts`
+- `apps/client/next.config.ts`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+## Change Log
+- 2026-02-18 : Story 3.5 implémentée — Indicateur de présence en ligne via Supabase Realtime Presence. Hook `useChatPresence` + `usePresenceStatus` + `useOnlineUsers` + `PresenceProvider` + `PresenceIndicator`. Intégration ChatWindow, ChatList, CRM ClientList, layouts Hub et Client. 37 nouveaux tests.
+- 2026-02-18 : Code review fixes — 8 corrections (H1-H4, M1-M4). Tests AC3/AC4 ajoutés. useMemo hooks. Layouts refactorisés. CRM onlineUserIds câblé. "MiKL" → "Votre conseiller". PresenceIndicator spread rest. 1376 tests passés.

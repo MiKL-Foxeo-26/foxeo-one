@@ -5,9 +5,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ChatList } from './chat-list'
 
 const mockUseConversations = vi.fn()
+const mockUseOnlineUsers = vi.fn()
 
 vi.mock('../hooks/use-conversations', () => ({
   useConversations: (...args: unknown[]) => mockUseConversations(...args),
+}))
+
+vi.mock('../hooks/use-online-users', () => ({
+  useOnlineUsers: () => mockUseOnlineUsers(),
 }))
 
 const defaultConversations = {
@@ -41,6 +46,7 @@ describe('ChatList', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockUseConversations.mockReturnValue(defaultConversations)
+    mockUseOnlineUsers.mockReturnValue([])
   })
 
   it('renders list of conversations', () => {
@@ -83,5 +89,33 @@ describe('ChatList', () => {
     mockUseConversations.mockReturnValue({ data: undefined, isPending: true })
     render(<ChatList onSelectClient={vi.fn()} />, { wrapper })
     expect(screen.getByTestId('chat-list-skeleton')).toBeInTheDocument()
+  })
+
+  // AC4: Presence indicators and sort toggle
+  it('renders presence indicator for each conversation', () => {
+    mockUseOnlineUsers.mockReturnValue(['client-a'])
+    render(<ChatList onSelectClient={vi.fn()} />, { wrapper })
+    expect(screen.getByTestId('presence-client-a')).toBeInTheDocument()
+    expect(screen.getByTestId('presence-client-b')).toBeInTheDocument()
+  })
+
+  it('renders sort toggle button', () => {
+    render(<ChatList onSelectClient={vi.fn()} />, { wrapper })
+    expect(screen.getByTestId('sort-online-first-toggle')).toBeInTheDocument()
+    expect(screen.getByTestId('sort-online-first-toggle')).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('sorts online clients first when toggle is active', async () => {
+    const user = userEvent.setup()
+    mockUseOnlineUsers.mockReturnValue(['client-b'])
+    render(<ChatList onSelectClient={vi.fn()} />, { wrapper })
+
+    const toggle = screen.getByTestId('sort-online-first-toggle')
+    await user.click(toggle)
+
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    const items = screen.getAllByTestId('conversation-item')
+    // client-b is online, should be first
+    expect(items[0]).toHaveTextContent('Bob Dupont')
   })
 })

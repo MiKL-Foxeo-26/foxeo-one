@@ -6,12 +6,15 @@ import { CreateClientDialog } from './create-client-dialog'
 import { ImportCsvDialog } from './import-csv-dialog'
 import { PinButton } from './pin-button'
 import { ClientStatusBadge } from './client-status-badge'
+import { PresenceDot } from './presence-dot'
 import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
 
 interface ClientListProps {
   clients: ClientListItem[]
   onRowClick?: (client: ClientListItem) => void
   showCreateButton?: boolean
+  /** AC4 (Story 3.5): List of client IDs currently online — provided by parent via useOnlineUsers() */
+  onlineUserIds?: string[]
 }
 
 // Type badge variants and labels
@@ -35,7 +38,9 @@ const formatDate = (isoDate: string): string => {
 const isDeferred = (client: ClientListItem): boolean =>
   !!client.deferredUntil && new Date(client.deferredUntil) > new Date()
 
-export function ClientList({ clients, onRowClick, showCreateButton = true }: ClientListProps) {
+export function ClientList({ clients, onRowClick, showCreateButton = true, onlineUserIds = [] }: ClientListProps) {
+  const onlineSet = new Set(onlineUserIds)
+
   const columns: ColumnDef<ClientListItem>[] = [
     {
       id: 'pin',
@@ -51,6 +56,8 @@ export function ClientList({ clients, onRowClick, showCreateButton = true }: Cli
       accessorKey: 'name',
       cell: (client) => (
         <div className="flex items-center gap-2">
+          {/* AC4 (Story 3.5): Realtime presence dot next to client name */}
+          <PresenceDot isOnline={onlineSet.has(client.id)} clientId={client.id} />
           <span>{client.name}</span>
           {isDeferred(client) && (
             <Badge variant="outline" className="text-xs" data-testid={`deferred-badge-${client.id}`}>

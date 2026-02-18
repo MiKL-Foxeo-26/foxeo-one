@@ -5,8 +5,10 @@ import { ScrollArea } from '@foxeo/ui'
 import { ChatMessage } from './chat-message'
 import { ChatInput } from './chat-input'
 import { ChatSkeleton } from './chat-skeleton'
+import { PresenceIndicator } from './presence-indicator'
 import { useChatMessages } from '../hooks/use-chat-messages'
 import { useChatRealtime } from '../hooks/use-chat-realtime'
+import { usePresenceStatus } from '../hooks/use-presence-status'
 import type { SenderType } from '../types/chat.types'
 
 interface ChatWindowProps {
@@ -24,6 +26,9 @@ export function ChatWindow({
 }: ChatWindowProps) {
   const { messages, isPending, isSending, sendMessage } = useChatMessages(clientId)
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  // AC3: Client sees operator presence status
+  const operatorStatus = usePresenceStatus(operatorId)
 
   // Subscribe to realtime updates
   useChatRealtime(clientId)
@@ -63,6 +68,20 @@ export function ChatWindow({
 
   return (
     <div className="flex h-full flex-col" data-testid="chat-window">
+      {/* AC3: Operator presence header — visible to client only */}
+      {currentUserType === 'client' && (
+        <div
+          className="flex items-center gap-2 border-b px-4 py-2 text-sm text-muted-foreground"
+          data-testid="operator-presence-header"
+        >
+          <PresenceIndicator status={operatorStatus} />
+          {operatorStatus === 'online' ? (
+            <span>Votre conseiller est en ligne</span>
+          ) : (
+            <span>Votre conseiller vous répondra dès que possible</span>
+          )}
+        </div>
+      )}
       <ScrollArea className="flex-1 p-4">
         <div className="flex flex-col gap-3">
           {messages.length === 0 ? (

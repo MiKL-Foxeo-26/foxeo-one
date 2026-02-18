@@ -11,6 +11,7 @@ import {
   type ClientFilters,
   type ClientListItem,
 } from '@foxeo/modules-crm'
+import { useOnlineUsers } from '@foxeo/modules-chat'
 
 interface CRMPageClientProps {
   initialClients: ClientListItem[]
@@ -18,6 +19,7 @@ interface CRMPageClientProps {
 
 export function CRMPageClient({ initialClients }: CRMPageClientProps) {
   const router = useRouter()
+  const onlineUserIds = useOnlineUsers()
 
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState<ClientFilters>({})
@@ -100,7 +102,7 @@ export function CRMPageClient({ initialClients }: CRMPageClientProps) {
           onCreateClient={handleCreateClient}
         />
       ) : (
-        <ClientList clients={filteredClients} onRowClick={handleRowClick} />
+        <ClientList clients={filteredClients} onRowClick={handleRowClick} onlineUserIds={onlineUserIds} />
       )}
     </div>
   )
