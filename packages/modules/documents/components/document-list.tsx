@@ -1,19 +1,23 @@
 'use client'
 
+import { useState } from 'react'
 import { DataTable, type ColumnDef } from '@foxeo/ui'
-import { Badge } from '@foxeo/ui'
+import { Badge, Button, Checkbox } from '@foxeo/ui'
 import { Trash2 } from 'lucide-react'
-import { Button } from '@foxeo/ui'
 import { formatFileSize } from '@foxeo/utils'
 import { DocumentIcon } from './document-icon'
+import { DocumentShareButton } from './document-share-button'
+import { useShareDocument } from '../hooks/use-share-document'
 import type { Document } from '../types/document.types'
 
 interface DocumentListProps {
   documents: Document[]
+  clientId?: string
   onDelete?: (documentId: string) => void
   isDeleting?: boolean
   showVisibility?: boolean
   viewerBaseHref?: string
+  showBatchActions?: boolean
 }
 
 const formatDate = (isoDate: string): string => {
@@ -29,12 +33,66 @@ const formatDate = (isoDate: string): string => {
 
 export function DocumentList({
   documents,
+  clientId,
   onDelete,
   isDeleting = false,
   showVisibility = true,
   viewerBaseHref,
+  showBatchActions = false,
 }: DocumentListProps) {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const { shareBatch, isBatchSharing } = useShareDocument(clientId ?? '')
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (selectedIds.size === documents.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(documents.map((d) => d.id)))
+    }
+  }
+
+  const handleBatchShare = () => {
+    if (!clientId || selectedIds.size === 0) return
+    shareBatch(
+      { documentIds: Array.from(selectedIds), clientId },
+      { onSuccess: () => setSelectedIds(new Set()) }
+    )
+  }
+
   const columns: ColumnDef<Document>[] = [
+    ...(showBatchActions
+      ? [
+          {
+            id: 'select',
+            header: () => (
+              <Checkbox
+                checked={documents.length > 0 && selectedIds.size === documents.length}
+                onCheckedChange={toggleAll}
+                aria-label="Tout sélectionner"
+                data-testid="select-all-checkbox"
+              />
+            ),
+            accessorKey: 'id' as const,
+            cell: (doc: Document) => (
+              <Checkbox
+                checked={selectedIds.has(doc.id)}
+                onCheckedChange={() => toggleSelection(doc.id)}
+                aria-label={`Sélectionner ${doc.name}`}
+                data-testid={`select-${doc.id}`}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ),
+          } satisfies ColumnDef<Document>,
+        ]
+      : []),
     {
       id: 'type',
       header: '',
@@ -95,6 +153,18 @@ export function DocumentList({
           } satisfies ColumnDef<Document>,
         ]
       : []),
+    ...(showBatchActions && clientId
+      ? [
+          {
+            id: 'share',
+            header: '',
+            accessorKey: 'id' as const,
+            cell: (doc: Document) => (
+              <DocumentShareButton document={doc} clientId={clientId} />
+            ),
+          } satisfies ColumnDef<Document>,
+        ]
+      : []),
     ...(onDelete
       ? [
           {
@@ -124,6 +194,32 @@ export function DocumentList({
 
   return (
     <div data-testid="document-list">
+      {showBatchActions && selectedIds.size > 0 && (
+        <div
+          className="flex items-center gap-3 px-4 py-2 mb-2 bg-muted rounded-md"
+          data-testid="batch-actions-bar"
+        >
+          <span className="text-sm text-muted-foreground">
+            {selectedIds.size} document{selectedIds.size > 1 ? 's' : ''} sélectionné{selectedIds.size > 1 ? 's' : ''}
+          </span>
+          <Button
+            size="sm"
+            onClick={handleBatchShare}
+            disabled={isBatchSharing}
+            data-testid="batch-share-btn"
+          >
+            Partager la sélection ({selectedIds.size})
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedIds(new Set())}
+            data-testid="clear-selection-btn"
+          >
+            Annuler
+          </Button>
+        </div>
+      )}
       <DataTable
         columns={columns}
         data={documents}

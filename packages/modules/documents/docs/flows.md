@@ -68,6 +68,46 @@ Utilisateur clique sur un document dans la liste
     → Autre → apercu metadonnees + bouton telecharger
 ```
 
+## Flow 6: Partage individuel MiKL → Client
+
+```
+Operateur clique "Partager" sur un document prive (Hub)
+  → Server Action shareDocument(documentId)
+    → Verification auth (getUser)
+    → Verification operateur (operators.auth_user_id)
+    → UPDATE documents SET visibility='shared' WHERE id=documentId
+    → RLS verifie que l'operateur possede ce document
+    → Fire-and-forget : INSERT notifications (client_id, type='document_shared')
+  → Invalidation cache TanStack Query ['documents', clientId]
+  → Badge passe "Prive" → "Partage"
+  → Bouton passe "Partager" → "Partage actif"
+  → Client voit le document dans son dashboard
+
+Operateur clique "Partage actif" → AlertDialog confirmation
+  → Si confirme : Server Action unshareDocument(documentId)
+    → UPDATE documents SET visibility='private'
+  → Badge repasse "Prive"
+  → Client ne voit plus le document
+```
+
+## Flow 7: Partage en lot (batch) MiKL → Client
+
+```
+Operateur coche N documents dans la liste Hub
+  → Barre batch apparait : "N documents selectionnes"
+  → Operateur clique "Partager la selection (N)"
+  → Server Action shareDocumentsBatch({ documentIds: [N ids], clientId })
+    → Validation Zod (array.min(1))
+    → Verification auth
+    → Verification operateur (possede le clientId)
+    → UPDATE documents SET visibility='shared' WHERE id IN (N ids)
+    → Retourne { count: N, documentIds: [...] }
+  → Invalidation cache ['documents', clientId]
+  → Selection effacee automatiquement (onSuccess callback)
+  → Barre batch disparait
+  → N documents passent en "Partage"
+```
+
 ## Flow 6: Telechargement / Generation PDF
 
 ```

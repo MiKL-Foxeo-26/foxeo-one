@@ -12,6 +12,7 @@ interface DocumentsPageClientProps {
   uploadedBy: 'client' | 'operator'
   initialDocuments: Document[]
   showVisibility?: boolean
+  showBatchActions?: boolean
   viewerBaseHref?: string
 }
 
@@ -21,6 +22,7 @@ export function DocumentsPageClient({
   uploadedBy,
   initialDocuments,
   showVisibility = true,
+  showBatchActions = false,
   viewerBaseHref,
 }: DocumentsPageClientProps) {
   const {
@@ -61,9 +63,11 @@ export function DocumentsPageClient({
 
       <DocumentList
         documents={displayDocuments}
+        clientId={clientId}
         onDelete={deleteDocument}
         isDeleting={isDeleting}
         showVisibility={showVisibility}
+        showBatchActions={showBatchActions}
         viewerBaseHref={viewerBaseHref}
       />
     </div>

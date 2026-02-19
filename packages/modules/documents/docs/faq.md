@@ -44,3 +44,19 @@ Le fichier uploade est supprime automatiquement du Storage (cleanup). L'erreur D
 ## Qu'est-ce qu'un signed URL ?
 
 Une URL temporaire (expire apres 1h) generee cote serveur pour acceder a un fichier dans Supabase Storage. Les chemins internes ne sont jamais exposes au client.
+
+## Puis-je retirer un partage apres l'avoir accorde ?
+
+Oui. Cliquez sur **"Partage actif"** dans la liste du Hub. Une boite de confirmation s'affiche avant de repasser le document en `private`. Le client ne verra plus le document dans son dashboard.
+
+## Le client est-il notifie quand je partage un document ?
+
+Oui. Lors du partage individuel (`shareDocument`), une notification est inseree automatiquement en base de donnees. Cette insertion est "fire-and-forget" : si elle echoue, le partage reste valide (l'erreur de notification ne bloque pas l'action).
+
+## Comment fonctionne le partage en lot ?
+
+Selectionnez plusieurs documents avec les cases a cocher dans le Hub, puis cliquez **"Partager la selection"**. Une seule requete SQL met a jour tous les documents selectionnes en `shared`. La selection est automatiquement effacee apres le succes.
+
+## Puis-je partager des documents uploades par le client ?
+
+Oui. L'operateur a toujours acces a tous les documents de son client (policy RLS `documents_select_operator`). Il peut changer leur visibilite en `shared` ou `private`.

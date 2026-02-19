@@ -47,6 +47,7 @@ export default async function ClientDocumentsPage({ params }: Props) {
       uploadedBy="operator"
       initialDocuments={documents ?? []}
       showVisibility
+      showBatchActions
       viewerBaseHref={`/modules/documents/${clientId}`}
     />
   )

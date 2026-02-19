@@ -24,10 +24,31 @@ Le module Documents permet aux clients et operateurs de gerer des fichiers sur l
 | Lab / One | `/modules/documents` | Client voit ses docs + docs partages |
 | Lab / One | `/modules/documents/[documentId]` | Viewer document client |
 
+## Partager des documents avec votre client
+
+L'operateur (MiKL) peut partager des documents prives avec son client via le Hub.
+
+### Partage individuel
+
+Chaque document de la liste dispose d'un bouton **"Partager"**. Un clic passe le document de `private` a `shared` : le client le voit immediatement dans son dashboard. Le client est notifie automatiquement.
+
+Pour retirer le partage, le meme bouton affiche **"Partage actif"**. Un clic ouvre une boite de confirmation avant de repasser le document en `private`.
+
+### Partage en lot (batch)
+
+La liste Hub propose des cases a cocher (`showBatchActions=true`). Apres selection de plusieurs documents, la barre d'actions batch apparait avec le bouton **"Partager la selection (N)"**. Un seul clic partage tous les documents selectionnes en une requete. La selection est effacee automatiquement apres succes.
+
+### Comportement visibilite
+
+| Etat | Client voit | Operateur voit |
+|------|-------------|----------------|
+| `private` | Non | Oui |
+| `shared` | Oui | Oui |
+
 ## Composants disponibles
 
 - `DocumentUpload` — Zone de depot avec validation
-- `DocumentList` — Tableau de documents
+- `DocumentList` — Tableau de documents (+ checkboxes batch si `showBatchActions=true`)
 - `DocumentIcon` — Icone par type de fichier
 - `DocumentSkeleton` — Skeleton loader
 - `DocumentsPageClient` — Page complete (upload + liste)
@@ -37,6 +58,7 @@ Le module Documents permet aux clients et operateurs de gerer des fichiers sur l
 - `DocumentDownloadButton` — Bouton telechargement / generation PDF
 - `DocumentVisibilityBadge` — Badge visibilite (Hub)
 - `DocumentViewerPageClient` — Page viewer complete
+- `DocumentShareButton` — Bouton partager/retirer partage individuel
 
 ## Securite
 

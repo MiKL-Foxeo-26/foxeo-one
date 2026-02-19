@@ -78,3 +78,19 @@ export const GeneratePdfInput = z.object({
   documentId: z.string().uuid(),
 })
 export type GeneratePdfInput = z.infer<typeof GeneratePdfInput>
+
+export const ShareDocumentInput = z.object({
+  documentId: z.string().uuid(),
+})
+export type ShareDocumentInput = z.infer<typeof ShareDocumentInput>
+
+export const UnshareDocumentInput = z.object({
+  documentId: z.string().uuid(),
+})
+export type UnshareDocumentInput = z.infer<typeof UnshareDocumentInput>
+
+export const ShareDocumentsBatchInput = z.object({
+  documentIds: z.array(z.string().uuid()).min(1, 'Au moins un document requis'),
+  clientId: z.string().uuid(),
+})
+export type ShareDocumentsBatchInput = z.infer<typeof ShareDocumentsBatchInput>
