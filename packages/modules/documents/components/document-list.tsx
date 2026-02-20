@@ -18,6 +18,7 @@ interface DocumentListProps {
   showVisibility?: boolean
   viewerBaseHref?: string
   showBatchActions?: boolean
+  searchQuery?: string
 }
 
 const formatDate = (isoDate: string): string => {
@@ -39,9 +40,21 @@ export function DocumentList({
   showVisibility = true,
   viewerBaseHref,
   showBatchActions = false,
+  searchQuery = '',
 }: DocumentListProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const { shareBatch, isBatchSharing } = useShareDocument(clientId ?? '')
+
+  const filteredDocuments = searchQuery.trim()
+    ? documents.filter((d) => {
+        const q = searchQuery.toLowerCase()
+        return (
+          d.name.toLowerCase().includes(q) ||
+          d.fileType.toLowerCase().includes(q) ||
+          d.tags.some((t) => t.toLowerCase().includes(q))
+        )
+      })
+    : documents
 
   const toggleSelection = (id: string) => {
     setSelectedIds((prev) => {
@@ -52,10 +65,10 @@ export function DocumentList({
   }
 
   const toggleAll = () => {
-    if (selectedIds.size === documents.length) {
+    if (selectedIds.size === filteredDocuments.length) {
       setSelectedIds(new Set())
     } else {
-      setSelectedIds(new Set(documents.map((d) => d.id)))
+      setSelectedIds(new Set(filteredDocuments.map((d) => d.id)))
     }
   }
 
@@ -74,7 +87,7 @@ export function DocumentList({
             id: 'select',
             header: () => (
               <Checkbox
-                checked={documents.length > 0 && selectedIds.size === documents.length}
+                checked={filteredDocuments.length > 0 && selectedIds.size === filteredDocuments.length}
                 onCheckedChange={toggleAll}
                 aria-label="Tout sélectionner"
                 data-testid="select-all-checkbox"
@@ -222,8 +235,8 @@ export function DocumentList({
       )}
       <DataTable
         columns={columns}
-        data={documents}
-        emptyMessage="Aucun document"
+        data={filteredDocuments}
+        emptyMessage={searchQuery.trim() ? 'Aucun document trouvé' : 'Aucun document'}
       />
     </div>
   )

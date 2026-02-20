@@ -108,7 +108,7 @@ Operateur coche N documents dans la liste Hub
   → N documents passent en "Partage"
 ```
 
-## Flow 6: Telechargement / Generation PDF
+## Flow 8: Telechargement / Generation PDF
 
 ```
 Utilisateur clique "Telecharger" ou "Telecharger en PDF"
@@ -120,4 +120,50 @@ Utilisateur clique "Telecharger" ou "Telecharger en PDF"
     → Retourne HTML brande
     → Telechargement cote client
   → Toast "Document telecharge"
+```
+
+## Flow 9: Creation d'un dossier
+
+```
+Utilisateur clique "+ Nouveau dossier" dans FolderTree
+  → Dialog s'ouvre avec champ nom
+  → Utilisateur saisit le nom (min 1 char, max 100)
+  → Clic "Creer"
+  → useFolderMutations.useCreateFolder.mutate({ clientId, operatorId, name })
+    → Server Action createFolder()
+      → Verification auth
+      → Validation Zod
+      → INSERT document_folders
+    → Invalidation cache ['folders', clientId]
+  → Nouveau dossier apparait dans l'arborescence
+```
+
+## Flow 10: Deplacement d'un document
+
+```
+Utilisateur survole un document → Menu contextuel "Deplacer vers..."
+  → Selection du dossier cible (ou "Non classes" = null)
+  → useFolderMutations.useMoveDocument.mutate({ documentId, folderId })
+    → Server Action moveDocument()
+      → Verification auth
+      → Verification document existe (RLS)
+      → Verification dossier existe (si folderId non null)
+      → UPDATE documents SET folder_id = folderId
+    → Invalidation cache ['folders', clientId] + ['documents', clientId]
+  → Toast "Document deplace dans {nom_dossier}"
+```
+
+## Flow 11: Recherche dans les documents
+
+```
+Utilisateur tape dans DocumentSearch (debounce 200ms)
+  → searchQuery propagee a DocumentsPageClient
+  → DocumentList recoit searchQuery prop
+  → filteredDocuments = documents.filter(d =>
+      d.name.includes(q) || d.fileType.includes(q) || d.tags.some(t => t.includes(q))
+    )
+  → AUCUNE requete DB supplementaire
+  → Resultats < 1 seconde (cache TanStack Query deja charge)
+  → Si 0 resultats → "Aucun document trouve"
+  → Clic X → clear, tous les documents reapparaissent
 ```

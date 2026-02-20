@@ -14,6 +14,8 @@ Le module Documents permet aux clients et operateurs de gerer des fichiers sur l
 - **Viewer de documents** : Visualisation directe dans le dashboard (Markdown en HTML, PDF en iframe, images)
 - **Telechargement PDF** : Telechargement direct ou generation PDF depuis Markdown avec branding Foxeo
 - **Signed URLs** : Acces securise aux fichiers via URLs temporaires (1h)
+- **Organisation en dossiers** : Arborescence de dossiers pour classer les documents
+- **Recherche** : Filtre en temps reel sur nom, type et tags
 
 ## Acces
 
@@ -23,6 +25,42 @@ Le module Documents permet aux clients et operateurs de gerer des fichiers sur l
 | Hub | `/modules/documents/[clientId]/[documentId]` | Viewer document avec badge visibilite |
 | Lab / One | `/modules/documents` | Client voit ses docs + docs partages |
 | Lab / One | `/modules/documents/[documentId]` | Viewer document client |
+
+## Organisation en dossiers
+
+La page documents affiche un panneau lateral gauche avec l'arborescence de dossiers.
+
+### Noeuds speciaux
+
+- **Tous les documents** : Affiche tous les documents sans filtre (selection par defaut)
+- **Non classes** : Affiche uniquement les documents sans dossier (`folderId = null`)
+
+### Creer un dossier
+
+Cliquer sur **"+ Nouveau dossier"** en bas du panneau. Une boite de dialogue s'ouvre pour saisir le nom. Le dossier apparait immediatement dans l'arborescence.
+
+### Renommer un dossier
+
+Survoler un dossier pour afficher les icones d'action. Cliquer sur l'icone crayon. La meme boite de dialogue que la creation s'ouvre avec le champ pre-rempli.
+
+### Supprimer un dossier
+
+Survoler un dossier et cliquer sur l'icone corbeille. Une boite de confirmation s'affiche. **Important** : seuls les dossiers vides (0 documents) peuvent etre supprimes. Si un dossier contient des documents, deplacer d'abord les documents.
+
+### Deplacer un document
+
+Ouvrir le menu contextuel du document (ou utiliser l'option "Deplacer vers..."). Selectionner le dossier cible. Le document est deplace immediatement. Choisir "Non classes" pour retirer le document de tout dossier.
+
+## Recherche
+
+La barre de recherche en haut de la liste filtre en temps reel (debounce 200ms) sur :
+- **Nom** du document
+- **Type** de fichier (ex : pdf, png)
+- **Tags** associes
+
+La recherche s'effectue sur **toutes les donnees deja chargees** (cache TanStack Query) — aucune requete DB supplementaire n'est effectuee. Les resultats apparaissent en moins de 1 seconde (NFR-P4).
+
+La recherche n'est pas limitee au dossier actif : elle traverse tous les documents du client.
 
 ## Partager des documents avec votre client
 
@@ -48,10 +86,10 @@ La liste Hub propose des cases a cocher (`showBatchActions=true`). Apres selecti
 ## Composants disponibles
 
 - `DocumentUpload` — Zone de depot avec validation
-- `DocumentList` — Tableau de documents (+ checkboxes batch si `showBatchActions=true`)
+- `DocumentList` — Tableau de documents (+ checkboxes batch si `showBatchActions=true`, + filtre `searchQuery`)
 - `DocumentIcon` — Icone par type de fichier
 - `DocumentSkeleton` — Skeleton loader
-- `DocumentsPageClient` — Page complete (upload + liste)
+- `DocumentsPageClient` — Page complete (upload + arborescence + recherche + liste)
 - `DocumentViewer` — Viewer selon type (Markdown, PDF, image, fallback)
 - `DocumentViewerSkeleton` — Skeleton loader du viewer
 - `DocumentMetadataPreview` — Apercu metadonnees pour fichiers non visualisables
@@ -59,9 +97,14 @@ La liste Hub propose des cases a cocher (`showBatchActions=true`). Apres selecti
 - `DocumentVisibilityBadge` — Badge visibilite (Hub)
 - `DocumentViewerPageClient` — Page viewer complete
 - `DocumentShareButton` — Bouton partager/retirer partage individuel
+- `FolderTree` — Arborescence de dossiers avec creation/renommage/suppression
+- `FolderTreeSkeleton` — Skeleton loader de l'arborescence
+- `CreateFolderDialog` — Dialog de creation/renommage de dossier
+- `DocumentSearch` — Champ de recherche avec debounce et clear
 
 ## Securite
 
 - **RLS** : Isolation complete entre clients. Un client ne voit jamais les documents prives d'un autre.
 - **Storage** : Bucket prive avec politiques RLS. Chemins : `{operatorId}/{clientId}/{filename}`
 - **Triple couche** : RLS (DB) + validation serveur (Server Action) + validation client (composant)
+- **Dossiers** : Memes politiques RLS que les documents — isolation par `client_id` et `operator_id`

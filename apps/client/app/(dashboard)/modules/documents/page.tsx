@@ -27,6 +27,7 @@ export default async function ClientDocumentsPage() {
       initialDocuments={documents ?? []}
       showVisibility={false}
       viewerBaseHref="/modules/documents"
+      isOperator={false}
     />
   )
 }

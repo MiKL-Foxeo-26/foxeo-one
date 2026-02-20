@@ -84,7 +84,7 @@ development_status:
   4-1-module-documents-migration-structure-upload-avec-validation: done
   4-2-visualisation-documents-viewer-html-telechargement-pdf: done
   4-3-partage-de-documents-mikl-client-visibilite: done
-  4-4-organisation-en-dossiers-recherche-dans-les-documents: ready-for-dev
+  4-4-organisation-en-dossiers-recherche-dans-les-documents: done
   4-5-synchronisation-documents-vers-dossier-bmad-local: ready-for-dev
   4-6-autosave-brouillons-undo-actions-recentes: ready-for-dev
   4-7-export-documents-en-formats-standards: ready-for-dev

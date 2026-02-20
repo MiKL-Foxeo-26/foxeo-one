@@ -60,3 +60,19 @@ Selectionnez plusieurs documents avec les cases a cocher dans le Hub, puis cliqu
 ## Puis-je partager des documents uploades par le client ?
 
 Oui. L'operateur a toujours acces a tous les documents de son client (policy RLS `documents_select_operator`). Il peut changer leur visibilite en `shared` ou `private`.
+
+## Puis-je supprimer un dossier non vide ?
+
+Non. Un dossier doit etre vide (0 documents) avant de pouvoir etre supprime. L'action `deleteFolder` retourne une erreur `FOLDER_NOT_EMPTY` si des documents sont encore dans le dossier. Deplacez d'abord les documents dans un autre dossier ou dans "Non classes".
+
+## Que devient un document quand son dossier est supprime ?
+
+Le document n'est pas supprime. La colonne `folder_id` est mise a `NULL` automatiquement (contrainte `ON DELETE SET NULL`). Le document apparait dans la vue "Non classes".
+
+## La recherche interroge-t-elle la base de donnees a chaque frappe ?
+
+Non. La recherche s'effectue uniquement sur les donnees deja en cache TanStack Query (filtre JavaScript cote client). Aucune requete DB supplementaire n'est effectuee. La recherche respecte NFR-P4 (< 1 seconde).
+
+## La recherche est-elle limitee au dossier selectionne ?
+
+Non. La recherche traverse tous les documents du client, independamment du dossier actif. C'est un choix delibere : si vous cherchez "contrat" vous trouvez tous vos contrats, meme dans des dossiers differents.

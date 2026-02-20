@@ -49,6 +49,7 @@ export default async function ClientDocumentsPage({ params }: Props) {
       showVisibility
       showBatchActions
       viewerBaseHref={`/modules/documents/${clientId}`}
+      isOperator={true}
     />
   )
 }

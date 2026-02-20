@@ -200,24 +200,41 @@ npm run clean         # Clean builds (turbo clean)
 
 ## Story Pipeline — Enchainement automatique (MUST follow)
 
-Quand le Dev Agent execute une story via `ds` (dev-story workflow), il DOIT enchainer **automatiquement** toutes les etapes suivantes sans attendre d'instruction utilisateur entre chaque etape :
+Le pipeline est en **2 phases** separees par un changement de modele obligatoire pour le Code Review.
+
+### Phase 1 — Dev Story (Sonnet, automatique)
+
+Quand le Dev Agent execute une story via `ds` (dev-story workflow), il DOIT enchainer **automatiquement** les etapes suivantes sans pause :
 
 1. **Dev Story** — Implementer toutes les tasks/subtasks de la story
 2. **Tests** — Lancer `npx vitest run` et verifier 0 echec
-3. **Code Review** — Executer le workflow `code-review` (adversarial, trouver 3-10 issues)
-4. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander
-5. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
-6. **Mettre a jour** — Story file (status → done, completion notes, file list) + sprint-status.yaml
-7. **Commit** — `git add` + `git commit` avec message format : `feat: Story X.Y — Description, code review fixes (N tests)`
-8. **Push** — `git push` vers origin
+
+**⛔ HALT OBLIGATOIRE apres l'etape 2** — Afficher le message suivant et ATTENDRE l'utilisateur :
+
+> **Phase 1 terminee.** Tests : ✅ N tests passing.
+>
+> **Action requise avant de continuer :**
+> 1. Lance `/model` et switche sur **Claude Opus 4.6**
+> 2. Lance `/bmad:bmm:workflows:code-review` en contexte frais
+> 3. Reviens ici et dis **"CR done"** avec la liste des issues trouvees (HIGH/MEDIUM/LOW)
+
+### Phase 2 — Post Code Review (Sonnet, apres retour utilisateur)
+
+A la reception de **"CR done"** + liste des issues :
+
+3. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander
+4. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
+5. **Mettre a jour** — Story file (status → done, completion notes, file list) + sprint-status.yaml
+6. **Commit** — `git add` + `git commit` avec message format : `feat: Story X.Y — Description, code review fixes (N tests)`
+7. **Push** — `git push` vers origin
 
 **Regles pipeline :**
-- Si les tests echouent a l'etape 2 ou 5, corriger et re-tester avant de continuer
+- Si les tests echouent a l'etape 2 ou 4, corriger et re-tester avant de continuer
 - Le code review doit trouver des issues (jamais "looks good") — c'est adversarial par design
 - Les issues LOW du code review sont documentees mais pas forcement fixees
 - Si un fix cree une regression, iterer jusqu'a 0 echec
 - Le commit message suit le pattern des commits existants (voir `git log --oneline -5`)
-- Ne JAMAIS s'arreter entre les etapes pour demander confirmation — le pipeline est autonome
+- La Phase 1 est autonome. La Phase 2 demarre uniquement sur signal "CR done" de l'utilisateur
 
 ## Model Routing — BMAD Agents & Workflows (MUST follow)
 

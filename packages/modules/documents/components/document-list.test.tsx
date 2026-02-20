@@ -93,7 +93,7 @@ const MOCK_DOCS: Document[] = [
     fileType: 'pdf',
     fileSize: 1024 * 500,
     folderId: null,
-    tags: [],
+    tags: ['finance'],
     visibility: 'private',
     uploadedBy: 'operator',
     createdAt: '2026-02-18T10:00:00Z',
@@ -108,7 +108,7 @@ const MOCK_DOCS: Document[] = [
     fileType: 'png',
     fileSize: 2048 * 1024,
     folderId: null,
-    tags: [],
+    tags: ['image'],
     visibility: 'shared',
     uploadedBy: 'client',
     createdAt: '2026-02-18T11:00:00Z',
@@ -188,5 +188,51 @@ describe('DocumentList', () => {
       { documentIds: ['doc-1'], clientId: 'client-1' },
       expect.any(Object)
     )
+  })
+
+  // === Tests filtre searchQuery (Task 7.4) ===
+
+  it('filtre par nom de document', () => {
+    render(
+      <DocumentList documents={MOCK_DOCS} searchQuery="rapport" />,
+      { wrapper: Wrapper }
+    )
+    expect(screen.getByTestId('doc-row-doc-1')).toBeDefined()
+    expect(screen.queryByTestId('doc-row-doc-2')).toBeNull()
+  })
+
+  it('filtre par type de fichier', () => {
+    render(
+      <DocumentList documents={MOCK_DOCS} searchQuery="png" />,
+      { wrapper: Wrapper }
+    )
+    expect(screen.queryByTestId('doc-row-doc-1')).toBeNull()
+    expect(screen.getByTestId('doc-row-doc-2')).toBeDefined()
+  })
+
+  it('filtre par tag', () => {
+    render(
+      <DocumentList documents={MOCK_DOCS} searchQuery="finance" />,
+      { wrapper: Wrapper }
+    )
+    expect(screen.getByTestId('doc-row-doc-1')).toBeDefined()
+    expect(screen.queryByTestId('doc-row-doc-2')).toBeNull()
+  })
+
+  it('affiche "Aucun document trouve" quand aucun resultat', () => {
+    render(
+      <DocumentList documents={MOCK_DOCS} searchQuery="xyznotfound" />,
+      { wrapper: Wrapper }
+    )
+    expect(screen.getByText('Aucun document trouvé')).toBeDefined()
+  })
+
+  it('affiche tous les documents quand searchQuery est vide', () => {
+    render(
+      <DocumentList documents={MOCK_DOCS} searchQuery="" />,
+      { wrapper: Wrapper }
+    )
+    expect(screen.getByTestId('doc-row-doc-1')).toBeDefined()
+    expect(screen.getByTestId('doc-row-doc-2')).toBeDefined()
   })
 })
