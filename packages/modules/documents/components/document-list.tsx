@@ -7,6 +7,7 @@ import { Trash2 } from 'lucide-react'
 import { formatFileSize } from '@foxeo/utils'
 import { DocumentIcon } from './document-icon'
 import { DocumentShareButton } from './document-share-button'
+import { DocumentSyncBadge } from './document-sync-badge'
 import { useShareDocument } from '../hooks/use-share-document'
 import type { Document } from '../types/document.types'
 
@@ -19,6 +20,7 @@ interface DocumentListProps {
   viewerBaseHref?: string
   showBatchActions?: boolean
   searchQuery?: string
+  isOperator?: boolean
 }
 
 const formatDate = (isoDate: string): string => {
@@ -41,6 +43,7 @@ export function DocumentList({
   viewerBaseHref,
   showBatchActions = false,
   searchQuery = '',
+  isOperator = false,
 }: DocumentListProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const { shareBatch, isBatchSharing } = useShareDocument(clientId ?? '')
@@ -174,6 +177,18 @@ export function DocumentList({
             accessorKey: 'id' as const,
             cell: (doc: Document) => (
               <DocumentShareButton document={doc} clientId={clientId} />
+            ),
+          } satisfies ColumnDef<Document>,
+        ]
+      : []),
+    ...(isOperator
+      ? [
+          {
+            id: 'sync',
+            header: 'Sync BMAD',
+            accessorKey: 'lastSyncedAt' as const,
+            cell: (doc: Document) => (
+              <DocumentSyncBadge lastSyncedAt={doc.lastSyncedAt} />
             ),
           } satisfies ColumnDef<Document>,
         ]

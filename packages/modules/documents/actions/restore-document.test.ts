@@ -2,8 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGetUser = vi.fn()
 
-// Update chain (for soft delete)
-const mockUpdateEq = vi.fn()
+// Update chain (for restore)
+const mockNot = vi.fn()
+const mockUpdateEq = vi.fn(() => ({ not: mockNot }))
 const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }))
 
 const mockFrom = vi.fn(() => ({
@@ -19,49 +20,49 @@ vi.mock('@foxeo/supabase', () => ({
 
 const DOC_ID = '00000000-0000-0000-0000-000000000099'
 
-describe('deleteDocument Server Action', () => {
+describe('restoreDocument Server Action', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-id' } }, error: null })
-    mockUpdateEq.mockResolvedValue({ error: null })
+    mockNot.mockResolvedValue({ error: null })
   })
 
   it('returns UNAUTHORIZED when user is not authenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'Not auth' } })
 
-    const { deleteDocument } = await import('./delete-document')
-    const result = await deleteDocument({ documentId: DOC_ID })
+    const { restoreDocument } = await import('./restore-document')
+    const result = await restoreDocument({ documentId: DOC_ID })
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('UNAUTHORIZED')
   })
 
   it('returns VALIDATION_ERROR for invalid documentId', async () => {
-    const { deleteDocument } = await import('./delete-document')
-    const result = await deleteDocument({ documentId: 'not-uuid' })
+    const { restoreDocument } = await import('./restore-document')
+    const result = await restoreDocument({ documentId: 'not-uuid' })
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('VALIDATION_ERROR')
   })
 
-  it('soft deletes document by setting deleted_at timestamp', async () => {
-    const { deleteDocument } = await import('./delete-document')
-    const result = await deleteDocument({ documentId: DOC_ID })
+  it('restores document by setting deleted_at to null', async () => {
+    const { restoreDocument } = await import('./restore-document')
+    const result = await restoreDocument({ documentId: DOC_ID })
 
     expect(result.error).toBeNull()
     expect(result.data).toEqual({ id: DOC_ID })
-    // Should call update with deleted_at timestamp
-    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
-      deleted_at: expect.any(String),
-    }))
+    // Should call update with deleted_at: null
+    expect(mockUpdate).toHaveBeenCalledWith({ deleted_at: null })
     expect(mockUpdateEq).toHaveBeenCalledWith('id', DOC_ID)
+    // Should filter only deleted documents
+    expect(mockNot).toHaveBeenCalledWith('deleted_at', 'is', null)
   })
 
-  it('returns DB_ERROR when soft delete update fails', async () => {
-    mockUpdateEq.mockResolvedValue({ error: { message: 'DB error' } })
+  it('returns DB_ERROR when restore update fails', async () => {
+    mockNot.mockResolvedValue({ error: { message: 'DB error' } })
 
-    const { deleteDocument } = await import('./delete-document')
-    const result = await deleteDocument({ documentId: DOC_ID })
+    const { restoreDocument } = await import('./restore-document')
+    const result = await restoreDocument({ documentId: DOC_ID })
 
     expect(result.data).toBeNull()
     expect(result.error?.code).toBe('DB_ERROR')

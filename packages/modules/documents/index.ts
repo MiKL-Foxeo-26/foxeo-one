@@ -18,6 +18,9 @@ export { FolderTree } from './components/folder-tree'
 export { FolderTreeSkeleton } from './components/folder-tree-skeleton'
 export { CreateFolderDialog } from './components/create-folder-dialog'
 export { DocumentSearch } from './components/document-search'
+export { SyncToZipButton } from './components/sync-to-zip-button'
+export { DocumentSyncBadge } from './components/document-sync-badge'
+export { DraftRestoreBanner } from './components/draft-restore-banner'
 
 // Hooks
 export { useDocuments } from './hooks/use-documents'
@@ -25,11 +28,15 @@ export { useDocumentViewer } from './hooks/use-document-viewer'
 export { useShareDocument } from './hooks/use-share-document'
 export { useFolders } from './hooks/use-folders'
 export { useFolderMutations } from './hooks/use-folder-mutations'
+export { useSyncDocuments } from './hooks/use-sync-documents'
+export { useDraftForm } from './hooks/use-draft-form'
+export { useUndoableAction } from './hooks/use-undo-action'
 
 // Actions
 export { uploadDocument } from './actions/upload-document'
 export { getDocuments } from './actions/get-documents'
 export { deleteDocument } from './actions/delete-document'
+export { restoreDocument, type RestoreDocumentInput } from './actions/restore-document'
 export { getDocumentUrl } from './actions/get-document-url'
 export { generatePdf } from './actions/generate-pdf'
 export { shareDocument } from './actions/share-document'
@@ -40,6 +47,9 @@ export { renameFolder } from './actions/rename-folder'
 export { deleteFolder } from './actions/delete-folder'
 export { getFolders } from './actions/get-folders'
 export { moveDocument } from './actions/move-document'
+export { syncDocumentsToZip } from './actions/sync-documents-to-zip'
+export type { SyncDocumentsResult } from './actions/sync-documents-to-zip'
+export type { ZipFileEntry } from './utils/zip-generator'
 
 // Types
 export type {
@@ -55,6 +65,7 @@ export type {
   ShareDocumentInput,
   UnshareDocumentInput,
   ShareDocumentsBatchInput,
+  SyncDocumentsInput,
 } from './types/document.types'
 
 export type {

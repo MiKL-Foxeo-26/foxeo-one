@@ -62,6 +62,36 @@ La recherche s'effectue sur **toutes les donnees deja chargees** (cache TanStack
 
 La recherche n'est pas limitee au dossier actif : elle traverse tous les documents du client.
 
+## Autosave & Annulation d'actions
+
+### Sauvegarde automatique des brouillons
+
+Les formulaires longs (upload document, creation dossier, edition nom) sauvegardent automatiquement votre travail toutes les **30 secondes** dans le navigateur (localStorage).
+
+**Comment ca marche :**
+1. Vous commencez a remplir un formulaire
+2. Apres 30 secondes d'edition, un brouillon est sauvegarde automatiquement
+3. Si vous fermez la page ou rechargez, un bandeau s'affiche : *"Un brouillon a ete trouve (sauvegarde le {date})"*
+4. Cliquez **"Reprendre"** pour restaurer vos donnees, ou **"Non, recommencer"** pour ignorer le brouillon
+5. Le brouillon est supprime automatiquement apres une soumission reussie
+
+**Note :** Les fichiers binaires (PDF, images) ne sont PAS sauvegardes dans le brouillon — uniquement les champs texte (nom, tags, etc.).
+
+### Annulation d'actions recentes
+
+Certaines actions peuvent etre annulees pendant **5 secondes** apres leur execution :
+- **Suppression de document**
+- **Retrait de partage**
+- **Suppression de dossier**
+
+**Comment ca marche :**
+1. Vous executez une action (ex : suppression d'un document)
+2. Un message de confirmation s'affiche avec un bouton **"Annuler"** et un timer de 5 secondes
+3. Si vous cliquez **"Annuler"** avant expiration, l'action est inversee immediatement
+4. Si vous ne faites rien, l'action devient definitive apres 5 secondes
+
+**Important :** L'annulation n'est possible que pendant les 5 secondes apres l'action. Passé ce délai, il faudra recreer manuellement le document ou dossier supprime.
+
 ## Partager des documents avec votre client
 
 L'operateur (MiKL) peut partager des documents prives avec son client via le Hub.
@@ -83,6 +113,34 @@ La liste Hub propose des cases a cocher (`showBatchActions=true`). Apres selecti
 | `private` | Non | Oui |
 | `shared` | Oui | Oui |
 
+## Synchroniser les documents vers BMAD
+
+L'operateur (MiKL) peut telecharger une archive ZIP de tous les documents `shared` d'un client pour les integrer dans son dossier BMAD local (utilise par Orpheus dans Cursor).
+
+### Comment utiliser
+
+1. Ouvrir la page Documents d'un client dans le Hub (`/modules/documents/[clientId]`)
+2. Cliquer sur le bouton **"Sync vers BMAD (N docs partages)"** en haut a droite
+3. Le ZIP est genere automatiquement cote serveur et le telechargement demarre
+4. Extraire le ZIP dans le dossier BMAD du client (ex: `{workspace}/clients/{clientId}/documents/`)
+5. Orpheus (dans Cursor) peut maintenant acceder aux derniers documents valides
+
+### Quels documents sont inclus ?
+
+Uniquement les documents avec `visibility = 'shared'`. Les documents prives (`private`) ne sont **jamais** inclus dans le ZIP.
+
+### Badge "Synce"
+
+Apres une synchronisation reussie, chaque document inclus affiche un badge **"Synce le {date}"** dans la colonne "Sync BMAD" de la liste. Le badge devient gris apres 7 jours (sync ancienne).
+
+### Limite de taille
+
+Si le total des documents depasse 50 Mo, un avertissement est logue mais le ZIP est genere quand meme. Pour les archives de grande taille, privilegiez un acces direct au bucket Supabase Storage.
+
+### Trace d'activite
+
+Chaque synchronisation est enregistree dans `activity_logs` : `{ action: 'documents_synced', metadata: { count, documentIds, syncedAt } }`.
+
 ## Composants disponibles
 
 - `DocumentUpload` — Zone de depot avec validation
@@ -101,6 +159,8 @@ La liste Hub propose des cases a cocher (`showBatchActions=true`). Apres selecti
 - `FolderTreeSkeleton` — Skeleton loader de l'arborescence
 - `CreateFolderDialog` — Dialog de creation/renommage de dossier
 - `DocumentSearch` — Champ de recherche avec debounce et clear
+- `SyncToZipButton` — Bouton de synchronisation ZIP vers BMAD (Hub uniquement)
+- `DocumentSyncBadge` — Badge "Synce le {date}" par document
 
 ## Securite
 

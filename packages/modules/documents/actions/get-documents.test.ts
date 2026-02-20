@@ -3,7 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockGetUser = vi.fn()
 
 const mockOrder = vi.fn()
-const mockEq = vi.fn(() => ({ order: mockOrder }))
+const mockIs = vi.fn(() => ({ order: mockOrder }))
+const mockEq = vi.fn(() => ({ is: mockIs }))
 const mockSelectAll = vi.fn(() => ({ eq: mockEq }))
 
 const mockFrom = vi.fn(() => ({
@@ -61,6 +62,8 @@ describe('getDocuments Server Action', () => {
           uploaded_by: 'operator',
           created_at: fixedDate,
           updated_at: fixedDate,
+          last_synced_at: null,
+          deleted_at: null,
         },
       ],
       error: null,

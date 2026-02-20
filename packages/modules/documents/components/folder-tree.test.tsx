@@ -30,6 +30,10 @@ vi.mock('@foxeo/ui', () => ({
   Input: ({ value, onChange, ...props }: React.ComponentProps<'input'>) => (
     <input value={value} onChange={onChange} {...props} />
   ),
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }))
 
 // Mock lucide-react

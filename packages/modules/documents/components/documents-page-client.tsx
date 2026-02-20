@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDocuments } from '../hooks/use-documents'
 import { useFolders } from '../hooks/use-folders'
+import { useUndoableAction } from '../hooks/use-undo-action'
+import { restoreDocument } from '../actions/restore-document'
 import { DocumentUpload } from './document-upload'
 import { DocumentList } from './document-list'
 import { DocumentSkeleton } from './document-skeleton'
@@ -40,6 +42,19 @@ export function DocumentsPageClient({
     deleteDocument,
     isDeleting,
   } = useDocuments(clientId)
+
+  const { execute: executeUndo } = useUndoableAction()
+
+  const handleUndoableDelete = useCallback(
+    (documentId: string) => {
+      executeUndo(
+        async () => { deleteDocument(documentId) },
+        async () => { await restoreDocument({ documentId }) },
+        { successMessage: 'Document supprimé' }
+      )
+    },
+    [deleteDocument, executeUndo]
+  )
 
   const { folders, isPending: foldersPending } = useFolders(clientId)
 
@@ -112,12 +127,13 @@ export function DocumentsPageClient({
           <DocumentList
             documents={filteredDocuments}
             clientId={clientId}
-            onDelete={deleteDocument}
+            onDelete={handleUndoableDelete}
             isDeleting={isDeleting}
             showVisibility={showVisibility}
             showBatchActions={showBatchActions}
             viewerBaseHref={viewerBaseHref}
             searchQuery={searchQuery}
+            isOperator={isOperator}
           />
         </div>
       </div>

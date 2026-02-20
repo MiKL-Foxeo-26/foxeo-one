@@ -15,6 +15,7 @@ import {
 } from '@foxeo/ui'
 import type { Document } from '../types/document.types'
 import { useShareDocument } from '../hooks/use-share-document'
+import { useUndoableAction } from '../hooks/use-undo-action'
 
 interface DocumentShareButtonProps {
   document: Document
@@ -23,6 +24,15 @@ interface DocumentShareButtonProps {
 
 export function DocumentShareButton({ document, clientId }: DocumentShareButtonProps) {
   const { share, unshare, isSharing, isUnsharing, shareError, unshareError } = useShareDocument(clientId)
+  const { execute: executeUndo } = useUndoableAction()
+
+  const handleUndoableUnshare = () => {
+    executeUndo(
+      async () => { unshare(document.id) },
+      async () => { share(document.id) },
+      { successMessage: 'Partage retiré' }
+    )
+  }
 
   if (document.visibility === 'private') {
     return (
@@ -60,13 +70,13 @@ export function DocumentShareButton({ document, clientId }: DocumentShareButtonP
         <AlertDialogHeader>
           <AlertDialogTitle>Retirer le partage ?</AlertDialogTitle>
           <AlertDialogDescription>
-            Le client ne pourra plus voir ce document. Cette action peut être annulée en
-            repartageant le document.
+            Le client ne pourra plus voir ce document. Vous pourrez annuler cette action
+            pendant 5 secondes après confirmation.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
-          <AlertDialogAction onClick={() => unshare(document.id)}>
+          <AlertDialogAction onClick={handleUndoableUnshare}>
             Confirmer
           </AlertDialogAction>
         </AlertDialogFooter>

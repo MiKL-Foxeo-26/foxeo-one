@@ -76,3 +76,41 @@ Non. La recherche s'effectue uniquement sur les donnees deja en cache TanStack Q
 ## La recherche est-elle limitee au dossier selectionne ?
 
 Non. La recherche traverse tous les documents du client, independamment du dossier actif. C'est un choix delibere : si vous cherchez "contrat" vous trouvez tous vos contrats, meme dans des dossiers differents.
+
+## Quels documents sont inclus dans le ZIP de synchronisation BMAD ?
+
+Uniquement les documents avec `visibility = 'shared'`. Les documents prives (`visibility = 'private'`) ne sont jamais inclus. Le bouton affiche le nombre de documents partages pour que vous sachiez combien seront inclus avant de cliquer.
+
+## Comment utiliser le ZIP avec Cursor/Orpheus ?
+
+1. Cliquer sur **"Sync vers BMAD"** dans le Hub
+2. Extraire le ZIP telecharge dans le dossier BMAD du client (ex: `.bmad/clients/{clientId}/documents/`)
+3. Orpheus (context IA de Cursor) peut maintenant lire les documents lors des sessions de travail
+
+Le format ZIP utilise la methode "stored" (non compresse) pour une compatibilite maximale avec tous les outils d'extraction.
+
+## Qu'est-ce que la sync automatique (Phase 2) ?
+
+La story 4.5 livre uniquement le mecanisme manuel (bouton ZIP). Une future Phase 2 implementera la synchronisation automatique via une Supabase Edge Function declenchee a chaque partage de document. Cette fonctionnalite necessite un acces reseau au dossier BMAD local (VPN, mount NFS, ou API agent local) et n'est pas encore implementee.
+
+## Combien de temps dure un brouillon sauvegarde ?
+
+Le brouillon est stocke dans le `localStorage` du navigateur. Il persiste tant que vous n'avez pas:
+- Soumis le formulaire avec succes (suppression automatique)
+- Clique sur "Non, recommencer" (suppression manuelle)
+- Vide le cache/cookies du navigateur
+
+En pratique, le brouillon peut persister plusieurs jours ou semaines jusqu'a l'une de ces actions.
+
+## L'annulation est-elle possible apres fermeture du navigateur ?
+
+Non. L'annulation (undo) est uniquement disponible dans les **5 secondes** suivant l'action, via le toast affiche a l'ecran. Si vous fermez la page ou si le delai expire, l'action devient definitive et ne peut plus etre annulee. C'est voulu : l'undo est concu pour corriger des erreurs immediates (clic accidentel), pas pour restaurer des donnees apres coup.
+
+## Quelles actions sont reversibles avec l'undo ?
+
+Actuellement, 3 actions supportent l'undo :
+1. **Suppression de document** : Le document est "soft deleted" (marque `deleted_at`) et peut etre restaure pendant 5 secondes
+2. **Retrait de partage** : Le document repasse en `private` mais peut etre re-partage pendant 5 secondes
+3. **Suppression de dossier** : Le dossier vide est supprime mais peut etre recree avec le meme nom pendant 5 secondes
+
+Les autres actions (upload, creation dossier, renommage) ne supportent pas l'undo car elles ne sont pas destructives.

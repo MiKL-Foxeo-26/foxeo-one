@@ -33,6 +33,10 @@ vi.mock('@foxeo/ui', () => ({
   AlertDialogAction: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
     <button onClick={onClick} data-testid="alert-confirm">{children}</button>
   ),
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }))
 
 const PRIVATE_DOC: Document = {
@@ -49,6 +53,8 @@ const PRIVATE_DOC: Document = {
   uploadedBy: 'operator',
   createdAt: '2026-02-19T10:00:00Z',
   updatedAt: '2026-02-19T10:00:00Z',
+  lastSyncedAt: null,
+  deletedAt: null,
 }
 
 const SHARED_DOC: Document = { ...PRIVATE_DOC, visibility: 'shared' }

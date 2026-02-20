@@ -7,6 +7,7 @@ import { cn } from '@foxeo/utils'
 import type { DocumentFolder } from '../types/folder.types'
 import { CreateFolderDialog } from './create-folder-dialog'
 import { useFolderMutations } from '../hooks/use-folder-mutations'
+import { useUndoableAction } from '../hooks/use-undo-action'
 
 interface FolderTreeProps {
   folders: DocumentFolder[]
@@ -87,6 +88,7 @@ export function FolderTree({
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
 
   const { useCreateFolder, useRenameFolder, useDeleteFolder } = useFolderMutations(clientId)
+  const { execute: executeUndo } = useUndoableAction()
 
   const handleCreate = (name: string) => {
     useCreateFolder.mutate(
@@ -110,17 +112,28 @@ export function FolderTree({
 
   const handleDeleteConfirm = () => {
     if (!folderToDelete) return
-    useDeleteFolder.mutate(
-      { folderId: folderToDelete.id },
-      {
-        onSuccess: () => {
-          if (selectedFolderId === folderToDelete.id) {
-            onSelectFolder(null)
+    const deletedFolder = folderToDelete
+    executeUndo(
+      async () => {
+        useDeleteFolder.mutate(
+          { folderId: deletedFolder.id },
+          {
+            onSuccess: () => {
+              if (selectedFolderId === deletedFolder.id) {
+                onSelectFolder(null)
+              }
+            },
           }
-          setFolderToDelete(null)
-        },
-      }
+        )
+      },
+      async () => {
+        useCreateFolder.mutate(
+          { clientId, operatorId, name: deletedFolder.name, parentId: null }
+        )
+      },
+      { successMessage: `Dossier "${deletedFolder.name}" supprimé` }
     )
+    setFolderToDelete(null)
   }
 
   return (

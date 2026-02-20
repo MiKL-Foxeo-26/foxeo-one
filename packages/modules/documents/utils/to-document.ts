@@ -15,5 +15,7 @@ export function toDocument(row: DocumentDB): Document {
     uploadedBy: row.uploaded_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    lastSyncedAt: row.last_synced_at ?? null,
+    deletedAt: row.deleted_at ?? null,
   }
 }

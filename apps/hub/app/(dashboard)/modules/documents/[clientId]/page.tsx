@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import { getDocuments, DocumentsPageClient } from '@foxeo/module-documents'
+import { SyncToZipButton } from '@foxeo/module-documents'
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -40,16 +41,23 @@ export default async function ClientDocumentsPage({ params }: Props) {
   // Load documents
   const { data: documents } = await getDocuments({ clientId })
 
+  const sharedDocumentCount = (documents ?? []).filter((d) => d.visibility === 'shared').length
+
   return (
-    <DocumentsPageClient
-      clientId={clientId}
-      operatorId={operator.id}
-      uploadedBy="operator"
-      initialDocuments={documents ?? []}
-      showVisibility
-      showBatchActions
-      viewerBaseHref={`/modules/documents/${clientId}`}
-      isOperator={true}
-    />
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-end px-4 pt-4">
+        <SyncToZipButton clientId={clientId} documentCount={sharedDocumentCount} />
+      </div>
+      <DocumentsPageClient
+        clientId={clientId}
+        operatorId={operator.id}
+        uploadedBy="operator"
+        initialDocuments={documents ?? []}
+        showVisibility
+        showBatchActions
+        viewerBaseHref={`/modules/documents/${clientId}`}
+        isOperator={true}
+      />
+    </div>
   )
 }

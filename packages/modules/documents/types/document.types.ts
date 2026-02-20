@@ -21,6 +21,8 @@ export interface Document {
   uploadedBy: UploadedBy
   createdAt: string
   updatedAt: string
+  lastSyncedAt: string | null
+  deletedAt: string | null
 }
 
 // ============================================================
@@ -41,6 +43,8 @@ export interface DocumentDB {
   uploaded_by: UploadedBy
   created_at: string
   updated_at: string
+  last_synced_at: string | null
+  deleted_at: string | null
 }
 
 // ============================================================
@@ -94,3 +98,8 @@ export const ShareDocumentsBatchInput = z.object({
   clientId: z.string().uuid(),
 })
 export type ShareDocumentsBatchInput = z.infer<typeof ShareDocumentsBatchInput>
+
+export const SyncDocumentsInput = z.object({
+  clientId: z.string().uuid(),
+})
+export type SyncDocumentsInput = z.infer<typeof SyncDocumentsInput>

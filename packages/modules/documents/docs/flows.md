@@ -153,7 +153,49 @@ Utilisateur survole un document → Menu contextuel "Deplacer vers..."
   → Toast "Document deplace dans {nom_dossier}"
 ```
 
-## Flow 11: Recherche dans les documents
+## Flow 11: Synchronisation manuelle ZIP vers BMAD
+
+```
+Operateur clique "Sync vers BMAD (N docs partages)" dans la page Hub
+  → SyncToZipButton.handleSync() (useTransition — non bloquant)
+  → Server Action syncDocumentsToZip(clientId)
+    → Verification auth (getUser)
+    → Verification operateur (operators.auth_user_id)
+    → Verification client (appartient a l'operateur)
+    → SELECT documents WHERE client_id=? AND visibility='shared'
+    → Si 0 documents → retourne ZIP vide base64 (count=0)
+    → Pour chaque document : createSignedUrl (5 min TTL)
+    → Si erreur signed URL → retourne STORAGE_ERROR
+    → generateZipFromDocuments([{ name, url }])
+      → Telecharge chaque fichier via fetch(signedUrl)
+      → Construit ZIP format "stored" (sans compression)
+      → Retourne Buffer ZIP
+    → zipBuffer.toString('base64')
+    → UPDATE documents SET last_synced_at=now WHERE id IN (documentIds)
+    → INSERT activity_logs { actor_type='operator', action='documents_synced', metadata }
+    → Retourne { zipBase64, count }
+  → SyncToZipButton decode base64 → Blob
+  → URL.createObjectURL(blob) → telechargement automatique
+  → Toast "Archive ZIP prete (N documents)"
+  → Invalidation cache TanStack Query ['documents', clientId]
+  → DocumentList raffraichit → badges "Synce le {date}" apparaissent
+
+Note: Limite de taille > 50 Mo → warning logue, ZIP genere quand meme
+```
+
+## Flow 11b: Extension Phase 2 — Sync automatique (non implemente)
+
+```
+TODO Phase 2: Sync automatique via Supabase Edge Function
+Trigger: UPDATE sur documents WHERE visibility='shared'
+Edge Function: supabase/functions/sync-document/index.ts
+  - Recupere le fichier depuis Storage
+  - Ecrit dans le dossier BMAD via API filesystem ou mount partage
+  - Met a jour last_synced_at
+Prerequis: acces reseau au dossier BMAD local (VPN, mount NFS, ou API agent local)
+```
+
+## Flow 12: Recherche dans les documents
 
 ```
 Utilisateur tape dans DocumentSearch (debounce 200ms)
@@ -166,4 +208,71 @@ Utilisateur tape dans DocumentSearch (debounce 200ms)
   → Resultats < 1 seconde (cache TanStack Query deja charge)
   → Si 0 resultats → "Aucun document trouve"
   → Clic X → clear, tous les documents reapparaissent
+```
+
+## Flow 13: Autosave de brouillon (formulaires longs)
+
+```
+Utilisateur commence a remplir un formulaire (ex: upload document)
+  → Hook useDraftForm('document-upload', clientId, form) active
+  → form.watch() ecoute les changements de valeurs
+  → Chaque modification → debounce 30 secondes
+  → Apres 30s inactivite → localStorage.setItem(
+      `draft:document-upload:${clientId}`,
+      JSON.stringify({ values: formData, timestamp: Date.now() })
+    )
+  → Log console: "[DOCUMENTS:DRAFT_SAVE] Brouillon sauvegarde"
+
+Utilisateur ferme la page et revient plus tard
+  → Page se charge → useDraftForm detecte brouillon dans localStorage
+  → DraftRestoreBanner s'affiche: "Un brouillon a ete trouve (sauvegarde le {date})"
+  → Utilisateur clique "Reprendre"
+    → form.reset(brouillonValues)
+    → Bandeau disparait
+    → Formulaire pre-rempli
+  → Utilisateur clique "Non, recommencer"
+    → localStorage.removeItem(draftKey)
+    → Bandeau disparait
+    → Formulaire vide
+
+Utilisateur soumet le formulaire avec succes
+  → form.formState.isSubmitSuccessful = true
+  → useEffect detecte isSubmitSuccessful
+  → localStorage.removeItem(draftKey)
+  → Log console: "[DOCUMENTS:DRAFT_CLEAR] Brouillon efface apres soumission"
+```
+
+## Flow 14: Annulation d'action (undo)
+
+```
+Utilisateur clique "Supprimer" sur un document
+  → Hook useUndoableAction() active
+  → Execute l'action immediatement:
+    → Server Action deleteDocument(documentId)
+      → UPDATE documents SET deleted_at=NOW() WHERE id=documentId (soft delete)
+      → Fichier Storage reste present (pour restauration eventuelle)
+    → Optimistic update → document disparait de la liste
+  → Toast.success("Document supprime", {
+      duration: 5000,
+      action: { label: "Annuler", onClick: undoAction }
+    })
+  → Timer 5 secondes visible dans le toast
+
+Utilisateur clique "Annuler" (dans les 5 secondes)
+  → undoAction() execute:
+    → Server Action restoreDocument(documentId)
+      → UPDATE documents SET deleted_at=NULL WHERE id=documentId
+    → Optimistic update → document reapparait
+  → Toast.success("Annulee")
+  → Log console: "[DOCUMENTS:UNDO] Action annulee"
+
+Utilisateur ne clique PAS "Annuler" (timer expire)
+  → Toast disparait apres 5 secondes
+  → Action devient definitive
+  → Document reste marque deleted_at=NOW()
+  → Note: Un job de nettoyage pourrait hard-delete les documents apres X jours
+
+Autres actions undoables:
+- Retrait de partage → undoAction = shareDocument(documentId)
+- Suppression de dossier → undoAction = createFolder({ name, clientId })
 ```
