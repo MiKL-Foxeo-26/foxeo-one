@@ -216,11 +216,11 @@ Quand le Dev Agent execute une story via `ds` (dev-story workflow), il DOIT ench
 > **Action requise avant de continuer :**
 > 1. Lance `/model` et switche sur **Claude Opus 4.6**
 > 2. Lance `/bmad:bmm:workflows:code-review` en contexte frais
-> 3. Reviens ici et dis **"CR done"** avec la liste des issues trouvees (HIGH/MEDIUM/LOW)
+> 3. Dis **"CR done"** pour enchainer les fixes (reste sur Opus)
 
-### Phase 2 — Post Code Review (Sonnet, apres retour utilisateur)
+### Phase 2 — Post Code Review (Opus, meme session)
 
-A la reception de **"CR done"** + liste des issues :
+A la reception de **"CR done"** (on reste sur Opus pour toute la Phase 2) :
 
 3. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander
 4. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
@@ -234,7 +234,7 @@ A la reception de **"CR done"** + liste des issues :
 - Les issues LOW du code review sont documentees mais pas forcement fixees
 - Si un fix cree une regression, iterer jusqu'a 0 echec
 - Le commit message suit le pattern des commits existants (voir `git log --oneline -5`)
-- La Phase 1 est autonome. La Phase 2 demarre uniquement sur signal "CR done" de l'utilisateur
+- La Phase 1 est autonome. La Phase 2 (CR + fixes + commit + push) se fait entierement sur Opus
 
 ## Model Routing — BMAD Agents & Workflows (MUST follow)
 
