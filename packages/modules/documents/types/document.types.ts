@@ -103,3 +103,21 @@ export const SyncDocumentsInput = z.object({
   clientId: z.string().uuid(),
 })
 export type SyncDocumentsInput = z.infer<typeof SyncDocumentsInput>
+
+export const ExportDocumentsInput = z.object({
+  clientId: z.string().uuid('clientId invalide'),
+  format: z.enum(['csv', 'json', 'pdf']),
+})
+export type ExportDocumentsInput = z.infer<typeof ExportDocumentsInput>
+
+export interface DocumentFilters {
+  folderId?: string | null
+  visibility?: DocumentVisibility
+  uploadedBy?: UploadedBy
+}
+
+export interface ExportMetadata {
+  clientId: string
+  exportedAt: string
+  exportedBy: string
+}

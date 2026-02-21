@@ -80,14 +80,14 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Gestion Documentaire (7 stories)
-  epic-4: in-progress
+  epic-4: done
   4-1-module-documents-migration-structure-upload-avec-validation: done
   4-2-visualisation-documents-viewer-html-telechargement-pdf: done
   4-3-partage-de-documents-mikl-client-visibilite: done
   4-4-organisation-en-dossiers-recherche-dans-les-documents: done
   4-5-synchronisation-documents-vers-dossier-bmad-local: done
   4-6-autosave-brouillons-undo-actions-recentes: done
-  4-7-export-documents-en-formats-standards: ready-for-dev
+  4-7-export-documents-en-formats-standards: done
   epic-4-retrospective: optional
 
   # Epic 5: Visioconference & Onboarding Prospect (6 stories)

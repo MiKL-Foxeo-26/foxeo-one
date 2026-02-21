@@ -21,6 +21,7 @@ export { DocumentSearch } from './components/document-search'
 export { SyncToZipButton } from './components/sync-to-zip-button'
 export { DocumentSyncBadge } from './components/document-sync-badge'
 export { DraftRestoreBanner } from './components/draft-restore-banner'
+export { DocumentExportMenu } from './components/document-export-menu'
 
 // Hooks
 export { useDocuments } from './hooks/use-documents'
@@ -31,6 +32,7 @@ export { useFolderMutations } from './hooks/use-folder-mutations'
 export { useSyncDocuments } from './hooks/use-sync-documents'
 export { useDraftForm } from './hooks/use-draft-form'
 export { useUndoableAction } from './hooks/use-undo-action'
+export { useExportDocuments } from './hooks/use-export-documents'
 
 // Actions
 export { uploadDocument } from './actions/upload-document'
@@ -48,6 +50,8 @@ export { deleteFolder } from './actions/delete-folder'
 export { getFolders } from './actions/get-folders'
 export { moveDocument } from './actions/move-document'
 export { syncDocumentsToZip } from './actions/sync-documents-to-zip'
+export { exportDocumentsCSV } from './actions/export-documents-csv'
+export { exportDocumentsJSON } from './actions/export-documents-json'
 export type { SyncDocumentsResult } from './actions/sync-documents-to-zip'
 export type { ZipFileEntry } from './utils/zip-generator'
 
@@ -66,6 +70,9 @@ export type {
   UnshareDocumentInput,
   ShareDocumentsBatchInput,
   SyncDocumentsInput,
+  ExportDocumentsInput,
+  DocumentFilters,
+  ExportMetadata,
 } from './types/document.types'
 
 export type {

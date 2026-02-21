@@ -106,6 +106,21 @@ En pratique, le brouillon peut persister plusieurs jours ou semaines jusqu'a l'u
 
 Non. L'annulation (undo) est uniquement disponible dans les **5 secondes** suivant l'action, via le toast affiche a l'ecran. Si vous fermez la page ou si le delai expire, l'action devient definitive et ne peut plus etre annulee. C'est voulu : l'undo est concu pour corriger des erreurs immediates (clic accidentel), pas pour restaurer des donnees apres coup.
 
+## Quels formats d'export sont disponibles ?
+
+Trois formats sont disponibles via le bouton "Exporter" dans la barre d'outils :
+- **CSV** : export de la liste de documents (compatible tableurs)
+- **JSON** : export de la liste avec metadonnees completes (camelCase)
+- **PDF** : telechargement d'un document individuel (uniquement sur la page viewer)
+
+## Le CSV est-il compatible Excel ?
+
+Oui. Le fichier CSV est genere avec un BOM UTF-8 en debut de fichier (`\uFEFF`). Ce BOM indique a Excel l'encodage du fichier, ce qui permet d'afficher correctement les caracteres accentues (e, a, o, etc.) sans avoir a importer manuellement l'encodage.
+
+## L'export inclut-il les documents prives ?
+
+Oui. L'export CSV et JSON inclut tous vos documents (prives et partages), soumis aux regles RLS habituelles. Le champ "Visibilite" dans le CSV indique "Prive" ou "Partage" pour chaque document. Les documents supprimes (`deleted_at IS NOT NULL`) sont exclus.
+
 ## Quelles actions sont reversibles avec l'undo ?
 
 Actuellement, 3 actions supportent l'undo :

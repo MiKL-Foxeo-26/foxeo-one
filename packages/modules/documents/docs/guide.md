@@ -161,6 +161,44 @@ Chaque synchronisation est enregistree dans `activity_logs` : `{ action: 'docume
 - `DocumentSearch` — Champ de recherche avec debounce et clear
 - `SyncToZipButton` — Bouton de synchronisation ZIP vers BMAD (Hub uniquement)
 - `DocumentSyncBadge` — Badge "Synce le {date}" par document
+- `DocumentExportMenu` — Menu deroulant d'export (CSV, JSON, PDF)
+
+## Exporter vos documents
+
+Le module Documents permet d'exporter la liste de vos documents ou un document individuel dans plusieurs formats standards.
+
+### Bouton "Exporter"
+
+Un bouton **"Exporter"** (icone Download) est disponible dans la barre d'outils au-dessus de la liste de documents. Un clic ouvre un menu deroulant avec les options disponibles.
+
+### Export CSV — Liste de documents
+
+Cliquer sur **"Exporter la liste en CSV"** dans le menu export.
+
+- Le serveur genere un fichier CSV avec BOM UTF-8 (compatible Excel)
+- Colonnes exportees : Nom, Type, Taille, Dossier, Visibilite, Date creation, Date modification
+- Le fichier se telecharge automatiquement dans votre navigateur
+- Nom du fichier : `documents-{clientId8}-{date}.csv`
+
+### Export JSON — Liste de documents
+
+Cliquer sur **"Exporter la liste en JSON"** dans le menu export.
+
+- Format JSON structure avec metadonnees completes (camelCase)
+- Structure racine : `{ exportedAt, exportedBy, clientId, totalCount, documents: [...] }`
+- Le fichier se telecharge automatiquement
+- Nom du fichier : `documents-{clientId8}-{date}.json`
+
+### Telecharger en PDF — Document individuel
+
+Cette option n'est disponible que sur la page viewer d'un document individuel.
+
+- **Fichier PDF natif** : telechargement direct via signed URL Supabase Storage
+- **Fichier Markdown** : generation serveur avec branding Foxeo (header logo, footer date) via `generatePdf()` — identique au bouton telechargement de la story 4.2
+
+### Indicateur de progression
+
+Si l'export prend plus d'une seconde, le bouton affiche **"Export en cours..."** avec un indicateur rotatif (Loader2). Vous pouvez continuer a naviguer pendant la generation — l'export se termine en arriere-plan.
 
 ## Securite
 

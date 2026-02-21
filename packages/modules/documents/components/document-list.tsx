@@ -8,6 +8,7 @@ import { formatFileSize } from '@foxeo/utils'
 import { DocumentIcon } from './document-icon'
 import { DocumentShareButton } from './document-share-button'
 import { DocumentSyncBadge } from './document-sync-badge'
+import { DocumentExportMenu } from './document-export-menu'
 import { useShareDocument } from '../hooks/use-share-document'
 import type { Document } from '../types/document.types'
 
@@ -222,6 +223,11 @@ export function DocumentList({
 
   return (
     <div data-testid="document-list">
+      {clientId && (
+        <div className="flex justify-end mb-2" data-testid="document-list-toolbar">
+          <DocumentExportMenu clientId={clientId} />
+        </div>
+      )}
       {showBatchActions && selectedIds.size > 0 && (
         <div
           className="flex items-center gap-3 px-4 py-2 mb-2 bg-muted rounded-md"

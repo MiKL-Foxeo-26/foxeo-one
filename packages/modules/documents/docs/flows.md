@@ -195,6 +195,75 @@ Edge Function: supabase/functions/sync-document/index.ts
 Prerequis: acces reseau au dossier BMAD local (VPN, mount NFS, ou API agent local)
 ```
 
+## Flow 15: Export CSV de la liste de documents
+
+```
+Utilisateur clique "Exporter" → "Exporter la liste en CSV"
+  → DocumentExportMenu.exportCSV() appele
+  → useExportDocuments.exportCSV() (useTransition — non bloquant)
+  → Server Action exportDocumentsCSV(clientId, filters?)
+    → Verification auth (getUser)
+    → Validation Zod (clientId UUID)
+    → SELECT documents WHERE client_id=? AND deleted_at IS NULL ORDER BY created_at DESC
+    → Application filtres en memoire si fournis (folderId, visibility, uploadedBy)
+    → SELECT document_folders WHERE client_id=?
+    → generateDocumentsCsv(documents, folders)
+      → Genere en-tete CSV (Nom, Type, Taille, Dossier, Visibilite, Date creation, Date modification)
+      → Pour chaque document : ligne CSV avec echappement des virgules/guillemets
+      → Prefixe BOM UTF-8 (\uFEFF)
+    → Retourne { csvContent, fileName, count }
+  → Cote client: Blob CSV → URL.createObjectURL → lien <a> download
+  → Telechargement automatique du fichier
+  → URL.revokeObjectURL apres 1 seconde (cleanup)
+  → Toast "Export CSV telecharge (N documents)"
+  → Log "[DOCUMENTS:EXPORT_CSV] N documents exportes"
+```
+
+## Flow 16: Export JSON de la liste de documents
+
+```
+Utilisateur clique "Exporter" → "Exporter la liste en JSON"
+  → DocumentExportMenu.exportJSON() appele
+  → useExportDocuments.exportJSON() (useTransition — non bloquant)
+  → Server Action exportDocumentsJSON(clientId, filters?)
+    → Verification auth (getUser)
+    → Validation Zod (clientId UUID)
+    → SELECT documents WHERE client_id=? AND deleted_at IS NULL ORDER BY created_at DESC
+    → Application filtres en memoire si fournis
+    → generateDocumentsJson(documents, metadata)
+      → Payload JSON: { exportedAt, exportedBy, clientId, totalCount, documents: [...] }
+      → Chaque document en camelCase: id, name, fileType, fileSize, formattedSize, folderId, visibility, uploadedBy, tags, createdAt, updatedAt
+    → Retourne { jsonContent, fileName, count }
+  → Cote client: Blob JSON → URL.createObjectURL → lien <a> download
+  → Telechargement automatique du fichier
+  → Toast "Export JSON telecharge (N documents)"
+  → Log "[DOCUMENTS:EXPORT_JSON] N documents exportes"
+```
+
+## Flow 17: Telechargement PDF d'un document individuel
+
+```
+Utilisateur (sur page viewer) ouvre "Exporter" → "Telecharger en PDF"
+  → DocumentExportMenu.handleDownloadPdf() appele
+  → useTransition (non bloquant)
+  → Si document.fileType = 'pdf' (natif) :
+    → Server Action getDocumentUrl({ documentId })
+      → Signed URL Supabase Storage (1h)
+    → Lien <a href=signedUrl download target='_blank'>
+    → Telechargement direct du fichier PDF
+    → Log "[DOCUMENTS:EXPORT_PDF] {filename}"
+  → Si document.fileType = 'md' (Markdown) :
+    → Server Action generatePdf({ documentId }) [reutilise story 4.2]
+      → Telecharge contenu Markdown depuis Storage
+      → Convertit Markdown → HTML
+      → Enveloppe dans template brande Foxeo
+      → Retourne { htmlContent, fileName }
+    → Blob HTML → URL.createObjectURL → lien <a> download
+    → Toast "PDF telecharge : {filename}"
+    → Log "[DOCUMENTS:EXPORT_PDF] {filename}"
+  → URL.revokeObjectURL apres 1 seconde
+```
+
 ## Flow 12: Recherche dans les documents
 
 ```
