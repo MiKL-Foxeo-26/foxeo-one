@@ -213,28 +213,26 @@ Quand le Dev Agent execute une story via `ds` (dev-story workflow), il DOIT ench
 
 > **Phase 1 terminee.** Tests : ✅ N tests passing.
 >
-> **Action requise avant de continuer :**
-> 1. Lance `/model` et switche sur **Claude Opus 4.6**
-> 2. Lance `/bmad:bmm:workflows:code-review` en contexte frais
-> 3. Dis **"CR done"** pour enchainer les fixes (reste sur Opus)
+> **Action requise :** Lance `/model`, switche sur **Claude Opus 4.6**, puis dis **"cr"** pour lancer la Phase 2.
 
-### Phase 2 — Post Code Review (Opus, meme session)
+### Phase 2 — Code Review + Fixes + Commit + Push (Opus, entierement automatique)
 
-A la reception de **"CR done"** (on reste sur Opus pour toute la Phase 2) :
+A la reception de **"cr"** (tout s'enchaine automatiquement sans pause, sur Opus) :
 
-3. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander
-4. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
-5. **Mettre a jour** — Story file (status → done, completion notes, file list) + sprint-status.yaml
-6. **Commit** — `git add` + `git commit` avec message format : `feat: Story X.Y — Description, code review fixes (N tests)`
-7. **Push** — `git push` vers origin
+3. **Code Review adversarial** — Executer le workflow code-review (instructions de `_bmad/bmm/workflows/4-implementation/code-review/instructions.xml`) : charger la story, analyser git vs story, verifier chaque AC et task [x], trouver 3-10 issues minimum (JAMAIS "looks good")
+4. **Fix automatique** — Corriger tous les HIGH et MEDIUM trouves, sans demander. Choisir automatiquement l'option [1] (fix them)
+5. **Re-test** — Relancer `npx vitest run` pour confirmer 0 regression apres les fixes
+6. **Mettre a jour** — Story file (status → done, completion notes avec CR fixes, file list) + sprint-status.yaml
+7. **Commit** — `git add` + `git commit` avec message format : `feat: Story X.Y — Description, code review fixes (N tests)`
+8. **Push** — `git push` vers origin
 
 **Regles pipeline :**
-- Si les tests echouent a l'etape 2 ou 4, corriger et re-tester avant de continuer
+- Si les tests echouent a l'etape 2 ou 5, corriger et re-tester avant de continuer
 - Le code review doit trouver des issues (jamais "looks good") — c'est adversarial par design
 - Les issues LOW du code review sont documentees mais pas forcement fixees
 - Si un fix cree une regression, iterer jusqu'a 0 echec
 - Le commit message suit le pattern des commits existants (voir `git log --oneline -5`)
-- La Phase 1 est autonome. La Phase 2 (CR + fixes + commit + push) se fait entierement sur Opus
+- La Phase 1 est autonome sur Sonnet. La Phase 2 s'execute entierement sur Opus, sans aucune pause ni interaction — du CR au push
 
 ## Model Routing — BMAD Agents & Workflows (MUST follow)
 
