@@ -36,6 +36,23 @@ export async function endMeeting(
       return errorResponse('Meeting non actif', 'CONFLICT')
     }
 
+    // Stop OpenVidu recording for this session (non-blocking)
+    if (existing.session_id) {
+      const openviduUrl = process.env.OPENVIDU_URL
+      const openviduSecret = process.env.OPENVIDU_SECRET
+      if (openviduUrl && openviduSecret) {
+        const authHeader = `Basic ${Buffer.from(`OPENVIDUAPP:${openviduSecret}`).toString('base64')}`
+        try {
+          await fetch(`${openviduUrl}/openvidu/api/recordings/stop/${existing.session_id}`, {
+            method: 'POST',
+            headers: { Authorization: authHeader },
+          })
+        } catch (recordingErr) {
+          console.error('[VISIO:END_SESSION] Recording stop failed (non-blocking):', recordingErr)
+        }
+      }
+    }
+
     // Calculer durée
     const endedAt = new Date()
     const startedAt = existing.started_at ? new Date(existing.started_at) : endedAt

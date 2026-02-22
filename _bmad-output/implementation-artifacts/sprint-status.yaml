@@ -93,7 +93,7 @@ development_status:
   # Epic 5: Visioconference & Onboarding Prospect (6 stories)
   epic-5: in-progress
   5-1-module-visio-migration-meetings-salle-de-visio-openvidu: done
-  5-2-enregistrement-visio-transcription-automatique-historique: ready-for-dev
+  5-2-enregistrement-visio-transcription-automatique-historique: done
   5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: ready-for-dev
   5-4-flux-post-visio-onboarding-prospect: ready-for-dev
   5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: ready-for-dev

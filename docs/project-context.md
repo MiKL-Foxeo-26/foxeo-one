@@ -212,7 +212,7 @@ Pas de code conditionnel pour les couleurs — override CSS variables uniquement
 | OpenVidu | Visio | Server Actions + webhooks |
 | Pennylane | Facturation, devis, abonnements, comptabilité | Server Actions proxy API v2 + Edge Function polling (cron 5min) |
 | Cal.com | Prise de RDV | Webhook entrant |
-| Deepgram | Transcription | Edge Function post-recording |
+| OpenAI Whisper | Transcription | Edge Function post-recording |
 | Stripe | Paiements CB | Connecté à Pennylane (réconciliation gérée par Pennylane) |
 
 Services self-hosted (VPS Docker Compose) : OpenVidu, Cal.com.

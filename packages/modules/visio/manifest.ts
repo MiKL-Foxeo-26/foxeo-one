@@ -14,7 +14,8 @@ export const manifest: ModuleManifest = {
   routes: [
     { path: '/modules/visio', component: 'VisioPage' },
     { path: '/modules/visio/:meetingId', component: 'MeetingRoomPage' },
+    { path: '/modules/visio/:meetingId/recordings', component: 'RecordingsPage' },
   ],
-  requiredTables: ['meetings'],
+  requiredTables: ['meetings', 'meeting_recordings'],
   dependencies: [],
 }

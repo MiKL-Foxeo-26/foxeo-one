@@ -47,6 +47,30 @@ export async function startMeeting(
       return errorResponse('Impossible de démarrer la session OpenVidu', 'OPENVIDU_ERROR', tokenResult.error)
     }
 
+    // Start OpenVidu recording for this session (non-blocking)
+    const openviduUrl = process.env.OPENVIDU_URL
+    const openviduSecret = process.env.OPENVIDU_SECRET
+    if (openviduUrl && openviduSecret) {
+      const authHeader = `Basic ${Buffer.from(`OPENVIDUAPP:${openviduSecret}`).toString('base64')}`
+      try {
+        await fetch(`${openviduUrl}/openvidu/api/recordings/start`, {
+          method: 'POST',
+          headers: {
+            Authorization: authHeader,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            session: tokenResult.data.sessionId,
+            outputMode: 'COMPOSED',
+            hasAudio: true,
+            hasVideo: true,
+          }),
+        })
+      } catch (recordingErr) {
+        console.error('[VISIO:START_SESSION] Recording start failed (non-blocking):', recordingErr)
+      }
+    }
+
     // Mettre à jour le meeting
     const { data, error } = await supabase
       .from('meetings')

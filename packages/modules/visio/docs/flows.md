@@ -75,7 +75,75 @@ MiKL (Hub) — Meeting en cours
   └─ Redirige vers /modules/visio
 ```
 
-## Flow 5 : Isolation des données (RLS)
+## Flow 5 : Enregistrement automatique (Story 5.2)
+
+```
+Meeting démarré (startMeeting)
+  │
+  ├─ Appel OpenVidu API: POST /recordings/start
+  │   └─ session, outputMode=COMPOSED, hasAudio=true, hasVideo=true
+  │
+  ├─ Meeting en cours (audio/vidéo enregistrés par OpenVidu)
+  │
+  ├─ Meeting terminé (endMeeting)
+  │   └─ Appel OpenVidu API: POST /recordings/stop/{sessionId}
+  │
+  ├─ OpenVidu envoie webhook: recordingStatusChanged (status=ready)
+  │   └─ Edge Function: openvidu-webhook
+  │       ├─ Vérifie signature webhook
+  │       ├─ Télécharge recording depuis OpenVidu
+  │       ├─ Upload vers Supabase Storage (bucket: recordings)
+  │       ├─ Insert dans meeting_recordings (status=pending)
+  │       └─ Trigger Edge Function: transcribe-recording (fire-and-forget)
+  │
+  └─ Edge Function: transcribe-recording
+      ├─ Download recording depuis Storage
+      ├─ Appel API Whisper (OpenAI) → format SRT
+      ├─ Upload SRT vers Storage (bucket: transcripts)
+      └─ Update meeting_recordings: transcript_url, status=completed
+```
+
+## Flow 6 : Consultation des enregistrements
+
+```
+Utilisateur (MiKL ou Client)
+  │
+  ├─ Navigue vers /modules/visio/[meetingId]/recordings
+  │
+  ├─ Server Component charge les recordings via getMeetingRecordings()
+  │   └─ RLS filtre automatiquement (owner/operator)
+  │
+  ├─ Liste affichée: durée, taille, date, statut transcription
+  │
+  ├─ Actions disponibles:
+  │   ├─ "Lire" → ouvre RecordingPlayer (vidéo + transcription synchronisée)
+  │   ├─ "Vidéo" → downloadRecording() → signed URL → téléchargement
+  │   └─ "Transcription" → downloadTranscript() → signed URL → téléchargement
+  │
+  └─ RecordingPlayer
+      ├─ <video> HTML5 natif avec contrôles
+      ├─ TranscriptViewer charge le SRT via signed URL
+      ├─ Parse SRT → affiche lignes avec timestamps
+      └─ Clic sur ligne → seek vidéo au timestamp correspondant
+```
+
+## Flow 7 : Isolation des recordings (RLS)
+
+```
+Client A (authentifié)
+  │
+  ├─ Tente de lire recordings du Client B
+  │   └─ SELECT * FROM meeting_recordings WHERE meeting_id = <meeting_client_b>
+  │
+  ├─ RLS policy "meeting_recordings_select_owner" évalue:
+  │   WHERE meeting_id IN (SELECT id FROM meetings
+  │     WHERE client_id IN (SELECT id FROM clients WHERE auth_user_id = auth.uid()))
+  │   → auth.uid() ≠ client_b.auth_user_id → AUCUN résultat
+  │
+  └─ Retourne [] — isolation garantie pour les recordings aussi
+```
+
+## Flow 8 : Isolation des données (RLS)
 
 ```
 Client A (authentifié)

@@ -28,7 +28,23 @@ docker compose up -d
 
 ## Q: Les meetings sont-ils enregistrés automatiquement ?
 
-**A:** Pas dans cette story (5.1). L'enregistrement est couvert dans la story 5.2.
+**A:** Oui (depuis Story 5.2). L'enregistrement démarre automatiquement avec `startMeeting()` et s'arrête avec `endMeeting()`. Le webhook OpenVidu notifie la plateforme quand l'enregistrement est prêt, puis la transcription est générée automatiquement via Whisper (OpenAI).
+
+## Q: Comment configurer la transcription automatique ?
+
+**A:** Ajoutez la variable `OPENAI_API_KEY` dans les secrets de la Edge Function `transcribe-recording`. La transcription utilise le modèle `whisper-1` et produit un fichier SRT. La langue par défaut est `fr` (configurable dans `meeting_recordings.transcription_language`).
+
+## Q: Où sont stockés les enregistrements ?
+
+**A:** Dans deux buckets Supabase Storage privés :
+- `recordings` — fichiers vidéo (MP4/WebM)
+- `transcripts` — fichiers SRT de transcription
+
+L'accès se fait uniquement via signed URLs (validité 1h), jamais par URL publique.
+
+## Q: Que se passe-t-il si la transcription échoue ?
+
+**A:** Le statut passe à `failed` dans `meeting_recordings.transcription_status`. L'enregistrement vidéo reste disponible. La transcription peut être relancée manuellement en appelant la Edge Function `transcribe-recording` avec le `meetingId`.
 
 ## Q: Que se passe-t-il si la connexion est coupée ?
 

@@ -268,6 +268,53 @@ export type Database = {
         }
         Relationships: []
       }
+      meeting_recordings: {
+        Row: {
+          id: string
+          meeting_id: string
+          recording_url: string
+          recording_duration_seconds: number
+          file_size_bytes: number
+          transcript_url: string | null
+          transcription_status: 'pending' | 'processing' | 'completed' | 'failed'
+          transcription_language: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          meeting_id: string
+          recording_url: string
+          recording_duration_seconds: number
+          file_size_bytes: number
+          transcript_url?: string | null
+          transcription_status?: 'pending' | 'processing' | 'completed' | 'failed'
+          transcription_language?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          meeting_id?: string
+          recording_url?: string
+          recording_duration_seconds?: number
+          file_size_bytes?: number
+          transcript_url?: string | null
+          transcription_status?: 'pending' | 'processing' | 'completed' | 'failed'
+          transcription_language?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'meeting_recordings_meeting_id_fkey'
+            columns: ['meeting_id']
+            isOneToOne: false
+            referencedRelation: 'meetings'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
