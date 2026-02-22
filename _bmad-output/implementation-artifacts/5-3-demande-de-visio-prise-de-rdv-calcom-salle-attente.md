@@ -1,6 +1,6 @@
 # Story 5.3: Demande de visio, prise de RDV (Cal.com) & salle d'attente
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,65 +24,65 @@ So that **je peux prendre rendez-vous facilement et MiKL contrôle l'entrée dan
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00030_create_meeting_requests.sql`
-  - [ ] 1.2 Table `meeting_requests`
-  - [ ] 1.3 Index : `idx_meeting_requests_client_id`, `idx_meeting_requests_operator_id_status`
-  - [ ] 1.4 Trigger updated_at
-  - [ ] 1.5 RLS policies
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00033_create_meeting_requests.sql` (renommé 00030→00033 car 00030 déjà pris)
+  - [x] 1.2 Table `meeting_requests`
+  - [x] 1.3 Index : `idx_meeting_requests_client_id`, `idx_meeting_requests_operator_id_status`
+  - [x] 1.4 Trigger updated_at
+  - [x] 1.5 RLS policies
 
-- [ ] Task 2 — Cal.com Docker setup (AC: #2)
-  - [ ] 2.1 `docker/calcom/docker-compose.yml` — Service Cal.com self-hosted
-  - [ ] 2.2 Configuration Cal.com : calendrier MiKL, webhook vers Supabase Edge Function
-  - [ ] 2.3 Documentation setup (`docs/calcom-setup.md`)
+- [x] Task 2 — Cal.com Docker setup (AC: #2)
+  - [x] 2.1 `docker/calcom/docker-compose.yml` — Service Cal.com self-hosted
+  - [x] 2.2 Configuration Cal.com : calendrier MiKL, webhook vers Supabase Edge Function
+  - [x] 2.3 Documentation setup (`docs/calcom-setup.md`)
 
-- [ ] Task 3 — Edge Function Cal.com webhook (AC: #2)
-  - [ ] 3.1 `supabase/functions/calcom-webhook/index.ts` — Reçoit événement `BOOKING_CREATED`
-  - [ ] 3.2 Crée `meeting` avec `scheduled_at` du booking
-  - [ ] 3.3 Crée `meeting_request` avec `status='accepted'`, `selected_slot`
-  - [ ] 3.4 Notification client
+- [x] Task 3 — Edge Function Cal.com webhook (AC: #2)
+  - [x] 3.1 `supabase/functions/calcom-webhook/index.ts` — Reçoit événement `BOOKING_CREATED`
+  - [x] 3.2 Crée `meeting` avec `scheduled_at` du booking
+  - [x] 3.3 Crée `meeting_request` avec `status='accepted'`, `selected_slot`
+  - [x] 3.4 Notification client
 
-- [ ] Task 4 — Server Actions demande manuelle (AC: #3)
-  - [ ] 4.1 `actions/request-meeting.ts` — Client crée demande avec 3 créneaux proposés
-  - [ ] 4.2 `actions/accept-meeting-request.ts` — MiKL accepte + sélectionne créneau + crée meeting
-  - [ ] 4.3 `actions/reject-meeting-request.ts` — MiKL refuse avec raison
-  - [ ] 4.4 `actions/get-meeting-requests.ts` — Récupérer demandes (filtré par RLS)
+- [x] Task 4 — Server Actions demande manuelle (AC: #3)
+  - [x] 4.1 `actions/request-meeting.ts` — Client crée demande avec 3 créneaux proposés
+  - [x] 4.2 `actions/accept-meeting-request.ts` — MiKL accepte + sélectionne créneau + crée meeting
+  - [x] 4.3 `actions/reject-meeting-request.ts` — MiKL refuse avec raison
+  - [x] 4.4 `actions/get-meeting-requests.ts` — Récupérer demandes (filtré par RLS)
 
-- [ ] Task 5 — Hooks TanStack Query (AC: #3)
-  - [ ] 5.1 `hooks/use-meeting-requests.ts` — queryKey `['meeting-requests', userId]`
+- [x] Task 5 — Hooks TanStack Query (AC: #3)
+  - [x] 5.1 `hooks/use-meeting-requests.ts` — queryKey `['meeting-requests', status]`
 
-- [ ] Task 6 — Composants UI Cal.com (AC: #2)
-  - [ ] 6.1 `components/calcom-booking-widget.tsx` — Iframe Cal.com
-  - [ ] 6.2 Documentation intégration Cal.com dans module visio
+- [x] Task 6 — Composants UI Cal.com (AC: #2)
+  - [x] 6.1 `components/calcom-booking-widget.tsx` — Iframe Cal.com
+  - [x] 6.2 Documentation intégration Cal.com dans module visio
 
-- [ ] Task 7 — Composants UI demande manuelle (AC: #3)
-  - [ ] 7.1 `components/meeting-request-form.tsx` — Formulaire 3 créneaux + message
-  - [ ] 7.2 `components/meeting-request-list.tsx` — Liste demandes côté MiKL
-  - [ ] 7.3 `components/meeting-request-card.tsx` — Card demande avec actions (accepter/refuser)
+- [x] Task 7 — Composants UI demande manuelle (AC: #3)
+  - [x] 7.1 `components/meeting-request-form.tsx` — Formulaire 3 créneaux + message
+  - [x] 7.2 `components/meeting-request-list.tsx` — Liste demandes côté MiKL
+  - [x] 7.3 `components/meeting-request-card.tsx` — Card demande avec actions (accepter/refuser)
 
-- [ ] Task 8 — Salle d'attente (AC: #4, #5)
-  - [ ] 8.1 `components/meeting-lobby.tsx` — Salle d'attente avec webcam preview
-  - [ ] 8.2 Hook `use-meeting-realtime.ts` — Subscribe channel `meeting:{meetingId}:status`
-  - [ ] 8.3 Broadcast `client_waiting` quand client entre dans lobby
-  - [ ] 8.4 Broadcast `operator_joined` quand MiKL accepte
-  - [ ] 8.5 Redirection automatique client vers salle principale
+- [x] Task 8 — Salle d'attente (AC: #4, #5)
+  - [x] 8.1 `components/meeting-lobby.tsx` — Salle d'attente avec webcam preview
+  - [x] 8.2 Hook `use-meeting-realtime.ts` — Subscribe channel `meeting:{meetingId}:status`
+  - [x] 8.3 Broadcast `client_waiting` quand client entre dans lobby
+  - [x] 8.4 Broadcast `operator_joined` quand MiKL accepte
+  - [x] 8.5 Redirection automatique client vers salle principale
 
-- [ ] Task 9 — Routes (AC: #3, #4)
-  - [ ] 9.1 Hub : `apps/hub/app/(dashboard)/modules/visio/requests/page.tsx` — Liste demandes
-  - [ ] 9.2 Hub : `apps/hub/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx` — Lobby MiKL
-  - [ ] 9.3 Client : `apps/client/app/(dashboard)/modules/visio/request/page.tsx` — Formulaire demande
-  - [ ] 9.4 Client : `apps/client/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx` — Lobby client
+- [x] Task 9 — Routes (AC: #3, #4)
+  - [x] 9.1 Hub : `apps/hub/app/(dashboard)/modules/visio/requests/page.tsx` — Liste demandes
+  - [x] 9.2 Hub : `apps/hub/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx` — Lobby MiKL
+  - [x] 9.3 Client : `apps/client/app/(dashboard)/modules/visio/request/page.tsx` — Formulaire demande
+  - [x] 9.4 Client : `apps/client/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx` — Lobby client
 
-- [ ] Task 10 — Tests (AC: #6)
-  - [ ] 10.1 Tests Edge Function : calcom-webhook
-  - [ ] 10.2 Tests Server Actions : requestMeeting, acceptMeetingRequest, rejectMeetingRequest
-  - [ ] 10.3 Tests composants : MeetingLobby, MeetingRequestForm
-  - [ ] 10.4 Tests RLS : client A ne voit pas demandes client B
-  - [ ] 10.5 Tests Realtime : broadcast client_waiting, operator_joined
+- [x] Task 10 — Tests (AC: #6)
+  - [x] 10.1 Tests Edge Function : calcom-webhook
+  - [x] 10.2 Tests Server Actions : requestMeeting, acceptMeetingRequest, rejectMeetingRequest
+  - [x] 10.3 Tests composants : MeetingLobby, MeetingRequestForm, CalcomBookingWidget, MeetingRequestCard
+  - [x] 10.4 Tests RLS : client A ne voit pas demandes client B
+  - [x] 10.5 Tests Realtime : broadcast client_waiting, operator_joined
 
-- [ ] Task 11 — Documentation (AC: #6)
-  - [ ] 11.1 Mise à jour `docs/guide.md` module visio
-  - [ ] 11.2 `docs/calcom-setup.md` — Setup Cal.com + webhook
+- [x] Task 11 — Documentation (AC: #6)
+  - [x] 11.1 Mise à jour `docs/guide.md` module visio
+  - [x] 11.2 `docs/calcom-setup.md` — Setup Cal.com + webhook
 
 ## Dev Notes
 
@@ -385,9 +385,76 @@ packages/modules/visio/
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+- Migration renommée 00030→00033 car 00030 (documents_soft_delete) et 00031/00032 (meetings/recordings) déjà existants
+- Import `@foxeo/supabase/client` corrigé en `@foxeo/supabase` (pas de subpath export)
+- Tests composants React corrigés pour utiliser `@testing-library/react` (render/screen) au lieu d'appels directs
 
 ### Completion Notes List
+- AC1: Table `meeting_requests` créée via migration 00033 avec tous les champs, index, trigger et 4 policies RLS
+- AC2: Cal.com Docker setup (`docker/calcom/docker-compose.yml`), Edge Function `calcom-webhook` avec vérification signature HMAC, widget iframe `CalcomBookingWidget`
+- AC3: 4 Server Actions (requestMeeting, acceptMeetingRequest, rejectMeetingRequest, getMeetingRequests), hook `useMeetingRequests`, formulaire 3 créneaux, liste demandes MiKL avec cartes accept/reject
+- AC4: Salle d'attente `MeetingLobby` avec Realtime Broadcast, hook `useMeetingRealtime`, broadcast `client_waiting`/`operator_joined`, redirection auto client
+- AC5: Interface MiKL dans lobby avec notification client en attente et bouton "Accepter l'entrée" + startMeeting() pour status in_progress
+- AC6: 102 nouveaux tests co-localisés (1997 total, 0 échecs). Tests migration, Docker, Edge Function, actions, hooks, composants, RLS
+- Manifest visio mis à jour avec 3 nouvelles routes et `meeting_requests` dans `requiredTables`
+- Index.ts barrel mis à jour avec tous les nouveaux exports
+
+### Code Review Fixes (Opus adversarial)
+- **HIGH**: useMeetingRealtime broadcast functions now reuse subscribed channel via ref instead of creating new channels
+- **HIGH**: MeetingLobby handleAdmit now calls startMeeting() to update meeting status to in_progress (AC5)
+- **HIGH**: MeetingRequestCard calls acceptMeetingRequest/rejectMeetingRequest server actions directly (Hub page buttons now functional)
+- **HIGH**: MeetingRequestForm datetime display fixed — uses local time format instead of UTC toISOString()
+- **MEDIUM**: rejectMeetingRequest no longer overwrites client's original message with rejection reason
+- **MEDIUM**: acceptMeetingRequest validates selectedSlot is in requestedSlots
+- **MEDIUM**: Added missing meeting-request-list.test.tsx (3 tests)
 
 ### File List
+
+**Nouveaux fichiers :**
+- `supabase/migrations/00033_create_meeting_requests.sql`
+- `supabase/migrations/00033_create_meeting_requests.test.ts`
+- `supabase/functions/calcom-webhook/index.ts`
+- `docker/calcom/docker-compose.yml`
+- `packages/modules/visio/types/meeting-request.types.ts`
+- `packages/modules/visio/types/meeting-request.types.test.ts`
+- `packages/modules/visio/utils/to-meeting-request.ts`
+- `packages/modules/visio/utils/to-meeting-request.test.ts`
+- `packages/modules/visio/actions/request-meeting.ts`
+- `packages/modules/visio/actions/request-meeting.test.ts`
+- `packages/modules/visio/actions/accept-meeting-request.ts`
+- `packages/modules/visio/actions/accept-meeting-request.test.ts`
+- `packages/modules/visio/actions/reject-meeting-request.ts`
+- `packages/modules/visio/actions/reject-meeting-request.test.ts`
+- `packages/modules/visio/actions/get-meeting-requests.ts`
+- `packages/modules/visio/actions/get-meeting-requests.test.ts`
+- `packages/modules/visio/hooks/use-meeting-requests.ts`
+- `packages/modules/visio/hooks/use-meeting-requests.test.ts`
+- `packages/modules/visio/hooks/use-meeting-realtime.ts`
+- `packages/modules/visio/hooks/use-meeting-realtime.test.ts`
+- `packages/modules/visio/components/calcom-booking-widget.tsx`
+- `packages/modules/visio/components/calcom-booking-widget.test.tsx`
+- `packages/modules/visio/components/meeting-request-form.tsx`
+- `packages/modules/visio/components/meeting-request-form.test.tsx`
+- `packages/modules/visio/components/meeting-request-list.tsx`
+- `packages/modules/visio/components/meeting-request-list.test.tsx`
+- `packages/modules/visio/components/meeting-request-card.tsx`
+- `packages/modules/visio/components/meeting-request-card.test.tsx`
+- `packages/modules/visio/components/meeting-lobby.tsx`
+- `packages/modules/visio/components/meeting-lobby.test.tsx`
+- `packages/modules/visio/docs/calcom-setup.md`
+- `apps/hub/app/(dashboard)/modules/visio/requests/page.tsx`
+- `apps/hub/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx`
+- `apps/client/app/(dashboard)/modules/visio/request/page.tsx`
+- `apps/client/app/(dashboard)/modules/visio/[meetingId]/lobby/page.tsx`
+- `tests/calcom-webhook.test.ts`
+- `tests/docker-calcom.test.ts`
+- `tests/rls-meeting-requests.test.ts`
+
+**Fichiers modifiés :**
+- `packages/modules/visio/manifest.ts` — Ajout routes /requests, /request, /:meetingId/lobby + requiredTables meeting_requests
+- `packages/modules/visio/index.ts` — Ajout exports composants, hooks, actions, types Story 5.3
+- `packages/modules/visio/docs/guide.md` — Ajout section Story 5.3 (architecture, routes, statuts)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status in-progress→review

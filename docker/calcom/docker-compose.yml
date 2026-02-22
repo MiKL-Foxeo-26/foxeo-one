@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  calcom:
+    image: calcom/cal.com:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@calcom-db:5432/calcom
+      - NEXTAUTH_SECRET=${CALCOM_NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=http://localhost:3001
+      - CALENDSO_ENCRYPTION_KEY=${CALCOM_ENCRYPTION_KEY}
+      - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3001
+    depends_on:
+      - calcom-db
+    restart: unless-stopped
+
+  calcom-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=calcom
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - calcom_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  calcom_data:

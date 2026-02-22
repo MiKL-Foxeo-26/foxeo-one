@@ -103,3 +103,65 @@ Variables d'environnement pour les Edge Functions :
 | `processing` | Transcription en cours via Whisper |
 | `completed` | Transcription terminée, SRT disponible |
 | `failed` | Erreur de transcription (retry possible) |
+
+## Demande de visio et salle d'attente (Story 5.3)
+
+### Vue d'ensemble
+
+Les clients peuvent demander un RDV visio via deux méthodes :
+1. **Cal.com** : widget de réservation intégré (self-hosted, Docker)
+2. **Formulaire manuel** : proposition de 3 créneaux horaires + message
+
+MiKL gère les demandes depuis le Hub et contrôle l'admission via une salle d'attente.
+
+### Architecture
+
+```
+Client                     Supabase                    Hub (MiKL)
+  │                            │                           │
+  ├─ Cal.com booking ─────────►│ calcom-webhook            │
+  │   (iframe)                 │── create meeting          │
+  │                            │── create meeting_request  │
+  │                            │── notify client           │
+  │                            │                           │
+  ├─ Manual request ──────────►│ requestMeeting()          │
+  │   (3 créneaux)             │── create meeting_request  │
+  │                            │── notify MiKL ───────────►│
+  │                            │                           ├─ acceptMeetingRequest()
+  │                            │◄─────────────────────────│── create meeting
+  │◄── notification ───────────│                           │── select créneau
+  │                            │                           │
+  ├─ Enter lobby ─────────────►│ Realtime Broadcast        │
+  │   broadcast client_waiting │── channel meeting:X:status│
+  │                            │──────────────────────────►│ "Client en attente"
+  │                            │                           ├─ "Accepter l'entrée"
+  │◄── operator_joined ────────│◄──────────────────────────│
+  │── redirect /visio/X ──────►│                           │
+```
+
+### Routes
+
+| Route | App | Description |
+|-------|-----|-------------|
+| `/modules/visio/request` | Client | Page de demande (Cal.com + formulaire) |
+| `/modules/visio/requests` | Hub | Liste des demandes côté MiKL |
+| `/modules/visio/[meetingId]/lobby` | Both | Salle d'attente (client attend, MiKL admet) |
+
+### Statuts meeting_request
+
+| Statut | Description |
+|--------|-------------|
+| `pending` | Demande envoyée, en attente de réponse MiKL |
+| `accepted` | MiKL a sélectionné un créneau, meeting créé |
+| `rejected` | MiKL a refusé la demande |
+| `completed` | Meeting terminé |
+
+### Cal.com — Configuration
+
+Voir `docs/calcom-setup.md` pour la configuration Docker et webhook.
+
+### Salle d'attente — Realtime
+
+La salle d'attente utilise Supabase Realtime Broadcast (pas Presence) pour les messages custom :
+- `client_waiting` : le client entre dans le lobby
+- `operator_joined` : MiKL accepte l'entrée → client redirigé vers la salle principale
