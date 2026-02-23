@@ -96,7 +96,7 @@ development_status:
   5-2-enregistrement-visio-transcription-automatique-historique: done
   5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: done
   5-4-flux-post-visio-onboarding-prospect: done
-  5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: ready-for-dev
+  5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: done
   5-6-ecran-de-graduation-lab-vers-one: ready-for-dev
   epic-5-retrospective: optional
 

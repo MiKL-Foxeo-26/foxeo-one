@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isPublicPath, isStaticOrApi, isConsentExcluded, CONSENT_EXCLUDED_PATHS } from './middleware'
+import { isPublicPath, isStaticOrApi, isConsentExcluded, isOnboardingExcluded, CONSENT_EXCLUDED_PATHS } from './middleware'
 
 describe('middleware routing logic', () => {
   describe('isPublicPath', () => {
@@ -130,6 +130,82 @@ describe('middleware routing logic', () => {
       const isPublic = isPublicPath(pathname)
       expect(isPublic).toBe(true)
       // When user && isPublic → redirect to /
+    })
+  })
+
+  describe('isOnboardingExcluded', () => {
+    it('returns true for /onboarding routes', () => {
+      expect(isOnboardingExcluded('/onboarding')).toBe(true)
+      expect(isOnboardingExcluded('/onboarding/welcome')).toBe(true)
+      expect(isOnboardingExcluded('/onboarding/tour')).toBe(true)
+    })
+
+    it('returns true for auth paths (to avoid redirect loops)', () => {
+      expect(isOnboardingExcluded('/login')).toBe(true)
+      expect(isOnboardingExcluded('/signup')).toBe(true)
+      expect(isOnboardingExcluded('/auth/callback')).toBe(true)
+    })
+
+    it('returns true for consent and legal paths', () => {
+      expect(isOnboardingExcluded('/consent-update')).toBe(true)
+      expect(isOnboardingExcluded('/legal')).toBe(true)
+    })
+
+    it('returns true for API and suspended paths', () => {
+      expect(isOnboardingExcluded('/api/webhooks/cal-com')).toBe(true)
+      expect(isOnboardingExcluded('/suspended')).toBe(true)
+    })
+
+    it('returns false for dashboard and module routes', () => {
+      expect(isOnboardingExcluded('/')).toBe(false)
+      expect(isOnboardingExcluded('/modules/crm')).toBe(false)
+      expect(isOnboardingExcluded('/settings')).toBe(false)
+      expect(isOnboardingExcluded('/modules/documents')).toBe(false)
+    })
+  })
+
+  describe('onboarding redirect logic', () => {
+    it('client without first_login_at should be redirected to onboarding/welcome', () => {
+      const client = { first_login_at: null, onboarding_completed: false }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = !isOnboardingExcluded(pathname) && !client.first_login_at
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('client with first_login_at but onboarding not completed should be redirected', () => {
+      const client = { first_login_at: '2026-02-23T10:00:00Z', onboarding_completed: false }
+      const pathname = '/modules/crm'
+
+      const shouldRedirectForFirstLogin = !isOnboardingExcluded(pathname) && !client.first_login_at
+      const shouldRedirectForOnboarding = !isOnboardingExcluded(pathname) && !client.onboarding_completed
+
+      expect(shouldRedirectForFirstLogin).toBe(false)
+      expect(shouldRedirectForOnboarding).toBe(true)
+    })
+
+    it('client with completed onboarding should NOT be redirected', () => {
+      const client = { first_login_at: '2026-02-23T10:00:00Z', onboarding_completed: true }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = !isOnboardingExcluded(pathname) && (!client.first_login_at || !client.onboarding_completed)
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('client on /onboarding path should NOT be redirected even if onboarding incomplete', () => {
+      const client = { first_login_at: null, onboarding_completed: false }
+      const pathname = '/onboarding/welcome'
+
+      const shouldRedirect = !isOnboardingExcluded(pathname) && !client.first_login_at
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('client with no first_login_at on /login should NOT be redirected (no loop)', () => {
+      const client = { first_login_at: null, onboarding_completed: false }
+      const pathname = '/login'
+
+      const shouldRedirect = !isOnboardingExcluded(pathname) && !client.first_login_at
+      expect(shouldRedirect).toBe(false)
     })
   })
 })

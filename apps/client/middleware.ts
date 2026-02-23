@@ -5,6 +5,7 @@ import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
 export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended']
+export const ONBOARDING_EXCLUDED_PATHS = ['/onboarding', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended']
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -23,6 +24,12 @@ export function isStaticOrApi(pathname: string): boolean {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/webhooks') ||
     pathname === '/favicon.ico'
+  )
+}
+
+export function isOnboardingExcluded(pathname: string): boolean {
+  return ONBOARDING_EXCLUDED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
   )
 }
 
@@ -60,10 +67,10 @@ export async function middleware(request: NextRequest) {
 
   // Check CGU consent version and client status for authenticated users (exclude specific paths)
   if (user && !isConsentExcluded(request.nextUrl.pathname)) {
-    // Get client info from clients table
+    // Get client info from clients table (include onboarding fields)
     const { data: client } = await supabase
       .from('clients')
-      .select('id, status')
+      .select('id, status, first_login_at, onboarding_completed')
       .eq('auth_user_id', user.id)
       .maybeSingle()
 
@@ -80,6 +87,36 @@ export async function middleware(request: NextRequest) {
       const consentRedirect = await checkConsentVersion(request, client.id)
       if (consentRedirect) {
         return consentRedirect
+      }
+
+      // Onboarding detection — only for non-onboarding paths
+      if (!isOnboardingExcluded(request.nextUrl.pathname)) {
+        // First login detection: first_login_at IS NULL
+        if (!client.first_login_at) {
+          // Record first login timestamp
+          await supabase
+            .from('clients')
+            .update({ first_login_at: new Date().toISOString() })
+            .eq('auth_user_id', user.id)
+
+          console.log('[ONBOARDING:FIRST_LOGIN] Client:', user.id)
+
+          // Redirect to welcome screen
+          const welcomeUrl = request.nextUrl.clone()
+          welcomeUrl.pathname = '/onboarding/welcome'
+          const welcomeResponse = NextResponse.redirect(welcomeUrl)
+          setLocaleCookie(welcomeResponse, locale)
+          return welcomeResponse
+        }
+
+        // Onboarding not completed → redirect to welcome
+        if (!client.onboarding_completed) {
+          const welcomeUrl = request.nextUrl.clone()
+          welcomeUrl.pathname = '/onboarding/welcome'
+          const welcomeResponse = NextResponse.redirect(welcomeUrl)
+          setLocaleCookie(welcomeResponse, locale)
+          return welcomeResponse
+        }
       }
     }
   }
