@@ -1,6 +1,6 @@
 # Story 5.4: Flux post-visio — Onboarding prospect
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,45 +24,45 @@ So that **je peux onboarder efficacement les nouveaux prospects sans friction**.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration DB (AC: #1, #5)
-  - [ ] 1.1 Ajouter colonne `type` à table `meetings` (via migration `00031_add_meetings_type.sql`)
-  - [ ] 1.2 Valeurs possibles : 'standard', 'prospect', 'onboarding', 'support'
-  - [ ] 1.3 Ajouter colonne `metadata` JSONB à table `meetings` (pour raison "pas intéressé", etc.)
+- [x] Task 1 — Migration DB (AC: #1, #5)
+  - [x] 1.1 Ajouter colonne `type` à table `meetings` (via migration `00031_add_meetings_type.sql`)
+  - [x] 1.2 Valeurs possibles : 'standard', 'prospect', 'onboarding', 'support'
+  - [x] 1.3 Ajouter colonne `metadata` JSONB à table `meetings` (pour raison "pas intéressé", etc.)
 
-- [ ] Task 2 — Server Actions (AC: #2, #3, #4, #5)
-  - [ ] 2.1 `actions/create-lab-onboarding.ts` — Crée client + parcours + envoie email bienvenue
-  - [ ] 2.2 `actions/send-prospect-resources.ts` — Génère liens temporaires + envoie email + crée rappel
-  - [ ] 2.3 `actions/schedule-follow-up.ts` — Crée reminder
-  - [ ] 2.4 `actions/mark-prospect-not-interested.ts` — Update meeting metadata
+- [x] Task 2 — Server Actions (AC: #2, #3, #4, #5)
+  - [x] 2.1 `actions/create-lab-onboarding.ts` — Crée client + parcours + envoie email bienvenue
+  - [x] 2.2 `actions/send-prospect-resources.ts` — Génère liens temporaires + envoie email + crée rappel
+  - [x] 2.3 `actions/schedule-follow-up.ts` — Crée reminder
+  - [x] 2.4 `actions/mark-prospect-not-interested.ts` — Update meeting metadata
 
-- [ ] Task 3 — Composants UI (AC: #1, #2, #3, #4, #5)
-  - [ ] 3.1 `components/post-meeting-dialog.tsx` — Dialog avec 4 options
-  - [ ] 3.2 `components/create-lab-form.tsx` — Formulaire création parcours Lab
-  - [ ] 3.3 `components/send-resources-form.tsx` — Sélection documents + email
-  - [ ] 3.4 `components/schedule-follow-up-form.tsx` — Date + message
-  - [ ] 3.5 `components/not-interested-form.tsx` — Raison optionnelle
+- [x] Task 3 — Composants UI (AC: #1, #2, #3, #4, #5)
+  - [x] 3.1 `components/post-meeting-dialog.tsx` — Dialog avec 4 options
+  - [x] 3.2 `components/create-lab-form.tsx` — Formulaire création parcours Lab
+  - [x] 3.3 `components/send-resources-form.tsx` — Sélection documents + email
+  - [x] 3.4 `components/schedule-follow-up-form.tsx` — Date + message
+  - [x] 3.5 `components/not-interested-form.tsx` — Raison optionnelle
 
-- [ ] Task 4 — Intégration module visio (AC: #1)
-  - [ ] 4.1 Modifier `actions/end-meeting.ts` — Détecte `type='prospect'` et déclenche ouverture dialog
-  - [ ] 4.2 Hook `use-post-meeting-dialog.ts` — Gère l'état du dialog
+- [x] Task 4 — Intégration module visio (AC: #1)
+  - [x] 4.1 Modifier `actions/end-meeting.ts` — Détecte `type='prospect'` et déclenche ouverture dialog
+  - [x] 4.2 Hook `use-post-meeting-dialog.ts` — Gère l'état du dialog
 
-- [ ] Task 5 — Edge Function email bienvenue (AC: #2)
-  - [ ] 5.1 Template email "Bienvenue dans Foxeo Lab"
-  - [ ] 5.2 Inclut lien activation compte + premiers pas
-  - [ ] 5.3 Réutilise Edge Function `send-email` de Story 3.3
+- [x] Task 5 — Edge Function email bienvenue (AC: #2)
+  - [x] 5.1 Template email "Bienvenue dans Foxeo Lab"
+  - [x] 5.2 Inclut lien activation compte + premiers pas
+  - [x] 5.3 Réutilise Edge Function `send-email` de Story 3.3
 
-- [ ] Task 6 — Génération liens temporaires (AC: #3)
-  - [ ] 6.1 Utilise Supabase Storage signed URLs (expiration 7 jours)
-  - [ ] 6.2 Fonction helper `generateResourceLinks(documentIds: string[]): Promise<string[]>`
+- [x] Task 6 — Génération liens temporaires (AC: #3)
+  - [x] 6.1 Utilise Supabase Storage signed URLs (expiration 7 jours)
+  - [x] 6.2 Fonction helper `generateResourceLinks(documentIds: string[]): Promise<string[]>`
 
-- [ ] Task 7 — Tests (AC: #6)
-  - [ ] 7.1 Tests Server Actions : createLabOnboarding, sendProspectResources, scheduleFollowUp
-  - [ ] 7.2 Tests composants : PostMeetingDialog, CreateLabForm
-  - [ ] 7.3 Tests intégration : flux complet post-visio → création client Lab
+- [x] Task 7 — Tests (AC: #6)
+  - [x] 7.1 Tests Server Actions : createLabOnboarding, sendProspectResources, scheduleFollowUp
+  - [x] 7.2 Tests composants : PostMeetingDialog, CreateLabForm
+  - [x] 7.3 Tests intégration : flux complet post-visio → création client Lab
 
-- [ ] Task 8 — Documentation (AC: #6)
-  - [ ] 8.1 Mise à jour `docs/guide.md` module visio
-  - [ ] 8.2 Documentation workflow onboarding prospect
+- [x] Task 8 — Documentation (AC: #6)
+  - [x] 8.1 Mise à jour `docs/guide.md` module visio
+  - [x] 8.2 Documentation workflow onboarding prospect
 
 ## Dev Notes
 
@@ -378,8 +378,76 @@ packages/modules/visio/
 
 ### Agent Model Used
 
+claude-sonnet-4-6
+
 ### Debug Log References
+
+- 1 test échec initial (overlay click) → `post-meeting-dialog.test.tsx` ligne 98 : `previousElementSibling` → `firstElementChild`
+- Migration `00031` déjà prise → utilisé `00034_add_meetings_type.sql`
+- Schema `parcours` : champ `active_stages` (pas `steps`), `template_id`, `operator_id` (corrections vs story Dev Notes)
+- Schema `reminders` : pas de `related_entity_type`/`related_entity_id` → adapté actions
+- Module visio sans react-hook-form → composants plain HTML+Tailwind+useState (pattern existant)
+- Prospect sans compte auth → `handleDirectEmail()` ajouté à Edge Function `send-email`
 
 ### Completion Notes List
 
+- Toutes les tasks/subtasks implémentées (Tasks 1–8)
+- 2066 tests passing, 0 failure (suite complète)
+- 81 tests skipped (RLS — require live Supabase)
+- Migration `00034` (type + metadata + clients prospect status)
+- 4 Server Actions créées avec `{ data, error }` pattern
+- 5 composants UI (plain HTML/Tailwind, pas de shadcn)
+- 2 email templates avec XSS protection (escapeHtml)
+- `handleDirectEmail()` ajouté à Edge Function send-email pour envoi sans auth
+- `generateResourceLinks()` utility (signed URLs 7 jours)
+- `usePostMeetingDialog` hook (state management)
+- Tous les exports ajoutés dans `visio/index.ts`
+- Documentation `docs/guide.md` mise à jour (section 5.4)
+- **CR Fixes (Phase 2):**
+  - H1: 3 test files manquants créés (send-resources-form, schedule-follow-up-form, not-interested-form)
+  - H2: generate-resource-links optimisé — batch `.in()` query au lieu de N+1
+  - H3: URL escaping ajouté dans prospect-resources email template (XSS prevention)
+  - M1: post-meeting-dialog — reset selectedAction au close (pas de state stale)
+  - M3: send-prospect-resources — client_id ajouté au reminder via meeting lookup
+  - M4: dead code supprimé dans send-email/index.ts
+
 ### File List
+
+- `supabase/migrations/00034_add_meetings_type.sql` (NEW)
+- `packages/modules/visio/types/meeting.types.ts` (MODIFIED)
+- `packages/modules/visio/types/meeting.types.test.ts` (MODIFIED)
+- `packages/modules/visio/utils/to-meeting.ts` (MODIFIED)
+- `packages/modules/visio/utils/to-meeting.test.ts` (MODIFIED)
+- `packages/modules/visio/utils/generate-resource-links.ts` (NEW)
+- `packages/modules/visio/utils/generate-resource-links.test.ts` (NEW)
+- `packages/modules/visio/actions/end-meeting.ts` (MODIFIED)
+- `packages/modules/visio/actions/end-meeting.test.ts` (MODIFIED)
+- `packages/modules/visio/actions/create-lab-onboarding.ts` (NEW)
+- `packages/modules/visio/actions/create-lab-onboarding.test.ts` (NEW)
+- `packages/modules/visio/actions/send-prospect-resources.ts` (NEW)
+- `packages/modules/visio/actions/send-prospect-resources.test.ts` (NEW)
+- `packages/modules/visio/actions/schedule-follow-up.ts` (NEW)
+- `packages/modules/visio/actions/schedule-follow-up.test.ts` (NEW)
+- `packages/modules/visio/actions/mark-prospect-not-interested.ts` (NEW)
+- `packages/modules/visio/actions/mark-prospect-not-interested.test.ts` (NEW)
+- `packages/modules/visio/hooks/use-post-meeting-dialog.ts` (NEW)
+- `packages/modules/visio/hooks/use-post-meeting-dialog.test.ts` (NEW)
+- `packages/modules/visio/components/post-meeting-dialog.tsx` (NEW)
+- `packages/modules/visio/components/post-meeting-dialog.test.tsx` (NEW)
+- `packages/modules/visio/components/create-lab-form.tsx` (NEW)
+- `packages/modules/visio/components/create-lab-form.test.tsx` (NEW)
+- `packages/modules/visio/components/send-resources-form.tsx` (NEW)
+- `packages/modules/visio/components/send-resources-form.test.tsx` (NEW)
+- `packages/modules/visio/components/schedule-follow-up-form.tsx` (NEW)
+- `packages/modules/visio/components/schedule-follow-up-form.test.tsx` (NEW)
+- `packages/modules/visio/components/not-interested-form.tsx` (NEW)
+- `packages/modules/visio/components/not-interested-form.test.tsx` (NEW)
+- `packages/modules/visio/index.ts` (MODIFIED)
+- `packages/modules/visio/docs/guide.md` (MODIFIED)
+- `supabase/functions/_shared/email-templates/welcome-lab.ts` (NEW)
+- `supabase/functions/_shared/email-templates/welcome-lab.test.ts` (NEW)
+- `supabase/functions/_shared/email-templates/prospect-resources.ts` (NEW)
+- `supabase/functions/_shared/email-templates/prospect-resources.test.ts` (NEW)
+- `supabase/functions/send-email/handler.ts` (MODIFIED)
+- `supabase/functions/send-email/handler.test.ts` (MODIFIED)
+- `supabase/functions/send-email/index.ts` (MODIFIED)

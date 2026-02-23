@@ -5,6 +5,7 @@ import {
   EndMeetingInput,
   GetMeetingsInput,
   MeetingStatusValues,
+  MeetingTypeValues,
 } from './meeting.types'
 
 const VALID_UUID = '00000000-0000-0000-0000-000000000001'
@@ -110,5 +111,14 @@ describe('MeetingStatusValues', () => {
     expect(MeetingStatusValues).toContain('in_progress')
     expect(MeetingStatusValues).toContain('completed')
     expect(MeetingStatusValues).toContain('cancelled')
+  })
+})
+
+describe('MeetingTypeValues', () => {
+  it('contains all expected types', () => {
+    expect(MeetingTypeValues).toContain('standard')
+    expect(MeetingTypeValues).toContain('prospect')
+    expect(MeetingTypeValues).toContain('onboarding')
+    expect(MeetingTypeValues).toContain('support')
   })
 })

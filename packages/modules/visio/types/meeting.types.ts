@@ -7,6 +7,9 @@ import { z } from 'zod'
 export const MeetingStatusValues = ['scheduled', 'in_progress', 'completed', 'cancelled'] as const
 export type MeetingStatus = typeof MeetingStatusValues[number]
 
+export const MeetingTypeValues = ['standard', 'prospect', 'onboarding', 'support'] as const
+export type MeetingType = typeof MeetingTypeValues[number]
+
 export interface Meeting {
   id: string
   clientId: string
@@ -19,6 +22,8 @@ export interface Meeting {
   durationSeconds: number | null
   sessionId: string | null
   status: MeetingStatus
+  type: MeetingType
+  metadata: Record<string, unknown>
   recordingUrl: string | null
   transcriptUrl: string | null
   createdAt: string
@@ -41,6 +46,8 @@ export interface MeetingDB {
   duration_seconds: number | null
   session_id: string | null
   status: MeetingStatus
+  type: MeetingType
+  metadata: Record<string, unknown>
   recording_url: string | null
   transcript_url: string | null
   created_at: string

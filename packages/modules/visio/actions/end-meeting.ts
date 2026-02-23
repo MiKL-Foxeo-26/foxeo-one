@@ -24,7 +24,7 @@ export async function endMeeting(
     // Vérifier que le meeting est bien en cours
     const { data: existing, error: findError } = await supabase
       .from('meetings')
-      .select('id, status, started_at, session_id')
+      .select('id, status, type, started_at, session_id')
       .eq('id', parsed.data.meetingId)
       .single()
 

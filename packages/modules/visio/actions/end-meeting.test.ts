@@ -33,6 +33,8 @@ const mockInProgressMeeting = {
   client_id: CLIENT_ID,
   operator_id: OPERATOR_ID,
   status: 'in_progress',
+  type: 'standard',
+  metadata: {},
   started_at: '2026-03-01T10:00:00.000Z',
   session_id: 'session-123',
 }
@@ -49,6 +51,8 @@ const mockEndedMeetingDB = {
   duration_seconds: 3600,
   session_id: 'session-123',
   status: 'completed',
+  type: 'standard',
+  metadata: {},
   recording_url: null,
   transcript_url: null,
   created_at: '2026-03-01T09:00:00.000Z',
@@ -109,5 +113,23 @@ describe('endMeeting Server Action', () => {
     expect(result.data?.status).toBe('completed')
     expect(result.data?.durationSeconds).toBe(3600)
     expect(result.data?.endedAt).toBe('2026-03-01T11:00:00.000Z')
+    expect(result.data?.type).toBe('standard')
+  })
+
+  it('returns meeting with prospect type so caller can trigger post-meeting dialog', async () => {
+    mockSelectSingle.mockResolvedValue({
+      data: { ...mockInProgressMeeting, type: 'prospect' },
+      error: null,
+    })
+    mockUpdateSingle.mockResolvedValue({
+      data: { ...mockEndedMeetingDB, type: 'prospect' },
+      error: null,
+    })
+
+    const { endMeeting } = await import('./end-meeting')
+    const result = await endMeeting({ meetingId: MEETING_ID })
+
+    expect(result.error).toBeNull()
+    expect(result.data?.type).toBe('prospect')
   })
 })

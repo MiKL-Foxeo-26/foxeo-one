@@ -13,6 +13,8 @@ export function toMeeting(db: MeetingDB): Meeting {
     durationSeconds: db.duration_seconds,
     sessionId: db.session_id,
     status: db.status,
+    type: db.type ?? 'standard',
+    metadata: db.metadata ?? {},
     recordingUrl: db.recording_url,
     transcriptUrl: db.transcript_url,
     createdAt: db.created_at,

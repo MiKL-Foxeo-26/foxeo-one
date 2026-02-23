@@ -186,3 +186,72 @@ describe('handleSendEmail', () => {
     expect(mockInsert).toHaveBeenCalled()
   })
 })
+
+describe('handleDirectEmail', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.resetModules()
+  })
+
+  const config = {
+    supabaseUrl: 'https://test.supabase.co',
+    serviceRoleKey: 'test-key',
+    resendApiKey: 'resend-key',
+    emailFrom: 'noreply@foxeo.io',
+  }
+
+  it('sends welcome-lab email successfully', async () => {
+    mockSendWithRetry.mockResolvedValue(undefined)
+    const { handleDirectEmail } = await import('./handler')
+    const result = await handleDirectEmail(
+      {
+        to: 'prospect@example.com',
+        template: 'welcome-lab',
+        data: { clientName: 'Alice', parcoursName: 'Parcours Complet', activationLink: 'https://lab.foxeo.io/activate' },
+      },
+      config
+    )
+    expect(result.success).toBe(true)
+    expect(mockSendWithRetry).toHaveBeenCalledOnce()
+  })
+
+  it('sends prospect-resources email successfully', async () => {
+    mockSendWithRetry.mockResolvedValue(undefined)
+    const { handleDirectEmail } = await import('./handler')
+    const result = await handleDirectEmail(
+      {
+        to: 'prospect@example.com',
+        template: 'prospect-resources',
+        data: { links: [{ name: 'Guide.pdf', url: 'https://storage.example.com/guide.pdf' }] },
+      },
+      config
+    )
+    expect(result.success).toBe(true)
+    expect(mockSendWithRetry).toHaveBeenCalledOnce()
+  })
+
+  it('returns error for unknown template', async () => {
+    const { handleDirectEmail } = await import('./handler')
+    const result = await handleDirectEmail(
+      { to: 'test@example.com', template: 'unknown-template' as 'welcome-lab', data: {} },
+      config
+    )
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('Unknown direct template')
+  })
+
+  it('returns error when email client throws', async () => {
+    mockSendWithRetry.mockRejectedValue(new Error('SMTP connection failed'))
+    const { handleDirectEmail } = await import('./handler')
+    const result = await handleDirectEmail(
+      {
+        to: 'prospect@example.com',
+        template: 'welcome-lab',
+        data: { clientName: 'Bob', parcoursName: 'Parcours', activationLink: 'https://link' },
+      },
+      config
+    )
+    expect(result.success).toBe(false)
+    expect(result.error).toContain('SMTP connection failed')
+  })
+})

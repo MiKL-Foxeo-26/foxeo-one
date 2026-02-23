@@ -8,9 +8,61 @@ import { newMessageEmailTemplate } from '../_shared/email-templates/new-message.
 import { alertInactivityEmailTemplate } from '../_shared/email-templates/alert-inactivity.ts'
 import { graduationEmailTemplate } from '../_shared/email-templates/graduation.ts'
 import { paymentFailedEmailTemplate } from '../_shared/email-templates/payment-failed.ts'
+import { welcomeLabEmailTemplate } from '../_shared/email-templates/welcome-lab.ts'
+import { prospectResourcesEmailTemplate } from '../_shared/email-templates/prospect-resources.ts'
 
 export interface SendEmailInput {
   notificationId: string
+}
+
+// Direct email send (prospects without auth account)
+export type DirectEmailTemplate = 'welcome-lab' | 'prospect-resources'
+
+export interface DirectEmailInput {
+  to: string
+  template: DirectEmailTemplate
+  data: Record<string, unknown>
+}
+
+export interface DirectEmailResult {
+  success: boolean
+  error?: string
+}
+
+export async function handleDirectEmail(
+  input: DirectEmailInput,
+  config: SendEmailConfig
+): Promise<DirectEmailResult> {
+  const emailClient = createEmailClient({ apiKey: config.resendApiKey, from: config.emailFrom })
+
+  let subject: string
+  let html: string
+
+  switch (input.template) {
+    case 'welcome-lab': {
+      const d = input.data as { clientName: string; parcoursName: string; activationLink: string }
+      subject = 'Bienvenue dans Foxeo Lab !'
+      html = welcomeLabEmailTemplate(d)
+      break
+    }
+    case 'prospect-resources': {
+      const d = input.data as { links: Array<{ name: string; url: string }> }
+      subject = 'Vos ressources Foxeo'
+      html = prospectResourcesEmailTemplate(d)
+      break
+    }
+    default:
+      return { success: false, error: `Unknown direct template: ${input.template}` }
+  }
+
+  try {
+    await emailClient.sendWithRetry({ to: input.to, subject, html })
+    return { success: true }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error(`[EMAIL:DIRECT] Failed to send ${input.template} to ${input.to}:`, msg)
+    return { success: false, error: msg }
+  }
 }
 
 export interface SendEmailConfig {

@@ -165,3 +165,104 @@ Voir `docs/calcom-setup.md` pour la configuration Docker et webhook.
 La salle d'attente utilise Supabase Realtime Broadcast (pas Presence) pour les messages custom :
 - `client_waiting` : le client entre dans le lobby
 - `operator_joined` : MiKL accepte l'entrée → client redirigé vers la salle principale
+
+## Flux post-visio — Onboarding prospect (Story 5.4)
+
+### Vue d'ensemble
+
+À la fin d'une visio prospect, MiKL dispose d'un dialog guidé "Suite à donner" pour traiter rapidement le prospect sans quitter la plateforme. Le dialog s'ouvre automatiquement si `meeting.type === 'prospect'`.
+
+### Architecture
+
+```
+MiKL                        Server Actions              Supabase / Email
+  │                              │                           │
+  ├─ endMeeting() ───────────────►│                           │
+  │   type='prospect'             │                           │
+  │◄── { data: { type:'prospect'}}│                           │
+  │                              │                           │
+  ├─ PostMeetingDialog (open)     │                           │
+  │   4 options                   │                           │
+  │                              │                           │
+  ├─ "Créer parcours Lab" ───────►│ createLabOnboarding()     │
+  │   clientName, email, template │── insert clients ────────►│
+  │                              │── insert parcours ───────►│
+  │                              │── update meeting.metadata ►│
+  │                              │── POST send-email ────────►│ (welcome-lab)
+  │                              │                           │
+  ├─ "Envoyer ressources" ───────►│ sendProspectResources()   │
+  │   prospectEmail, documentIds  │── createSignedUrl (7j) ──►│
+  │                              │── POST send-email ────────►│ (prospect-resources)
+  │                              │── insert reminders ───────►│ (3 jours)
+  │                              │                           │
+  ├─ "Programmer rappel" ────────►│ scheduleFollowUp()        │
+  │   date + message              │── insert reminders ───────►│
+  │                              │                           │
+  └─ "Pas intéressé" ───────────►│ markProspectNotInterested()│
+      raison optionnelle          │── update meeting.metadata ►│
+                                 │── update meeting.status ──►│ (completed)
+```
+
+### Meeting types
+
+| Type | Description |
+|------|-------------|
+| `standard` | Meeting classique (défaut) |
+| `prospect` | Visio avec un prospect — déclenche dialog post-visio |
+| `onboarding` | Session d'onboarding client |
+| `support` | Meeting de support |
+
+### Champ `metadata` (JSONB)
+
+Le champ `meetings.metadata` enregistre les décisions post-visio :
+
+```json
+// Prospect converti
+{ "prospect_converted": true, "client_id": "uuid" }
+
+// Pas intéressé
+{ "not_interested": true, "reason": "budget", "timestamp": "2026-02-23T14:00:00Z" }
+```
+
+### Actions disponibles
+
+| Action | Server Action | Description |
+|--------|--------------|-------------|
+| Créer parcours Lab | `createLabOnboarding()` | Crée client (status=prospect) + parcours + email bienvenue |
+| Envoyer ressources | `sendProspectResources()` | Génère signed URLs (7j) + email + rappel 3j |
+| Programmer rappel | `scheduleFollowUp()` | Crée reminder pour MiKL |
+| Pas intéressé | `markProspectNotInterested()` | Update metadata + status=completed |
+
+### Hook `usePostMeetingDialog`
+
+```typescript
+const { dialogState, openDialog, closeDialog } = usePostMeetingDialog()
+
+// Après endMeeting() — si prospect
+if (result.data?.type === 'prospect') {
+  openDialog(result.data.id)
+}
+
+// Dans le JSX
+<PostMeetingDialog
+  meetingId={dialogState.meetingId!}
+  isOpen={dialogState.isOpen}
+  onClose={closeDialog}
+  templates={templates}
+  prospectDocuments={documents}
+  onLabCreated={(clientId) => router.push(`/crm/clients/${clientId}`)}
+/>
+```
+
+### Email templates
+
+| Template | Fichier | Données requises |
+|----------|---------|-----------------|
+| `welcome-lab` | `_shared/email-templates/welcome-lab.ts` | `{ clientName, parcoursName, activationLink }` |
+| `prospect-resources` | `_shared/email-templates/prospect-resources.ts` | `{ links: [{name, url}] }` |
+
+Les deux templates utilisent `escapeHtml()` pour prévenir les injections XSS.
+
+### Utilitaires
+
+- `generateResourceLinks(supabase, documentIds)` → `ResourceLink[]` — Génère les signed URLs (7 jours) depuis Supabase Storage

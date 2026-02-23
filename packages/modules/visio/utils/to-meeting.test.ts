@@ -18,6 +18,8 @@ const mockDB: MeetingDB = {
   duration_seconds: null,
   session_id: null,
   status: 'scheduled',
+  type: 'standard',
+  metadata: {},
   recording_url: null,
   transcript_url: null,
   created_at: '2026-03-01T09:00:00.000Z',
@@ -38,6 +40,8 @@ describe('toMeeting', () => {
     expect(meeting.durationSeconds).toBeNull()
     expect(meeting.sessionId).toBeNull()
     expect(meeting.status).toBe('scheduled')
+    expect(meeting.type).toBe('standard')
+    expect(meeting.metadata).toEqual({})
     expect(meeting.recordingUrl).toBeNull()
     expect(meeting.transcriptUrl).toBeNull()
     expect(meeting.createdAt).toBe('2026-03-01T09:00:00.000Z')
@@ -63,5 +67,23 @@ describe('toMeeting', () => {
     expect(meeting.sessionId).toBe('session-abc123')
     expect(meeting.recordingUrl).toBe('https://storage/recording.mp4')
     expect(meeting.transcriptUrl).toBe('https://storage/transcript.txt')
+  })
+
+  it('maps prospect meeting with metadata', () => {
+    const prospectDB: MeetingDB = {
+      ...mockDB,
+      type: 'prospect',
+      metadata: { prospect_converted: true, client_id: 'some-uuid' },
+    }
+    const meeting = toMeeting(prospectDB)
+    expect(meeting.type).toBe('prospect')
+    expect(meeting.metadata).toEqual({ prospect_converted: true, client_id: 'some-uuid' })
+  })
+
+  it('defaults type to standard when missing', () => {
+    const dbWithoutType = { ...mockDB } as Partial<MeetingDB>
+    delete (dbWithoutType as Record<string, unknown>).type
+    const meeting = toMeeting(dbWithoutType as MeetingDB)
+    expect(meeting.type).toBe('standard')
   })
 })

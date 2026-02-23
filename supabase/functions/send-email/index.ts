@@ -1,10 +1,12 @@
 // Edge Function: send-email
 // Story: 3.3 — Notifications email transactionnelles
+// Story: 5.4 — Envoi direct aux prospects (sans auth account)
 //
 // Déclenchement : appelé par trigger DB ou directement via pg_net
-// Input: { notificationId: string }
+// Input A: { notificationId: string }
+// Input B: { to: string, template: 'welcome-lab' | 'prospect-resources', data: object }
 
-import { handleSendEmail } from './handler.ts'
+import { handleSendEmail, handleDirectEmail } from './handler.ts'
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
@@ -27,7 +29,9 @@ Deno.serve(async (req) => {
     )
   }
 
-  let body: { notificationId?: string }
+  const config = { supabaseUrl, serviceRoleKey, resendApiKey, emailFrom }
+
+  let body: { notificationId?: string; to?: string; template?: string; data?: Record<string, unknown> }
   try {
     body = await req.json()
   } catch {
@@ -37,16 +41,30 @@ Deno.serve(async (req) => {
     )
   }
 
+  // Route: Direct send (prospect emails without auth account)
+  if (body.to && body.template) {
+    const result = await handleDirectEmail(
+      { to: body.to, template: body.template as 'welcome-lab' | 'prospect-resources', data: body.data ?? {} },
+      config
+    )
+    const status = result.success ? 200 : 500
+    return new Response(JSON.stringify(result), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Route: Notification-based send
   if (!body.notificationId) {
     return new Response(
-      JSON.stringify({ error: 'Missing notificationId' }),
+      JSON.stringify({ error: 'Missing notificationId or (to + template)' }),
       { status: 400, headers: { 'Content-Type': 'application/json' } }
     )
   }
 
   const result = await handleSendEmail(
     { notificationId: body.notificationId },
-    { supabaseUrl, serviceRoleKey, resendApiKey, emailFrom }
+    config
   )
 
   const status = result.success ? 200 : 500
