@@ -4,8 +4,9 @@ import { checkConsentVersion } from './middleware-consent'
 import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
-export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended']
-export const ONBOARDING_EXCLUDED_PATHS = ['/onboarding', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended']
+export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended', '/graduation']
+export const ONBOARDING_EXCLUDED_PATHS = ['/onboarding', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/graduation']
+export const GRADUATION_EXCLUDED_PATHS = ['/graduation', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/onboarding']
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -29,6 +30,12 @@ export function isStaticOrApi(pathname: string): boolean {
 
 export function isOnboardingExcluded(pathname: string): boolean {
   return ONBOARDING_EXCLUDED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  )
+}
+
+export function isGraduationExcluded(pathname: string): boolean {
+  return GRADUATION_EXCLUDED_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   )
 }
@@ -67,10 +74,10 @@ export async function middleware(request: NextRequest) {
 
   // Check CGU consent version and client status for authenticated users (exclude specific paths)
   if (user && !isConsentExcluded(request.nextUrl.pathname)) {
-    // Get client info from clients table (include onboarding fields)
+    // Get client info from clients table (include onboarding + graduation fields)
     const { data: client } = await supabase
       .from('clients')
-      .select('id, status, first_login_at, onboarding_completed')
+      .select('id, status, first_login_at, onboarding_completed, graduated_at, graduation_screen_shown')
       .eq('auth_user_id', user.id)
       .maybeSingle()
 
@@ -116,6 +123,19 @@ export async function middleware(request: NextRequest) {
           const welcomeResponse = NextResponse.redirect(welcomeUrl)
           setLocaleCookie(welcomeResponse, locale)
           return welcomeResponse
+        }
+      }
+
+      // Graduation detection — only for non-graduation paths
+      if (!isGraduationExcluded(request.nextUrl.pathname)) {
+        if (client.graduated_at && !client.graduation_screen_shown) {
+          console.log('[GRADUATION:CELEBRATE] Client graduated:', user.id)
+
+          const celebrateUrl = request.nextUrl.clone()
+          celebrateUrl.pathname = '/graduation/celebrate'
+          const celebrateResponse = NextResponse.redirect(celebrateUrl)
+          setLocaleCookie(celebrateResponse, locale)
+          return celebrateResponse
         }
       }
     }

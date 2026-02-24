@@ -1,3 +1,12 @@
 @import "@foxeo/ui/globals.css";
 @import "@foxeo/ui/themes/lab.css";
 @import "@foxeo/ui/themes/one.css";
+
+/* Graduation theme transition — Lab → One */
+html.theme-transition {
+  transition: all 1s ease-in-out;
+}
+
+html.theme-transition * {
+  transition: background-color 1s ease-in-out, color 1s ease-in-out;
+}

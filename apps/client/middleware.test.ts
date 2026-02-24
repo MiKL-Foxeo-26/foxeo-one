@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isPublicPath, isStaticOrApi, isConsentExcluded, isOnboardingExcluded, CONSENT_EXCLUDED_PATHS } from './middleware'
+import { isPublicPath, isStaticOrApi, isConsentExcluded, isOnboardingExcluded, isGraduationExcluded, CONSENT_EXCLUDED_PATHS, GRADUATION_EXCLUDED_PATHS } from './middleware'
 
 describe('middleware routing logic', () => {
   describe('isPublicPath', () => {
@@ -206,6 +206,91 @@ describe('middleware routing logic', () => {
 
       const shouldRedirect = !isOnboardingExcluded(pathname) && !client.first_login_at
       expect(shouldRedirect).toBe(false)
+    })
+  })
+
+  describe('isGraduationExcluded', () => {
+    it('returns true for /graduation routes', () => {
+      expect(isGraduationExcluded('/graduation')).toBe(true)
+      expect(isGraduationExcluded('/graduation/celebrate')).toBe(true)
+      expect(isGraduationExcluded('/graduation/discover-one')).toBe(true)
+      expect(isGraduationExcluded('/graduation/tour-one')).toBe(true)
+    })
+
+    it('returns true for auth paths (avoid redirect loops)', () => {
+      expect(isGraduationExcluded('/login')).toBe(true)
+      expect(isGraduationExcluded('/signup')).toBe(true)
+      expect(isGraduationExcluded('/auth/callback')).toBe(true)
+    })
+
+    it('returns true for onboarding paths', () => {
+      expect(isGraduationExcluded('/onboarding')).toBe(true)
+      expect(isGraduationExcluded('/onboarding/welcome')).toBe(true)
+    })
+
+    it('returns true for consent, legal, api, and suspended paths', () => {
+      expect(isGraduationExcluded('/consent-update')).toBe(true)
+      expect(isGraduationExcluded('/legal')).toBe(true)
+      expect(isGraduationExcluded('/api/webhooks/cal-com')).toBe(true)
+      expect(isGraduationExcluded('/suspended')).toBe(true)
+    })
+
+    it('returns false for dashboard and module routes', () => {
+      expect(isGraduationExcluded('/')).toBe(false)
+      expect(isGraduationExcluded('/modules/crm')).toBe(false)
+      expect(isGraduationExcluded('/settings')).toBe(false)
+    })
+
+    it('includes /graduation in GRADUATION_EXCLUDED_PATHS', () => {
+      expect(GRADUATION_EXCLUDED_PATHS).toContain('/graduation')
+    })
+  })
+
+  describe('graduation redirect logic', () => {
+    it('graduated client with screen not shown should be redirected to /graduation/celebrate', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: false }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect =
+        !isGraduationExcluded(pathname) && !!client.graduated_at && !client.graduation_screen_shown
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('graduated client with screen already shown should NOT be redirected', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: true }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect =
+        !isGraduationExcluded(pathname) && !!client.graduated_at && !client.graduation_screen_shown
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('non-graduated client should NOT be redirected to graduation', () => {
+      const client = { graduated_at: null, graduation_screen_shown: false }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect =
+        !isGraduationExcluded(pathname) && !!client.graduated_at && !client.graduation_screen_shown
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('graduated client on /graduation path should NOT be redirected (no loop)', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: false }
+      const pathname = '/graduation/celebrate'
+
+      const shouldRedirect =
+        !isGraduationExcluded(pathname) && !!client.graduated_at && !client.graduation_screen_shown
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('/graduation paths are excluded from consent check', () => {
+      expect(isConsentExcluded('/graduation')).toBe(true)
+      expect(isConsentExcluded('/graduation/celebrate')).toBe(true)
+    })
+
+    it('/graduation paths are excluded from onboarding check', () => {
+      expect(isOnboardingExcluded('/graduation')).toBe(true)
+      expect(isOnboardingExcluded('/graduation/celebrate')).toBe(true)
     })
   })
 })

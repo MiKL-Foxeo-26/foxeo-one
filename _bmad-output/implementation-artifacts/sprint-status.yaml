@@ -97,7 +97,7 @@ development_status:
   5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: done
   5-4-flux-post-visio-onboarding-prospect: done
   5-5-ecran-de-bienvenue-premiere-connexion-tutoriel-lab: done
-  5-6-ecran-de-graduation-lab-vers-one: ready-for-dev
+  5-6-ecran-de-graduation-lab-vers-one: done
   epic-5-retrospective: optional
 
   # Epic 6: Parcours Lab — Accompagnement Creation (6 stories)
