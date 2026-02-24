@@ -21,6 +21,9 @@ const mockStepDB: ParcoursStepDB = {
   title: 'Étape 1 — Idée',
   description: 'Définissez votre idée principale.',
   brief_template: 'Mon idée est...',
+  brief_content: null,
+  brief_assets: null,
+  one_teasing_message: null,
   status: 'current',
   completed_at: null,
   validation_required: true,
@@ -77,5 +80,47 @@ describe('toParcoursStep', () => {
     const result = toParcoursStep(completedStep)
     expect(result.status).toBe('completed')
     expect(result.completedAt).toBe('2026-02-01T10:00:00.000Z')
+  })
+
+  it('maps brief_content to briefContent', () => {
+    const stepWithBrief: ParcoursStepDB = {
+      ...mockStepDB,
+      brief_content: '## Mon brief\n\nContenu détaillé de l\'étape.',
+    }
+    const result = toParcoursStep(stepWithBrief)
+    expect(result.briefContent).toBe('## Mon brief\n\nContenu détaillé de l\'étape.')
+  })
+
+  it('defaults briefContent to null when absent', () => {
+    const result = toParcoursStep(mockStepDB)
+    expect(result.briefContent).toBeNull()
+  })
+
+  it('maps brief_assets to briefAssets array', () => {
+    const stepWithAssets: ParcoursStepDB = {
+      ...mockStepDB,
+      brief_assets: ['https://example.com/image.jpg', 'https://example.com/video.mp4'],
+    }
+    const result = toParcoursStep(stepWithAssets)
+    expect(result.briefAssets).toEqual(['https://example.com/image.jpg', 'https://example.com/video.mp4'])
+  })
+
+  it('defaults briefAssets to empty array when null', () => {
+    const result = toParcoursStep(mockStepDB)
+    expect(result.briefAssets).toEqual([])
+  })
+
+  it('maps one_teasing_message to oneTeasingMessage', () => {
+    const stepWithTeasing: ParcoursStepDB = {
+      ...mockStepDB,
+      one_teasing_message: 'Dans One, cette fonctionnalité sera automatisée.',
+    }
+    const result = toParcoursStep(stepWithTeasing)
+    expect(result.oneTeasingMessage).toBe('Dans One, cette fonctionnalité sera automatisée.')
+  })
+
+  it('defaults oneTeasingMessage to null when absent', () => {
+    const result = toParcoursStep(mockStepDB)
+    expect(result.oneTeasingMessage).toBeNull()
   })
 })

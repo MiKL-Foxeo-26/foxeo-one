@@ -1,6 +1,6 @@
 # Story 6.2: Consultation des briefs par étape — Teasing Foxeo One
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,35 +24,35 @@ So that **je comprends ce qui est attendu à chaque étape et je suis motivé pa
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00035_add_brief_content_parcours_steps.sql`
-  - [ ] 1.2 Ajouter colonnes `brief_content`, `brief_assets`, `one_teasing_message` à `parcours_steps`
-  - [ ] 1.3 Migration données : copier `brief_template` vers `brief_content` si existant
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00038_add_brief_content_parcours_steps.sql` (00035 déjà prise)
+  - [x] 1.2 Ajouter colonnes `brief_content`, `brief_assets`, `one_teasing_message` à `parcours_steps`
+  - [x] 1.3 Migration données : copier `brief_template` vers `brief_content` si existant
 
-- [ ] Task 2 — Composants UI (AC: #2, #3, #4, #5)
-  - [ ] 2.1 `components/parcours-step-detail.tsx` — Vue détaillée étape
-  - [ ] 2.2 `components/brief-markdown-renderer.tsx` — Rendu markdown avec styles
-  - [ ] 2.3 `components/brief-assets-gallery.tsx` — Gallery images/vidéos
-  - [ ] 2.4 `components/one-teasing-card.tsx` — Card teasing Foxeo One
-  - [ ] 2.5 `components/step-navigation-buttons.tsx` — Boutons prev/next
+- [x] Task 2 — Composants UI (AC: #2, #3, #4, #5)
+  - [x] 2.1 `components/parcours-step-detail.tsx` — Vue détaillée étape
+  - [x] 2.2 `components/brief-markdown-renderer.tsx` — Rendu markdown avec styles
+  - [x] 2.3 `components/brief-assets-gallery.tsx` — Gallery images/vidéos
+  - [x] 2.4 `components/one-teasing-card.tsx` — Card teasing Foxeo One
+  - [x] 2.5 `components/step-navigation-buttons.tsx` — Boutons prev/next
 
-- [ ] Task 3 — Page détaillée étape (AC: #2, #5)
-  - [ ] 3.1 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/page.tsx`
-  - [ ] 3.2 Récupérer étape depuis DB avec brief complet
-  - [ ] 3.3 Breadcrumb integration
+- [x] Task 3 — Page détaillée étape (AC: #2, #5)
+  - [x] 3.1 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/page.tsx` (refactored)
+  - [x] 3.2 Récupérer étape depuis DB avec brief complet
+  - [x] 3.3 Breadcrumb integration (dans ParcoursStepDetail)
 
-- [ ] Task 4 — Markdown renderer (AC: #3)
-  - [ ] 4.1 Installer lib `react-markdown` + `remark-gfm` (GitHub Flavored Markdown)
-  - [ ] 4.2 Styling markdown : prose classes Tailwind ou custom CSS
-  - [ ] 4.3 Support images, vidéos (iframe YouTube/Vimeo)
+- [x] Task 4 — Markdown renderer (AC: #3)
+  - [x] 4.1 Installer lib `react-markdown` + `remark-gfm` (GitHub Flavored Markdown)
+  - [x] 4.2 Styling markdown : prose classes Tailwind ou custom CSS
+  - [x] 4.3 Support images, vidéos (iframe YouTube/Vimeo)
 
-- [ ] Task 5 — Tests (AC: #6)
-  - [ ] 5.1 Tests composants : BriefMarkdownRenderer, OneTeasingCard
-  - [ ] 5.2 Tests rendering : markdown → HTML correct
-  - [ ] 5.3 Tests navigation : prev/next disabled selon statut
+- [x] Task 5 — Tests (AC: #6)
+  - [x] 5.1 Tests composants : BriefMarkdownRenderer, OneTeasingCard, BriefAssetsGallery, StepNavigationButtons
+  - [x] 5.2 Tests rendering : markdown → HTML correct (via mock)
+  - [x] 5.3 Tests navigation : prev/next disabled selon statut
 
-- [ ] Task 6 — Documentation (AC: #6)
-  - [ ] 6.1 Mise à jour `docs/guide.md` module parcours
+- [x] Task 6 — Documentation (AC: #6)
+  - [x] 6.1 Mise à jour `docs/guide.md` module parcours
 
 ## Dev Notes
 
@@ -303,8 +303,62 @@ packages/modules/parcours/
 
 ### Agent Model Used
 
+Claude Sonnet 4.6 (claude-sonnet-4-6)
+
 ### Debug Log References
+
+- Migration numérotée 00038 (00035 déjà prise par `add_onboarding_fields_clients`)
+- `react-markdown` et `remark-gfm` installés via npm workspace
+- `ParcoursStepDB` et `ParcoursStep` étendus avec 3 nouveaux champs (breaking: tous les mocks de tests mis à jour)
+- Page existante `steps/[stepNumber]/page.tsx` refactorisée pour déléguer au composant `ParcoursStepDetail`
 
 ### Completion Notes List
 
+- ✅ Migration `00038_add_brief_content_parcours_steps.sql` : colonnes `brief_content` (TEXT), `brief_assets` (JSONB default []), `one_teasing_message` (TEXT nullable)
+- ✅ Données migrées : `brief_template` → `brief_content` pour les lignes existantes
+- ✅ Types `ParcoursStepDB` et `ParcoursStep` étendus + mapper `toParcoursStep` mis à jour
+- ✅ 5 nouveaux composants créés dans `packages/modules/parcours/components/`
+- ✅ `react-markdown` + `remark-gfm` installés, rendu markdown complet avec composants custom
+- ✅ `BriefAssetsGallery` : images + iframes YouTube (embed URL) + Vimeo (embed URL)
+- ✅ `OneTeasingCard` : card gradient violet/vert, rendu conditionnel (null si pas de message)
+- ✅ `StepNavigationButtons` : prev/next avec aria-disabled sur les extrêmes + lock-aware (AC5)
+- ✅ Page simplifiée → délègue à `ParcoursStepDetail` (Server Component)
+- ✅ 42 nouveaux tests (2271 total, 0 failing)
+- ✅ Tous les mocks existants mis à jour avec les nouveaux champs requis
+
+**Code Review Fixes (Sonnet 4.6 adversarial) :**
+- ✅ [H1] Ajout section "Pourquoi cette étape ?" manquante (AC2)
+- ✅ [H2] Navigation prev/next désormais lock-aware avec props `prevStep`/`nextStep` (AC5)
+- ✅ [M1] `package-lock.json` ajouté au File List
+- ✅ [M2] Tests ajoutés pour `ParcoursStepDetail` (11 tests)
+- ✅ [M3] Tests `BriefMarkdownRenderer` améliorés (vérifient prose classes + component overrides)
+- ✅ [M4] Import `vi` ajouté dans `step-navigation-buttons.test.tsx` + tests lock-aware
+- ✅ [FIX] Import `Button` corrigé: `@foxeo/ui` au lieu de `@foxeo/ui/components/button`
+
 ### File List
+
+**Créés :**
+- `supabase/migrations/00038_add_brief_content_parcours_steps.sql`
+- `packages/modules/parcours/components/brief-markdown-renderer.tsx`
+- `packages/modules/parcours/components/brief-markdown-renderer.test.tsx`
+- `packages/modules/parcours/components/brief-assets-gallery.tsx`
+- `packages/modules/parcours/components/brief-assets-gallery.test.tsx`
+- `packages/modules/parcours/components/one-teasing-card.tsx`
+- `packages/modules/parcours/components/one-teasing-card.test.tsx`
+- `packages/modules/parcours/components/step-navigation-buttons.tsx`
+- `packages/modules/parcours/components/step-navigation-buttons.test.tsx`
+- `packages/modules/parcours/components/parcours-step-detail.tsx`
+- `packages/modules/parcours/components/parcours-step-detail.test.tsx`
+
+**Modifiés :**
+- `packages/modules/parcours/types/parcours.types.ts`
+- `packages/modules/parcours/utils/parcours-mappers.ts`
+- `packages/modules/parcours/utils/parcours-mappers.test.ts`
+- `packages/modules/parcours/actions/get-parcours.test.ts`
+- `packages/modules/parcours/components/parcours-timeline.test.tsx`
+- `packages/modules/parcours/components/parcours-overview.test.tsx`
+- `packages/modules/parcours/index.ts`
+- `packages/modules/parcours/package.json`
+- `packages/modules/parcours/docs/guide.md`
+- `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/page.tsx`
+- `package-lock.json`

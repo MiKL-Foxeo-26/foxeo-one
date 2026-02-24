@@ -103,7 +103,7 @@ development_status:
   # Epic 6: Parcours Lab — Accompagnement Creation (6 stories)
   epic-6: in-progress
   6-1-module-parcours-lab-migration-structure-vue-parcours-progression: done
-  6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: ready-for-dev
+  6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: done
   6-3-soumission-de-brief-pour-validation-notifications: ready-for-dev
   6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: ready-for-dev
   6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: ready-for-dev

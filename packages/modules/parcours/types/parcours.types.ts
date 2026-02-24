@@ -26,6 +26,9 @@ export interface ParcoursStepDB {
   title: string
   description: string
   brief_template: string | null
+  brief_content: string | null
+  brief_assets: string[] | null
+  one_teasing_message: string | null
   status: ParcoursStepStatus
   completed_at: string | null
   validation_required: boolean
@@ -55,6 +58,9 @@ export interface ParcoursStep {
   title: string
   description: string
   briefTemplate: string | null
+  briefContent: string | null
+  briefAssets: string[]
+  oneTeasingMessage: string | null
   status: ParcoursStepStatus
   completedAt: string | null
   validationRequired: boolean
