@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { Skeleton } from '@foxeo/ui'
 import { useValidationRequest } from '../hooks/use-validation-request'
@@ -9,6 +10,8 @@ import { RequestContent } from './request-content'
 import { RequestHistory } from './request-history'
 import { RequestExchanges } from './request-exchanges'
 import { RequestActions } from './request-actions'
+import { ApproveDialog } from './approve-dialog'
+import { RejectDialog } from './reject-dialog'
 import type { ExchangeEntry } from './request-exchanges'
 
 type RequestDetailProps = {
@@ -17,6 +20,8 @@ type RequestDetailProps = {
 
 export function RequestDetail({ requestId }: RequestDetailProps) {
   const { request, isLoading, error } = useValidationRequest(requestId)
+  const [isApproveOpen, setIsApproveOpen] = useState(false)
+  const [isRejectOpen, setIsRejectOpen] = useState(false)
 
   if (isLoading) {
     return <RequestDetailSkeleton />
@@ -111,18 +116,35 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
       {/* Zone boutons sticky */}
       <RequestActions
         status={request.status}
-        onValidate={() => {
-          // Story 7.3
-        }}
-        onRefuse={() => {
-          // Story 7.3
-        }}
+        onValidate={() => setIsApproveOpen(true)}
+        onRefuse={() => setIsRejectOpen(true)}
         onRequestClarification={() => {
           // Story 7.4
         }}
         onTreatmentAction={() => {
           // Story 7.5
         }}
+      />
+
+      {/* Modales validation / refus */}
+      <ApproveDialog
+        open={isApproveOpen}
+        onClose={() => setIsApproveOpen(false)}
+        requestId={request.id}
+        clientId={request.clientId}
+        title={request.title}
+        clientName={request.client.name}
+        type={request.type}
+      />
+
+      <RejectDialog
+        open={isRejectOpen}
+        onClose={() => setIsRejectOpen(false)}
+        requestId={request.id}
+        clientId={request.clientId}
+        title={request.title}
+        clientName={request.client.name}
+        type={request.type}
       />
     </div>
   )

@@ -42,6 +42,16 @@ vi.mock('./request-actions', () => ({
   ),
 }))
 
+vi.mock('./approve-dialog', () => ({
+  ApproveDialog: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="approve-dialog" /> : null,
+}))
+
+vi.mock('./reject-dialog', () => ({
+  RejectDialog: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="reject-dialog" /> : null,
+}))
+
 const mockDetail: ValidationRequestDetail = {
   id: 'req-1',
   clientId: 'c-1',

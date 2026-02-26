@@ -1,6 +1,6 @@
 # Story 7.3 : Validation & refus de demande avec commentaire
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -109,84 +109,84 @@ So that **le client sait clairement si son travail est accepté ou ce qu'il doit
 ## Tasks / Subtasks
 
 ### Task 1 : Créer les composants de modale (AC: 1, 4)
-- [ ] Créer `components/approve-dialog.tsx` (modale validation)
+- [x] Créer `components/approve-dialog.tsx` (modale validation)
   - Résumé de la demande
   - Champ commentaire optionnel (max 500 caractères)
   - Boutons Confirmer/Annuler
-- [ ] Créer `components/reject-dialog.tsx` (modale refus)
+- [x] Créer `components/reject-dialog.tsx` (modale refus)
   - Résumé de la demande
   - Champ commentaire obligatoire (min 10 caractères)
   - Validation Zod
   - Boutons Confirmer/Annuler désactivés si invalide
-- [ ] Utiliser Dialog, Textarea, Button de @foxeo/ui
-- [ ] Écrire tests `approve-dialog.test.tsx`, `reject-dialog.test.tsx`
+- [x] Utiliser Dialog, Textarea, Button de @foxeo/ui
+- [x] Écrire tests `approve-dialog.test.tsx`, `reject-dialog.test.tsx`
 
 ### Task 2 : Créer la Server Action approveRequest (AC: 2)
-- [ ] Créer `actions/approve-request.ts`
-- [ ] Valider les inputs avec Zod (requestId UUID, comment optionnel)
-- [ ] Démarrer transaction Supabase
-- [ ] Mettre à jour `validation_requests` (status, reviewer_comment, reviewed_at)
-- [ ] Si brief_lab : mettre à jour `parcours` (étape completed, avancer current_step_id)
-- [ ] Créer notification client
-- [ ] Commit transaction
-- [ ] Retourner `{ data, error }` format
-- [ ] Logger les erreurs avec format `[VALIDATION-HUB:APPROVE]`
-- [ ] Écrire test `approve-request.test.ts`
+- [x] Créer `actions/approve-request.ts`
+- [x] Valider les inputs avec Zod (requestId UUID, comment optionnel)
+- [x] Démarrer transaction Supabase
+- [x] Mettre à jour `validation_requests` (status, reviewer_comment, reviewed_at)
+- [x] Si brief_lab : mettre à jour `parcours` (étape completed, avancer current_step_id)
+- [x] Créer notification client
+- [x] Commit transaction
+- [x] Retourner `{ data, error }` format
+- [x] Logger les erreurs avec format `[VALIDATION-HUB:APPROVE]`
+- [x] Écrire test `approve-request.test.ts`
 
 ### Task 3 : Créer la Server Action rejectRequest (AC: 5)
-- [ ] Créer `actions/reject-request.ts`
-- [ ] Valider les inputs avec Zod (requestId UUID, comment obligatoire min 10 chars)
-- [ ] Mettre à jour `validation_requests` (status, reviewer_comment, reviewed_at)
-- [ ] Créer notification client
-- [ ] Retourner `{ data, error }` format
-- [ ] Logger les erreurs avec format `[VALIDATION-HUB:REJECT]`
-- [ ] Écrire test `reject-request.test.ts`
+- [x] Créer `actions/reject-request.ts`
+- [x] Valider les inputs avec Zod (requestId UUID, comment obligatoire min 10 chars)
+- [x] Mettre à jour `validation_requests` (status, reviewer_comment, reviewed_at)
+- [x] Créer notification client
+- [x] Retourner `{ data, error }` format
+- [x] Logger les erreurs avec format `[VALIDATION-HUB:REJECT]`
+- [x] Écrire test `reject-request.test.ts`
 
 ### Task 4 : Intégrer les modales dans request-detail (AC: 1, 4)
-- [ ] Modifier `components/request-detail.tsx`
-- [ ] Ajouter state pour ouvrir/fermer les modales
-- [ ] Connecter bouton "Valider" → `<ApproveDialog />`
-- [ ] Connecter bouton "Refuser" → `<RejectDialog />`
-- [ ] Passer les props nécessaires (requestId, title, clientName, type)
+- [x] Modifier `components/request-detail.tsx`
+- [x] Ajouter state pour ouvrir/fermer les modales
+- [x] Connecter bouton "Valider" → `<ApproveDialog />`
+- [x] Connecter bouton "Refuser" → `<RejectDialog />`
+- [x] Passer les props nécessaires (requestId, title, clientName, type)
 
 ### Task 5 : Implémenter la logique de soumission (AC: 2, 5)
-- [ ] Dans `approve-dialog.tsx` : appeler `approveRequest(requestId, comment)`
-- [ ] Dans `reject-dialog.tsx` : appeler `rejectRequest(requestId, comment)`
-- [ ] Utiliser `useTransition` pour gérer l'état pending
-- [ ] Afficher spinner dans le bouton pendant l'action
-- [ ] Gérer les erreurs retournées par les Server Actions
+- [x] Dans `approve-dialog.tsx` : appeler `approveRequest(requestId, comment)`
+- [x] Dans `reject-dialog.tsx` : appeler `rejectRequest(requestId, comment)`
+- [x] Utiliser `useTransition` pour gérer l'état pending
+- [x] Afficher spinner dans le bouton pendant l'action
+- [x] Gérer les erreurs retournées par les Server Actions
 
 ### Task 6 : Implémenter le feedback utilisateur (AC: 3, 6, 7)
-- [ ] Toast de succès après validation : "Demande validée avec succès"
-- [ ] Toast de succès après refus : "Demande refusée — le client a été notifié"
-- [ ] Toast d'erreur en cas de problème : "Erreur lors du traitement — veuillez réessayer"
-- [ ] Invalider les caches TanStack Query appropriés
-- [ ] Rediriger vers `/modules/validation-hub` après succès
-- [ ] Utiliser `useRouter()` de Next.js pour la redirection
+- [x] Toast de succès après validation : "Demande validée avec succès"
+- [x] Toast de succès après refus : "Demande refusée — le client a été notifié"
+- [x] Toast d'erreur en cas de problème : "Erreur lors du traitement — veuillez réessayer"
+- [x] Invalider les caches TanStack Query appropriés
+- [x] Rediriger vers `/modules/validation-hub` après succès
+- [x] Utiliser `useRouter()` de Next.js pour la redirection
 
 ### Task 7 : Implémenter la logique parcours Lab (AC: 2)
-- [ ] Créer helper `utils/update-parcours-step.ts`
-- [ ] Fonction pour avancer `current_step_id` à l'étape suivante
-- [ ] Fonction pour marquer étape comme 'completed'
-- [ ] Fonction pour détecter si c'est la dernière étape
-- [ ] Fonction pour marquer parcours comme 'completed' si dernière étape
-- [ ] Écrire test `update-parcours-step.test.ts`
+- [x] Créer helper `utils/update-parcours-step.ts`
+- [x] Fonction pour avancer `current_step_id` à l'étape suivante
+- [x] Fonction pour marquer étape comme 'completed'
+- [x] Fonction pour détecter si c'est la dernière étape
+- [x] Fonction pour marquer parcours comme 'completed' si dernière étape
+- [x] Écrire test `update-parcours-step.test.ts`
 
 ### Task 8 : Créer les notifications client (AC: 2, 5)
-- [ ] Vérifier que la table `notifications` existe (Epic 3)
-- [ ] Créer helper `utils/create-validation-notification.ts`
-- [ ] Fonction pour créer notification validation
-- [ ] Fonction pour créer notification refus
-- [ ] Utiliser les types du module notifications
-- [ ] Écrire test `create-validation-notification.test.ts`
+- [x] Vérifier que la table `notifications` existe (Epic 3)
+- [x] Créer helper `utils/create-validation-notification.ts`
+- [x] Fonction pour créer notification validation
+- [x] Fonction pour créer notification refus
+- [x] Utiliser les types du module notifications
+- [x] Écrire test `create-validation-notification.test.ts`
 
 ### Task 9 : Tests d'intégration (AC: 2-7)
-- [ ] Test workflow complet validation (modale → action → notification → redirect)
-- [ ] Test workflow complet refus (modale → action → notification → redirect)
-- [ ] Test transaction rollback en cas d'erreur
-- [ ] Test invalidation cache TanStack Query
-- [ ] Test mise à jour parcours Lab (si brief_lab)
-- [ ] Test création notifications
+- [x] Test workflow complet validation (modale → action → notification → redirect)
+- [x] Test workflow complet refus (modale → action → notification → redirect)
+- [x] Test transaction rollback en cas d'erreur
+- [x] Test invalidation cache TanStack Query
+- [x] Test mise à jour parcours Lab (si brief_lab)
+- [x] Test création notifications
 
 ## Dev Notes
 
@@ -680,16 +680,58 @@ Cette story **crée des notifications** pour le client. Le module notifications 
 
 ### Agent Model Used
 
-(À remplir par le dev agent)
+Claude Sonnet 4.6 (claude-sonnet-4-6)
 
 ### Debug Log References
 
-(À remplir par le dev agent lors de l'implémentation)
+- **UUID validation fix**: Tests initiaux utilisaient `'req-uuid'`, `'client-uuid'` comme IDs — Zod `z.string().uuid()` rejetait ces valeurs. Corrigé avec des UUIDs réels (`550e8400-e29b-41d4-a716-44665544000X`).
+- **`screen.getByRole('form')` throws**: Remplacé par `.closest('form')` sur le texte du bouton submit.
+- **`expect.anything()` n'accepte pas `undefined`**: Pour approveRequest appelé sans commentaire, assertion changée à `undefined` explicite.
+- **useRouter dans request-detail.test.tsx**: Après ajout des dialogs, les tests échouaient avec "invariant expected app router to be mounted". Corrigé via `vi.mock('./approve-dialog', ...)` et `vi.mock('./reject-dialog', ...)`.
+- **`parcours.status` constraint**: Utilisé `'termine'` (non `'completed'`) pour le statut parcours complété — valeur correcte contrainte DB.
+- **`notifications.recipient_id`**: Doit être `clients.auth_user_id` (auth.uid() du client) — JOIN avec clients ajouté dans les fonctions SQL.
 
 ### Completion Notes List
 
-(À remplir par le dev agent après implémentation)
+- Implémentation via RPC Supabase (`approve_validation_request` / `reject_validation_request`) pour atomicité transactionnelle complète côté PostgreSQL.
+- Migration `00045_validation_request_functions.sql` créée avec les deux fonctions PL/pgSQL.
+- `Label` component absent de `@foxeo/ui` → utilisé `<label>` HTML natif (pattern déjà documenté en mémoire).
+- Toast via `showSuccess()`/`showError()` depuis `@foxeo/ui` (non `toast.success`).
+- 52 nouveaux tests ajoutés (2535 → 2587 tests passing).
+- Tous les ACs couverts : modales, Server Actions, feedback utilisateur, gestion erreurs, avancement parcours, notifications.
+
+**Code Review Fixes (4 MEDIUM, 1 LOW):**
+- M1: Retiré invalidation cache parcours inutile dans reject-dialog (refus ne modifie pas le parcours)
+- M2: Retiré `'use server'` des utils de référence + supprimé exports dead code de index.ts
+- M3: Éliminé double création client Supabase dans create-validation-notification.ts
+- M4: Ajouté protection fermeture dialog pendant isPending (approve + reject)
+- L2: Supprimé dead code (variables et fonctions non utilisées) dans update-parcours-step.test.ts
 
 ### File List
 
-(À remplir par le dev agent — liste des fichiers créés/modifiés)
+**Créés :**
+- `supabase/migrations/00045_validation_request_functions.sql`
+- `packages/modules/validation-hub/actions/approve-request.ts`
+- `packages/modules/validation-hub/actions/approve-request.test.ts`
+- `packages/modules/validation-hub/actions/reject-request.ts`
+- `packages/modules/validation-hub/actions/reject-request.test.ts`
+- `packages/modules/validation-hub/components/approve-dialog.tsx`
+- `packages/modules/validation-hub/components/approve-dialog.test.tsx`
+- `packages/modules/validation-hub/components/reject-dialog.tsx`
+- `packages/modules/validation-hub/components/reject-dialog.test.tsx`
+- `packages/modules/validation-hub/utils/update-parcours-step.ts`
+- `packages/modules/validation-hub/utils/update-parcours-step.test.ts`
+- `packages/modules/validation-hub/utils/create-validation-notification.ts`
+- `packages/modules/validation-hub/utils/create-validation-notification.test.ts`
+
+**Modifiés :**
+- `packages/modules/validation-hub/components/request-detail.tsx` (ajout dialogs + state)
+- `packages/modules/validation-hub/components/request-detail.test.tsx` (mocks dialogs)
+- `packages/modules/validation-hub/index.ts` (nouveaux exports)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+### Change Log
+
+| Date | Version | Description | Author |
+|------|---------|-------------|--------|
+| 2026-02-26 | 1.0 | Implémentation complète Story 7.3 — validation & refus avec commentaire | Claude Sonnet 4.6 |

@@ -10,6 +10,8 @@ export { RequestContent } from './components/request-content'
 export { RequestHistory } from './components/request-history'
 export { RequestExchanges } from './components/request-exchanges'
 export { RequestActions } from './components/request-actions'
+export { ApproveDialog } from './components/approve-dialog'
+export { RejectDialog } from './components/reject-dialog'
 export type { ExchangeEntry } from './components/request-exchanges'
 
 // Hooks
@@ -25,6 +27,8 @@ export { getValidationRequests } from './actions/get-validation-requests'
 export { getValidationRequest } from './actions/get-validation-request'
 export { getClientPreviousRequests } from './actions/get-client-previous-requests'
 export { getClientRecentMessages } from './actions/get-client-recent-messages'
+export { approveRequest } from './actions/approve-request'
+export { rejectRequest } from './actions/reject-request'
 
 // Types
 export type {

@@ -114,7 +114,7 @@ development_status:
   epic-7: in-progress
   7-1-module-validation-hub-structure-types-file-attente-des-demandes: done
   7-2-vue-detaillee-dune-demande-avec-contexte-complet: done
-  7-3-validation-refus-de-demande-avec-commentaire: ready-for-dev
+  7-3-validation-refus-de-demande-avec-commentaire: done
   7-4-demande-de-precisions-sur-une-soumission: ready-for-dev
   7-5-actions-de-traitement-workflows-post-decision: ready-for-dev
   7-6-temps-reel-compteur-de-demandes-abonnement-realtime: ready-for-dev
