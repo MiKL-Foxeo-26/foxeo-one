@@ -13,6 +13,7 @@ import { RequestActions } from './request-actions'
 import { ApproveDialog } from './approve-dialog'
 import { RejectDialog } from './reject-dialog'
 import { ClarificationDialog } from './clarification-dialog'
+import { ActionPicker } from './action-picker'
 import type { ExchangeEntry } from './request-exchanges'
 
 type RequestDetailProps = {
@@ -130,9 +131,16 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
         onValidate={() => setIsApproveOpen(true)}
         onRefuse={() => setIsRejectOpen(true)}
         onRequestClarification={() => setIsClarificationOpen(true)}
-        onTreatmentAction={() => {
-          // Story 7.5
-        }}
+        treatmentActionSlot={
+          <ActionPicker
+            requestId={request.id}
+            clientId={request.clientId}
+            parcoursId={request.parcoursId}
+            requestTitle={request.title}
+            clientName={request.client.name}
+            disabled={request.status === 'rejected'}
+          />
+        }
       />
 
       {/* Modales validation / refus */}

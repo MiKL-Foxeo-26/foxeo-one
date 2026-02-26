@@ -1,6 +1,6 @@
 # Story 7.5 : Actions de traitement — workflows post-décision
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -122,80 +122,80 @@ So that **je peux orienter chaque demande vers le workflow le plus adapté**.
 ## Tasks / Subtasks
 
 ### Task 1 : Créer le composant action-picker (AC: 1)
-- [ ] Créer `components/action-picker.tsx` (dropdown 4 options)
-- [ ] Option A : Réactiver Lab (conditionnelle si parcours_id existe)
-- [ ] Option B : Programmer Visio
-- [ ] Option C : Dev direct
-- [ ] Option D : Reporter
-- [ ] Utiliser DropdownMenu de @foxeo/ui
-- [ ] Icônes Lucide appropriées pour chaque option
-- [ ] Écrire test `action-picker.test.tsx`
+- [x] Créer `components/action-picker.tsx` (dropdown 4 options)
+- [x] Option A : Réactiver Lab (conditionnelle si parcours_id existe)
+- [x] Option B : Programmer Visio
+- [x] Option C : Dev direct
+- [x] Option D : Reporter
+- [x] Utiliser DropdownMenu de @foxeo/ui
+- [x] Icônes Lucide appropriées pour chaque option
+- [x] Écrire test `action-picker.test.tsx`
 
 ### Task 2 : Créer les Server Actions (AC: 2-5)
-- [ ] Créer `actions/reactivate-lab.ts` (Option A)
-- [ ] Créer `actions/schedule-visio.ts` (Option B)
-- [ ] Créer `actions/start-dev.ts` (Option C)
-- [ ] Créer `actions/postpone-request.ts` (Option D)
-- [ ] Chaque action retourne `{ data, error }` format
-- [ ] Écrire tests pour chaque action
+- [x] Créer `actions/reactivate-lab.ts` (Option A)
+- [x] Créer `actions/schedule-visio.ts` (Option B)
+- [x] Créer `actions/start-dev.ts` (Option C)
+- [x] Créer `actions/postpone-request.ts` (Option D)
+- [x] Chaque action retourne `{ data, error }` format
+- [x] Écrire tests pour chaque action
 
 ### Task 3 : Implémenter Option A — Réactiver Lab (AC: 2)
-- [ ] Valider que parcours_id existe
-- [ ] Marquer demande 'approved'
-- [ ] Mettre à jour reviewer_comment
-- [ ] Si parcours status = 'completed' ou 'suspended' : status → 'in_progress'
-- [ ] Créer notification client
-- [ ] Logger avec `[VALIDATION-HUB:REACTIVATE-LAB]`
+- [x] Valider que parcours_id existe
+- [x] Marquer demande 'approved'
+- [x] Mettre à jour reviewer_comment
+- [x] Si parcours status = 'completed' ou 'suspended' : status → 'in_progress'
+- [x] Créer notification client
+- [x] Logger avec `[VALIDATION-HUB:REACTIVATE-LAB]`
 
 ### Task 4 : Implémenter Option B — Programmer Visio (AC: 3)
-- [ ] Demande reste 'pending'
-- [ ] Mettre à jour reviewer_comment
-- [ ] Créer notification client
-- [ ] Ouvrir formulaire Cal.com (intégration module agenda Epic 5)
-- [ ] Pas de redirection (reste sur la page)
-- [ ] Logger avec `[VALIDATION-HUB:SCHEDULE-VISIO]`
+- [x] Demande reste 'pending'
+- [x] Mettre à jour reviewer_comment
+- [x] Créer notification client
+- [x] Ouvrir formulaire Cal.com (intégration module agenda Epic 5)
+- [x] Pas de redirection (reste sur la page)
+- [x] Logger avec `[VALIDATION-HUB:SCHEDULE-VISIO]`
 
 ### Task 5 : Implémenter Option C — Dev direct (AC: 4)
-- [ ] Marquer demande 'approved'
-- [ ] Mettre à jour reviewer_comment
-- [ ] Récupérer `clients.bmad_project_path`
-- [ ] Afficher lien `cursor://${bmad_project_path}` ou message si null
-- [ ] Créer notification client
-- [ ] Logger avec `[VALIDATION-HUB:START-DEV]`
+- [x] Marquer demande 'approved'
+- [x] Mettre à jour reviewer_comment
+- [x] Récupérer `clients.bmad_project_path`
+- [x] Afficher lien `cursor://${bmad_project_path}` ou message si null
+- [x] Créer notification client
+- [x] Logger avec `[VALIDATION-HUB:START-DEV]`
 
 ### Task 6 : Implémenter Option D — Reporter (AC: 5)
-- [ ] Créer modale de report avec champs raison (optionnel) et date (optionnel)
-- [ ] Demande reste 'pending'
-- [ ] Mettre à jour reviewer_comment avec raison
-- [ ] Si date fournie : créer notification système avec `scheduled_at`
-- [ ] Pas de notification client
-- [ ] Ajouter badge "Reportée" dans la file d'attente
-- [ ] Logger avec `[VALIDATION-HUB:POSTPONE]`
+- [x] Créer modale de report avec champs raison (optionnel) et date (optionnel)
+- [x] Demande reste 'pending'
+- [x] Mettre à jour reviewer_comment avec raison
+- [x] Si date fournie : créer notification système avec `scheduled_at`
+- [x] Pas de notification client
+- [x] Ajouter badge "Reportée" dans la file d'attente
+- [x] Logger avec `[VALIDATION-HUB:POSTPONE]`
 
 ### Task 7 : Intégrer action-picker dans request-detail (AC: 1)
-- [ ] Modifier `components/request-detail.tsx`
-- [ ] Ajouter bouton "Actions de traitement" avec dropdown
-- [ ] Connecter les 4 options aux Server Actions
-- [ ] Passer les props nécessaires (requestId, clientId, parcoursId, bmadProjectPath)
+- [x] Modifier `components/request-detail.tsx`
+- [x] Ajouter bouton "Actions de traitement" avec dropdown
+- [x] Connecter les 4 options aux Server Actions
+- [x] Passer les props nécessaires (requestId, clientId, parcoursId, bmadProjectPath)
 
 ### Task 8 : Implémenter invalidation cache (AC: 6)
-- [ ] Invalider `['validation-requests']` après chaque action
-- [ ] Invalider `['validation-request', requestId]` après chaque action
-- [ ] Invalider `['parcours', clientId]` après option A
-- [ ] Rediriger vers `/modules/validation-hub` (sauf option B)
+- [x] Invalider `['validation-requests']` après chaque action
+- [x] Invalider `['validation-request', requestId]` après chaque action
+- [x] Invalider `['parcours', clientId]` après option A
+- [x] Rediriger vers `/modules/validation-hub` (sauf option B)
 
 ### Task 9 : Améliorer la file d'attente (AC: 5)
-- [ ] Modifier `components/validation-queue.tsx`
-- [ ] Ajouter badge "Reportée" pour les demandes reportées
-- [ ] Filtrer les demandes reportées si nécessaire
-- [ ] Tester l'affichage
+- [x] Modifier `components/validation-queue.tsx`
+- [x] Ajouter badge "Reportée" pour les demandes reportées
+- [x] Filtrer les demandes reportées si nécessaire
+- [x] Tester l'affichage
 
 ### Task 10 : Tests d'intégration (AC: 2-6)
-- [ ] Test Option A : réactivation parcours Lab
-- [ ] Test Option B : ouverture formulaire Cal.com
-- [ ] Test Option C : affichage lien Cursor
-- [ ] Test Option D : création rappel + badge "Reportée"
-- [ ] Test invalidation cache pour chaque option
+- [x] Test Option A : réactivation parcours Lab
+- [x] Test Option B : ouverture formulaire Cal.com
+- [x] Test Option C : affichage lien Cursor
+- [x] Test Option D : création rappel + badge "Reportée"
+- [x] Test invalidation cache pour chaque option
 
 ## Dev Notes
 
@@ -479,16 +479,51 @@ Cette story intègre :
 
 ### Agent Model Used
 
-(À remplir par le dev agent)
+claude-sonnet-4-6
 
 ### Debug Log References
 
-(À remplir par le dev agent lors de l'implémentation)
+- `DropdownMenu` absent de `@foxeo/ui` → custom dropdown avec `useState` + click-outside detection
+- `DatePicker` absent de `@foxeo/ui` → `<input type="date">` natif
+- Collision de texte dans `postpone-dialog` (titre = bouton "Reporter la demande") → bouton renommé "Confirmer le report"
+- `bmadProjectPath` prop supprimée de `ActionPicker` → l'action `startDev` récupère directement en DB
 
 ### Completion Notes List
 
-(À remplir par le dev agent après implémentation)
+- Créé `action-picker.tsx` : dropdown custom 4 options (A conditionnel parcoursId), click-outside, useTransition
+- Créé `postpone-dialog.tsx` : Dialog avec reason (optionnel) + date reminder (optionnel), native `<input type="date">`
+- Créé `reactivate-lab.ts` : approve request + reactivate parcours if completed/suspended + notify client
+- Créé `schedule-visio.ts` : update reviewer_comment + build calComUrl + notify client (request stays pending)
+- Créé `start-dev.ts` : approve request + fetch bmad_project_path → cursorUrl + notify client
+- Créé `postpone-request.ts` : update reviewer_comment + create system reminder notification with scheduled_at
+- Modifié `request-actions.tsx` : ajout `treatmentActionSlot?: React.ReactNode` prop (backward compatible)
+- Modifié `request-detail.tsx` : intégration `ActionPicker` via `treatmentActionSlot`
+- Modifié `validation-queue.tsx` : badge "Reportée" (orange) quand status=pending && reviewerComment starts with "Reporté"
+- Mis à jour `index.ts` : export nouveaux composants et actions
+- 62 nouveaux tests, 2679 total (0 régression)
 
 ### File List
 
-(À remplir par le dev agent — liste des fichiers créés/modifiés)
+- `packages/modules/validation-hub/components/action-picker.tsx` (NOUVEAU)
+- `packages/modules/validation-hub/components/action-picker.test.tsx` (NOUVEAU)
+- `packages/modules/validation-hub/components/postpone-dialog.tsx` (NOUVEAU)
+- `packages/modules/validation-hub/components/postpone-dialog.test.tsx` (NOUVEAU)
+- `packages/modules/validation-hub/actions/reactivate-lab.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/reactivate-lab.test.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/schedule-visio.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/schedule-visio.test.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/start-dev.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/start-dev.test.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/postpone-request.ts` (NOUVEAU)
+- `packages/modules/validation-hub/actions/postpone-request.test.ts` (NOUVEAU)
+- `packages/modules/validation-hub/components/request-actions.tsx` (MODIFIÉ)
+- `packages/modules/validation-hub/components/request-detail.tsx` (MODIFIÉ)
+- `packages/modules/validation-hub/components/validation-queue.tsx` (MODIFIÉ)
+- `packages/modules/validation-hub/components/validation-queue.test.tsx` (MODIFIÉ)
+- `packages/modules/validation-hub/index.ts` (MODIFIÉ)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (MODIFIÉ)
+
+## Change Log
+
+- 2026-02-26 : Implémentation Story 7.5 — 4 Server Actions, ActionPicker dropdown, PostponeDialog, badge "Reportée" (62 nouveaux tests, 2679 total)
+- 2026-02-26 : Code Review fixes — dual toast bug (showSuccess+showError→single showSuccess), disabled prop pour ActionPicker (requests rejetées), suppression dead prop bmadProjectPath, suppression as casts unsafe, fix test titre dialog postpone (2681 tests)
