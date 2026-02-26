@@ -1,6 +1,6 @@
 # Story 6.6: Élio Lab — Configuration Orpheus (personnalisation agent)
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,42 +24,42 @@ So that **je peux affiner le comportement de mon assistant IA selon mes besoins 
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00038_create_elio_configs.sql`
-  - [ ] 1.2 Table `elio_configs` avec tous les champs + contraintes
-  - [ ] 1.3 Index : `idx_elio_configs_client_id`
-  - [ ] 1.4 Trigger updated_at
-  - [ ] 1.5 RLS policies
+- [x] Task 1 — Migration Supabase (AC: #1)
+  - [x] 1.1 Créer migration `00043_create_elio_configs.sql` (00038 déjà pris)
+  - [x] 1.2 Table `elio_configs` avec tous les champs + contraintes
+  - [x] 1.3 Index : `idx_elio_configs_client_id`
+  - [x] 1.4 Trigger updated_at
+  - [x] 1.5 RLS policies (select, insert, update, delete)
 
-- [ ] Task 2 — Server Actions (AC: #2, #4)
-  - [ ] 2.1 `actions/get-elio-config.ts` — Récupérer config ou retourner defaults
-  - [ ] 2.2 `actions/update-elio-config.ts` — Modifier config
-  - [ ] 2.3 `actions/reset-elio-config.ts` — Supprimer config (retour defaults)
+- [x] Task 2 — Server Actions (AC: #2, #4)
+  - [x] 2.1 `actions/get-elio-config.ts` — Récupérer config ou retourner defaults
+  - [x] 2.2 `actions/update-elio-config.ts` — Modifier config (upsert)
+  - [x] 2.3 `actions/reset-elio-config.ts` — Supprimer config (retour defaults)
 
-- [ ] Task 3 — Page configuration (AC: #2, #5)
-  - [ ] 3.1 `apps/client/app/(dashboard)/settings/elio/advanced/page.tsx`
-  - [ ] 3.2 Formulaire config Orpheus
-  - [ ] 3.3 Preview system prompt (si ENABLE_ELIO_DEBUG)
+- [x] Task 3 — Page configuration (AC: #2, #5)
+  - [x] 3.1 `apps/client/app/(dashboard)/settings/elio/advanced/page.tsx`
+  - [x] 3.2 Formulaire config Orpheus intégré via OrpheusConfigForm
+  - [x] 3.3 Preview system prompt conditionnel (si ENABLE_ELIO_DEBUG=true)
 
-- [ ] Task 4 — Composants UI (AC: #2)
-  - [ ] 4.1 `components/orpheus-config-form.tsx` — Formulaire config avancée
-  - [ ] 4.2 `components/elio-model-selector.tsx` — Dropdown sélection modèle
-  - [ ] 4.3 `components/elio-temperature-slider.tsx` — Slider température avec labels
-  - [ ] 4.4 `components/elio-feature-toggles.tsx` — Toggles features (code_generation, web_search, etc.)
+- [x] Task 4 — Composants UI (AC: #2)
+  - [x] 4.1 `components/orpheus-config-form.tsx` — Formulaire config avancée
+  - [x] 4.2 `components/elio-model-selector.tsx` — Dropdown sélection modèle
+  - [x] 4.3 `components/elio-temperature-slider.tsx` — Slider natif HTML avec labels
+  - [x] 4.4 `components/elio-feature-toggles.tsx` — Toggles features (Switch)
 
-- [ ] Task 5 — Intégration API Claude (AC: #3)
-  - [ ] 5.1 Modifier `actions/generate-brief.ts` (Story 6.5) : récupérer elio_configs
-  - [ ] 5.2 Modifier helper `buildElioSystemPrompt()` : ajouter custom_instructions
-  - [ ] 5.3 Utiliser model, temperature, max_tokens du config dans appels API
+- [x] Task 5 — Intégration API Claude (AC: #3)
+  - [x] 5.1 Modifier `actions/generate-brief.ts` : récupérer elio_configs via getElioConfig()
+  - [x] 5.2 Modifier helper `buildElioSystemPrompt()` : paramètre optionnel customInstructions
+  - [x] 5.3 Utiliser model, temperature, max_tokens du config dans appels API
 
-- [ ] Task 6 — Tests (AC: #6)
-  - [ ] 6.1 Tests Server Actions : updateElioConfig, resetElioConfig
-  - [ ] 6.2 Tests injection config : mock API Claude avec config custom
-  - [ ] 6.3 Tests composants : OrpheusConfigForm
-  - [ ] 6.4 Tests RLS : client A ne voit pas config client B
+- [x] Task 6 — Tests (AC: #6)
+  - [x] 6.1 Tests Server Actions : get/update/resetElioConfig (5+4+4 tests)
+  - [x] 6.2 Tests injection config : mock API Claude avec config custom (4 tests)
+  - [x] 6.3 Tests composants : OrpheusConfigForm (6 tests)
+  - [x] 6.4 Tests RLS : client A ne voit pas config client B (4 tests, skip si RUN_RLS_TESTS)
 
-- [ ] Task 7 — Documentation (AC: #6)
-  - [ ] 7.1 Documentation Orpheus dans `docs/elio-advanced.md`
+- [x] Task 7 — Documentation (AC: #6)
+  - [x] 7.1 Documentation Orpheus dans `docs/elio-advanced.md`
 
 ## Dev Notes
 
@@ -421,8 +421,54 @@ packages/modules/elio/
 
 ### Agent Model Used
 
+claude-sonnet-4-6
+
 ### Debug Log References
+
+- Migration numéro : 00038 déjà utilisé → migration créée en 00043
+- `@foxeo/ui` : pas de Slider Radix → slider natif HTML `<input type="range">`
+- `@foxeo/ui` : pas de `Label` → utilisation de `<label>` HTML avec Tailwind
+- `Alert` : variant `warning` inexistant → utilisation du variant `default` avec AlertTriangle icon
+- `getElioConfig()` en Server Action est appelable depuis Server Component (page)
+- Les tests RLS sont skip par défaut (nécessitent `RUN_RLS_TESTS=1` + Supabase local)
 
 ### Completion Notes List
 
+- Story 6.6 implémentée complètement : migration DB, 3 server actions, 4 composants UI, page settings, intégration API Claude, 28 tests ajoutés (2423 total, aucune régression)
+- Code Review fixes: [H1] validation Zod serveur dans updateElioConfig, [M1] getElioConfig(clientId) skip double auth, [M2] debug preview avec vrai profil client, [M3] validation runtime modèle dans toElioConfig, [M4] loading.tsx + error.tsx pour route
+- Task 1: Migration `00043_create_elio_configs.sql` avec RLS complet (select/insert/update/delete) et trigger updated_at
+- Task 2: `getElioConfig` retourne defaults si config absente. `updateElioConfig` utilise upsert sur conflict client_id. `resetElioConfig` supprime la row DB.
+- Task 3: Page Server Component `/settings/elio/advanced` avec warning Orpheus + debug preview conditionnel (ENABLE_ELIO_DEBUG=true)
+- Task 4: `ElioModelSelector` (Select), `ElioTemperatureSlider` (input range natif), `ElioFeatureToggles` (Switch), `OrpheusConfigForm` (useTransition pattern, validation max_tokens)
+- Task 5: `generate-brief.ts` modifié pour injecter model/temperature/max_tokens/customInstructions. `buildElioSystemPrompt` étendu avec 3ème paramètre optionnel `customInstructions`.
+- Task 6: Tests unitaires co-localisés. Tests RLS dans `tests/rls/elio-configs-rls.test.ts` (skip si pas de Supabase local).
+- Task 7: Documentation complète dans `docs/elio-advanced.md`
+
 ### File List
+
+**Nouveaux fichiers :**
+- `supabase/migrations/00043_create_elio_configs.sql`
+- `packages/modules/elio/types/elio-config.types.ts`
+- `packages/modules/elio/actions/get-elio-config.ts`
+- `packages/modules/elio/actions/get-elio-config.test.ts`
+- `packages/modules/elio/actions/update-elio-config.ts`
+- `packages/modules/elio/actions/update-elio-config.test.ts`
+- `packages/modules/elio/actions/reset-elio-config.ts`
+- `packages/modules/elio/actions/reset-elio-config.test.ts`
+- `packages/modules/elio/actions/generate-brief-with-elio-config.test.ts`
+- `packages/modules/elio/components/orpheus-config-form.tsx`
+- `packages/modules/elio/components/orpheus-config-form.test.tsx`
+- `packages/modules/elio/components/elio-model-selector.tsx`
+- `packages/modules/elio/components/elio-temperature-slider.tsx`
+- `packages/modules/elio/components/elio-feature-toggles.tsx`
+- `packages/modules/elio/docs/elio-advanced.md`
+- `apps/client/app/(dashboard)/settings/elio/advanced/page.tsx`
+- `tests/rls/elio-configs-rls.test.ts`
+
+- `apps/client/app/(dashboard)/settings/elio/advanced/loading.tsx`
+- `apps/client/app/(dashboard)/settings/elio/advanced/error.tsx`
+
+**Fichiers modifiés :**
+- `packages/modules/elio/actions/generate-brief.ts`
+- `packages/modules/elio/utils/build-system-prompt.ts`
+- `packages/modules/elio/index.ts`

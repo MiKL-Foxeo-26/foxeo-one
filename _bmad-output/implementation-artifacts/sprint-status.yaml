@@ -107,7 +107,7 @@ development_status:
   6-3-soumission-de-brief-pour-validation-notifications: done
   6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: done
   6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: done
-  6-6-elio-lab-configuration-orpheus-personnalisation-agent: ready-for-dev
+  6-6-elio-lab-configuration-orpheus-personnalisation-agent: done
   epic-6-retrospective: optional
 
   # Epic 7: Validation Hub (6 stories)

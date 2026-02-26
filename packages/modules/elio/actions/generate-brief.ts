@@ -4,11 +4,12 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import { type ActionResponse, successResponse, errorResponse } from '@foxeo/types'
 import { toCommunicationProfile, type CommunicationProfileDB } from '../types/communication-profile.types'
+import { getElioConfig } from './get-elio-config'
+import { DEFAULT_ELIO_CONFIG } from '../types/elio-config.types'
 
 const MAX_CONVERSATION_MESSAGES = 20
 const API_TIMEOUT_MS = 30_000
 const LOG_PREVIEW_LENGTH = 100
-const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514'
 
 export async function generateBrief(
   stepId: string
@@ -53,6 +54,10 @@ export async function generateBrief(
   if (!parcoursData || parcoursData.client_id !== client.id) {
     return errorResponse('Accès non autorisé à cette étape', 'FORBIDDEN')
   }
+
+  // Récupérer config Élio (modèle, température, max_tokens, instructions custom)
+  const { data: elioConfig } = await getElioConfig(client.id)
+  const activeConfig = elioConfig ?? DEFAULT_ELIO_CONFIG
 
   // Récupérer profil communication (optionnel — valeurs par défaut si absent)
   const { data: profileDB } = await supabase
@@ -102,6 +107,7 @@ export async function generateBrief(
     conversationContext,
     preferredTone: profile?.preferredTone ?? 'friendly',
     preferredLength: profile?.preferredLength ?? 'balanced',
+    customInstructions: activeConfig.customInstructions ?? undefined,
   })
 
   try {
@@ -111,8 +117,9 @@ export async function generateBrief(
     })
 
     const message = await anthropic.messages.create({
-      model: ANTHROPIC_MODEL,
-      max_tokens: 2000,
+      model: activeConfig.model,
+      max_tokens: activeConfig.maxTokens,
+      temperature: activeConfig.temperature,
       messages: [{ role: 'user', content: prompt }],
     })
 
@@ -139,6 +146,7 @@ interface BuildPromptInput {
   conversationContext: string
   preferredTone: string
   preferredLength: string
+  customInstructions?: string
 }
 
 function buildGenerateBriefPrompt(input: BuildPromptInput): string {
@@ -150,6 +158,7 @@ function buildGenerateBriefPrompt(input: BuildPromptInput): string {
     conversationContext,
     preferredTone,
     preferredLength,
+    customInstructions,
   } = input
 
   const contextSection = conversationContext
@@ -178,5 +187,5 @@ Le brief doit :
 - Respecter le template si fourni
 - Utiliser un format markdown (headings, listes, etc.)
 
-Génère uniquement le brief, sans introduction ni commentaire additionnel.`
+Génère uniquement le brief, sans introduction ni commentaire additionnel.${customInstructions?.trim() ? `\n\n**Instructions supplémentaires :**\n${customInstructions.trim()}` : ''}`
 }

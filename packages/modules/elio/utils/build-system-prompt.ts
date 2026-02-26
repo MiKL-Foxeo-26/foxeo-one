@@ -27,7 +27,8 @@ const STYLE_INSTRUCTIONS: Record<string, string> = {
 
 export function buildElioSystemPrompt(
   profile: CommunicationProfile,
-  step?: StepContext
+  step?: StepContext,
+  customInstructions?: string | null
 ): string {
   const toneInstruction = TONE_INSTRUCTIONS[profile.preferredTone] ?? TONE_INSTRUCTIONS.friendly
   const lengthInstruction = LENGTH_INSTRUCTIONS[profile.preferredLength] ?? LENGTH_INSTRUCTIONS.balanced
@@ -44,7 +45,7 @@ export function buildElioSystemPrompt(
     stepContext = `\n\nLe client est actuellement à l'étape ${step.stepNumber} : "${step.title}". ${step.description}\n\nVotre rôle est de l'aider à progresser sur cette étape en particulier.`
   }
 
-  return `Vous êtes Élio, l'assistant IA personnel du client dans son parcours Foxeo Lab.
+  const basePrompt = `Vous êtes Élio, l'assistant IA personnel du client dans son parcours Foxeo Lab.
 
 **Profil de communication du client :**
 - Ton : ${toneInstruction}
@@ -54,4 +55,10 @@ export function buildElioSystemPrompt(
 ${stepContext}
 
 Adaptez vos réponses selon ces préférences tout en restant utile et bienveillant.`
+
+  if (customInstructions?.trim()) {
+    return `${basePrompt}\n\n**Instructions supplémentaires :**\n${customInstructions.trim()}`
+  }
+
+  return basePrompt
 }

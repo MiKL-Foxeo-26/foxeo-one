@@ -6,6 +6,10 @@ export { PersonalizeElioDialog } from './components/personalize-elio-dialog'
 export { ElioGuidedSuggestions } from './components/elio-guided-suggestions'
 export { GeneratedBriefDialog } from './components/generated-brief-dialog'
 export { ElioGenerateBriefSection } from './components/elio-generate-brief-section'
+export { OrpheusConfigForm } from './components/orpheus-config-form'
+export { ElioModelSelector } from './components/elio-model-selector'
+export { ElioTemperatureSlider } from './components/elio-temperature-slider'
+export { ElioFeatureToggles } from './components/elio-feature-toggles'
 
 // Actions
 export { createCommunicationProfile } from './actions/create-communication-profile'
@@ -13,6 +17,9 @@ export { updateCommunicationProfile } from './actions/update-communication-profi
 export { getCommunicationProfile } from './actions/get-communication-profile'
 export { generateBrief } from './actions/generate-brief'
 export { submitElioBrief } from './actions/submit-elio-brief'
+export { getElioConfig } from './actions/get-elio-config'
+export { updateElioConfig } from './actions/update-elio-config'
+export { resetElioConfig } from './actions/reset-elio-config'
 
 // Utils
 export { buildElioSystemPrompt } from './utils/build-system-prompt'
@@ -40,3 +47,16 @@ export {
   InteractionStyleValues,
   toCommunicationProfile,
 } from './types/communication-profile.types'
+
+export type {
+  ElioConfig,
+  ElioConfigDB,
+  ElioModel,
+  UpdateElioConfigInput,
+} from './types/elio-config.types'
+
+export {
+  ELIO_MODELS,
+  DEFAULT_ELIO_CONFIG,
+  toElioConfig,
+} from './types/elio-config.types'
