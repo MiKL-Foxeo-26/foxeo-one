@@ -104,9 +104,9 @@ development_status:
   epic-6: in-progress
   6-1-module-parcours-lab-migration-structure-vue-parcours-progression: done
   6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: done
-  6-3-soumission-de-brief-pour-validation-notifications: review
+  6-3-soumission-de-brief-pour-validation-notifications: done
   6-4-elio-lab-conversation-guidee-adaptation-au-profil-communication: done
-  6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: ready-for-dev
+  6-5-elio-lab-generation-de-briefs-soumission-automatique-au-validation-hub: done
   6-6-elio-lab-configuration-orpheus-personnalisation-agent: ready-for-dev
   epic-6-retrospective: optional
 

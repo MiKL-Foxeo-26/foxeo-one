@@ -105,3 +105,79 @@ export interface CompleteStepResult {
   nextStepUnlocked: boolean
   parcoursCompleted: boolean
 }
+
+// --- Step Submissions ---
+
+export const SubmissionStatusValues = ['pending', 'approved', 'rejected', 'revision_requested'] as const
+export type SubmissionStatus = typeof SubmissionStatusValues[number]
+
+export const ValidateDecisionValues = ['approved', 'rejected', 'revision_requested'] as const
+export type ValidateDecision = typeof ValidateDecisionValues[number]
+
+export interface StepSubmissionDB {
+  id: string
+  parcours_step_id: string
+  client_id: string
+  submission_content: string
+  submission_files: string[]
+  submitted_at: string
+  status: SubmissionStatus
+  feedback: string | null
+  feedback_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface StepSubmission {
+  id: string
+  parcoursStepId: string
+  clientId: string
+  submissionContent: string
+  submissionFiles: string[]
+  submittedAt: string
+  status: SubmissionStatus
+  feedback: string | null
+  feedbackAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface StepSubmissionWithStep extends StepSubmission {
+  stepNumber: number
+  stepTitle: string
+  parcoursId: string
+}
+
+// --- Zod Schemas for Submissions ---
+
+export const SubmitStepInput = z.object({
+  stepId: z.string().uuid('stepId invalide'),
+  content: z.string().min(50, 'Votre soumission doit contenir au moins 50 caractères'),
+  files: z.array(z.string()).max(5, 'Maximum 5 fichiers').optional(),
+})
+export type SubmitStepInput = z.infer<typeof SubmitStepInput>
+
+export const ValidateSubmissionInput = z.object({
+  submissionId: z.string().uuid('submissionId invalide'),
+  decision: z.enum(ValidateDecisionValues),
+  feedback: z.string().optional(),
+}).refine(
+  (data) => data.decision === 'approved' || (data.feedback && data.feedback.length > 0),
+  { message: 'Le feedback est obligatoire pour une révision ou un refus', path: ['feedback'] }
+)
+export type ValidateSubmissionInput = z.infer<typeof ValidateSubmissionInput>
+
+export const GetSubmissionsInput = z.object({
+  clientId: z.string().uuid('clientId invalide').optional(),
+  stepId: z.string().uuid('stepId invalide').optional(),
+  status: z.enum(SubmissionStatusValues).optional(),
+})
+export type GetSubmissionsInput = z.infer<typeof GetSubmissionsInput>
+
+export interface SubmitStepResult {
+  submissionId: string
+}
+
+export interface ValidateSubmissionResult {
+  stepCompleted: boolean
+}

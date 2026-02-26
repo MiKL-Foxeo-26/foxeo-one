@@ -1,7 +1,7 @@
 // Parcours Lab Module
 export { manifest } from './manifest'
 
-// Components
+// Components — Parcours
 export { ParcoursOverview } from './components/parcours-overview'
 export { ParcoursProgressBar } from './components/parcours-progress-bar'
 export { ParcoursStepCard } from './components/parcours-step-card'
@@ -13,15 +13,28 @@ export { BriefAssetsGallery } from './components/brief-assets-gallery'
 export { OneTeasingCard } from './components/one-teasing-card'
 export { StepNavigationButtons } from './components/step-navigation-buttons'
 
+// Components — Submissions (Story 6.3)
+export { SubmitStepForm } from './components/submit-step-form'
+export { SubmissionFileUpload } from './components/submission-file-upload'
+export { SubmissionStatusBadge } from './components/submission-status-badge'
+export { SubmissionsList } from './components/submissions-list'
+export { SubmissionDetailView } from './components/submission-detail-view'
+export { ValidateSubmissionForm } from './components/validate-submission-form'
+
 // Hooks
 export { useParcours } from './hooks/use-parcours'
 export { useParcoursSteps } from './hooks/use-parcours-steps'
+export { useStepSubmissions } from './hooks/use-step-submissions'
 
 // Actions
 export { getParcours } from './actions/get-parcours'
 export { updateStepStatus } from './actions/update-step-status'
 export { completeStep } from './actions/complete-step'
 export { skipStep } from './actions/skip-step'
+export { submitStep } from './actions/submit-step'
+export { validateSubmission } from './actions/validate-submission'
+export { getSubmissions } from './actions/get-submissions'
+export { getSubmissionById } from './actions/get-submission-by-id'
 
 // Types
 export type {
@@ -36,6 +49,17 @@ export type {
   UpdateStepStatusInput,
   CompleteStepInput,
   SkipStepInput,
+  // Submission types
+  StepSubmission,
+  StepSubmissionDB,
+  StepSubmissionWithStep,
+  SubmissionStatus,
+  ValidateDecision,
+  SubmitStepInput,
+  ValidateSubmissionInput,
+  GetSubmissionsInput,
+  SubmitStepResult,
+  ValidateSubmissionResult,
 } from './types/parcours.types'
 
-export { ParcoursStepStatusValues } from './types/parcours.types'
+export { ParcoursStepStatusValues, SubmissionStatusValues, ValidateDecisionValues } from './types/parcours.types'

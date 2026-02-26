@@ -22,13 +22,38 @@ Des suggestions contextuelles (chips) sont affichées selon l'étape du parcours
 ### Modification du profil
 Le profil est modifiable à tout moment dans **Paramètres > Profil de communication Élio**.
 
+## Fonctionnalités Story 6.5
+
+### Génération de briefs
+Élio peut générer automatiquement le brief d'une étape à partir du contexte de conversation. Le client peut relire, modifier, régénérer et soumettre le brief.
+
+**Conditions d'activation** : étape `current` avec `validation_required = TRUE`.
+
+### Workflow de génération
+1. Client clique "Générer mon brief avec Élio" (sur la page de soumission d'étape)
+2. Élio appelle l'API Claude avec le contexte conversation + template étape + profil
+3. Dialog affiche le brief généré en markdown
+4. Client peut : éditer (textarea), régénérer, ou soumettre pour validation
+5. Soumission → flow identique Story 6.3 : notification MiKL + étape → `pending_validation`
+
+### Notes techniques
+- Conversation context : table `elio_conversations` (Story 8.2) — fallback gracieux si absente
+- Max 20 messages de conversation chargés pour limiter les tokens
+- Clé API Anthropic : côté serveur uniquement (`ANTHROPIC_API_KEY`)
+- Logging : `[ELIO:GENERATE_BRIEF]`, `[ELIO:SUBMIT_BRIEF]`
+
 ## Architecture
 
 - `types/communication-profile.types.ts` — Types TypeScript
 - `actions/create-communication-profile.ts` — Server Action création
 - `actions/update-communication-profile.ts` — Server Action mise à jour
 - `actions/get-communication-profile.ts` — Server Action lecture
+- `actions/generate-brief.ts` — Server Action génération brief via API Claude
+- `actions/submit-elio-brief.ts` — Server Action soumission brief généré
 - `utils/build-system-prompt.ts` — Construction du prompt système Claude
 - `components/personalize-elio-dialog.tsx` — Dialog personnalisation initiale
 - `components/elio-guided-suggestions.tsx` — Chips suggestions étape
+- `components/generated-brief-dialog.tsx` — Dialog aperçu + édition + soumission brief
+- `components/elio-generate-brief-section.tsx` — Section intégrable avec bouton + dialog
+- `components/brief-markdown-renderer.tsx` — Rendu markdown du brief
 - `data/elio-suggestions.ts` — Données suggestions par étape

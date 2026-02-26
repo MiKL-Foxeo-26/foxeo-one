@@ -4,11 +4,15 @@ export { manifest } from './manifest'
 // Components
 export { PersonalizeElioDialog } from './components/personalize-elio-dialog'
 export { ElioGuidedSuggestions } from './components/elio-guided-suggestions'
+export { GeneratedBriefDialog } from './components/generated-brief-dialog'
+export { ElioGenerateBriefSection } from './components/elio-generate-brief-section'
 
 // Actions
 export { createCommunicationProfile } from './actions/create-communication-profile'
 export { updateCommunicationProfile } from './actions/update-communication-profile'
 export { getCommunicationProfile } from './actions/get-communication-profile'
+export { generateBrief } from './actions/generate-brief'
+export { submitElioBrief } from './actions/submit-elio-brief'
 
 // Utils
 export { buildElioSystemPrompt } from './utils/build-system-prompt'

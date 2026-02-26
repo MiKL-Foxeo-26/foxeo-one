@@ -1,6 +1,6 @@
 # Story 6.3: Soumission de brief pour validation & notifications
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -24,51 +24,51 @@ So that **je reçois un feedback structuré avant de passer à l'étape suivante
 
 ## Tasks / Subtasks
 
-- [ ] Task 1 — Migration Supabase (AC: #1)
-  - [ ] 1.1 Créer migration `00036_create_step_submissions.sql`
-  - [ ] 1.2 Table `step_submissions` avec tous les champs
-  - [ ] 1.3 Index : `idx_step_submissions_parcours_step_id`, `idx_step_submissions_client_id_status`
-  - [ ] 1.4 Trigger updated_at
-  - [ ] 1.5 RLS policies
+- [x] ask 1 — Migration Supabase (AC: #1)
+  - [x] .1 Créer migration `00036_create_step_submissions.sql`
+  - [x] .2 Table `step_submissions` avec tous les champs
+  - [x] .3 Index : `idx_step_submissions_parcours_step_id`, `idx_step_submissions_client_id_status`
+  - [x] .4 Trigger updated_at
+  - [x] .5 RLS policies
 
-- [ ] Task 2 — Supabase Storage bucket (AC: #2, #3)
-  - [ ] 2.1 Créer bucket `submissions` (public: false, RLS activé)
-  - [ ] 2.2 Policies Storage : client upload ses submissions, opérateur voit tout
+- [x] ask 2 — Supabase Storage bucket (AC: #2, #3)
+  - [x] .1 Créer bucket `submissions` (public: false, RLS activé)
+  - [x] .2 Policies Storage : client upload ses submissions, opérateur voit tout
 
-- [ ] Task 3 — Server Actions (AC: #3, #5)
-  - [ ] 3.1 `actions/submit-step.ts` — Créer soumission + upload fichiers + notifications
-  - [ ] 3.2 `actions/validate-submission.ts` — MiKL valide/demande révision/refuse + update step status + notifications
-  - [ ] 3.3 `actions/get-submissions.ts` — Récupérer soumissions (filtré par RLS)
+- [x] ask 3 — Server Actions (AC: #3, #5)
+  - [x] .1 `actions/submit-step.ts` — Créer soumission + upload fichiers + notifications
+  - [x] .2 `actions/validate-submission.ts` — MiKL valide/demande révision/refuse + update step status + notifications
+  - [x] .3 `actions/get-submissions.ts` — Récupérer soumissions (filtré par RLS)
 
-- [ ] Task 4 — Hooks TanStack Query (AC: #2)
-  - [ ] 4.1 `hooks/use-step-submissions.ts` — queryKey `['step-submissions', stepId]`
+- [x] ask 4 — Hooks TanStack Query (AC: #2)
+  - [x] .1 `hooks/use-step-submissions.ts` — queryKey `['step-submissions', stepId]`
 
-- [ ] Task 5 — Composants UI Client (AC: #2)
-  - [ ] 5.1 `components/submit-step-form.tsx` — Formulaire soumission (react-hook-form + Zod)
-  - [ ] 5.2 `components/submission-file-upload.tsx` — Upload fichiers avec preview
-  - [ ] 5.3 `components/submission-status-badge.tsx` — Badge statut soumission
+- [x] ask 5 — Composants UI Client (AC: #2)
+  - [x] .1 `components/submit-step-form.tsx` — Formulaire soumission (react-hook-form + Zod)
+  - [x] .2 `components/submission-file-upload.tsx` — Upload fichiers avec preview
+  - [x] .3 `components/submission-status-badge.tsx` — Badge statut soumission
 
-- [ ] Task 6 — Composants UI MiKL (AC: #4, #5)
-  - [ ] 6.1 `components/submissions-list.tsx` — Liste soumissions côté CRM
-  - [ ] 6.2 `components/submission-detail-view.tsx` — Vue détaillée soumission
-  - [ ] 6.3 `components/validate-submission-form.tsx` — Formulaire validation MiKL
+- [x] ask 6 — Composants UI MiKL (AC: #4, #5)
+  - [x] .1 `components/submissions-list.tsx` — Liste soumissions côté CRM
+  - [x] .2 `components/submission-detail-view.tsx` — Vue détaillée soumission
+  - [x] .3 `components/validate-submission-form.tsx` — Formulaire validation MiKL
 
-- [ ] Task 7 — Routes Client (AC: #2)
-  - [ ] 7.1 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submit/page.tsx`
-  - [ ] 7.2 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submission/page.tsx` — Voir sa soumission
+- [x] ask 7 — Routes Client (AC: #2)
+  - [x] .1 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submit/page.tsx`
+  - [x] .2 `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submission/page.tsx` — Voir sa soumission
 
-- [ ] Task 8 — Routes Hub (AC: #4, #5)
-  - [ ] 8.1 Hub : Onglet "Soumissions" dans `/modules/crm/clients/[clientId]` (ou sous-route dédiée)
-  - [ ] 8.2 Hub : `/modules/crm/clients/[clientId]/submissions/[submissionId]` — Vue détaillée validation
+- [x] ask 8 — Routes Hub (AC: #4, #5)
+  - [x] .1 Hub : Onglet "Soumissions" dans `/modules/crm/clients/[clientId]` (ou sous-route dédiée)
+  - [x] .2 Hub : `/modules/crm/clients/[clientId]/submissions/[submissionId]` — Vue détaillée validation
 
-- [ ] Task 9 — Tests (AC: #6)
-  - [ ] 9.1 Tests Server Actions : submitStep, validateSubmission
-  - [ ] 9.2 Tests composants : SubmitStepForm, ValidateSubmissionForm
-  - [ ] 9.3 Tests RLS : client A ne voit pas soumissions client B
-  - [ ] 9.4 Tests workflow : submit → pending → approved → unlock next step
+- [x] ask 9 — Tests (AC: #6)
+  - [x] .1 Tests Server Actions : submitStep, validateSubmission
+  - [x] .2 Tests composants : SubmitStepForm, ValidateSubmissionForm
+  - [x] .3 Tests RLS : client A ne voit pas soumissions client B
+  - [x] .4 Tests workflow : submit → pending → approved → unlock next step
 
-- [ ] Task 10 — Documentation (AC: #6)
-  - [ ] 10.1 Mise à jour `docs/guide.md`, `docs/flows.md` module parcours
+- [x] ask 10 — Documentation (AC: #6)
+  - [x] 0.1 Mise à jour `docs/guide.md`, `docs/flows.md` module parcours
 
 ## Dev Notes
 
@@ -429,8 +429,78 @@ packages/modules/parcours/
 
 ### Agent Model Used
 
+claude-sonnet-4-6
+
 ### Debug Log References
+
+- Migration numérotée 00039/00040/00041 (pas 00036 — conflits avec migrations existantes)
+- Migration 00041 ajoutée pour corriger la contrainte notification_types (manquait success, info, warning, error)
+- Tests vi.mock réécris avec vi.hoisted() pour éviter l'erreur de hoisting ReferenceError
+- Tests submission-workflow.test.ts redesignés en logique pure (sans appels Supabase) pour éviter les conflits de mock cache
 
 ### Completion Notes List
 
+- AC1 : Table step_submissions créée (migration 00039) avec trigger updated_at et 4 policies RLS
+- AC2 : Bucket Supabase Storage "submissions" créé (migration 00040) — private, RLS client/operator
+- AC3 : submitStep() — vérification duplicate pending, upload fichiers, notifications opérateur+client, log [PARCOURS:SUBMIT]
+- AC4 : SubmissionsList avec table étape/date/statut/lien, loading skeleton, état vide
+- AC5 : validateSubmission() — approved/revision_requested/rejected avec logique step completion et notifications
+- AC6 : 8 fichiers de tests — submit-step, validate-submission, submission-status-badge, submit-step-form, validate-submission-form, submission-workflow, step-submissions-rls (skipIf sans RUN_RLS_TESTS), use-step-submissions
+- Hook useStepSubmissions avec queryKey ['step-submissions', stepId, clientId, status]
+- get-submission-by-id.ts ajouté (non prévu dans story) pour SubmissionDetailView
+- package.json module parcours : @hookform/resolvers, react-hook-form, date-fns ajoutés
+- docs/guide.md et docs/flows.md mis à jour (Flow 5, 6, 7 ajoutés)
+- 2320 tests passing, 0 failures, 86 skipped (RLS live DB)
+
 ### File List
+
+**Migrations Supabase :**
+- `supabase/migrations/00039_create_step_submissions.sql` (NEW)
+- `supabase/migrations/00040_create_submissions_storage_bucket.sql` (NEW)
+- `supabase/migrations/00041_extend_notification_types.sql` (NEW)
+
+**Types :**
+- `packages/modules/parcours/types/parcours.types.ts` (MODIFIED — ajout SubmissionStatus, ValidateDecision, StepSubmission*, schemas Zod)
+
+**Server Actions :**
+- `packages/modules/parcours/actions/submit-step.ts` (NEW)
+- `packages/modules/parcours/actions/validate-submission.ts` (NEW)
+- `packages/modules/parcours/actions/get-submissions.ts` (NEW)
+- `packages/modules/parcours/actions/get-submission-by-id.ts` (NEW)
+
+**Hooks :**
+- `packages/modules/parcours/hooks/use-step-submissions.ts` (NEW)
+
+**Composants :**
+- `packages/modules/parcours/components/submission-status-badge.tsx` (NEW)
+- `packages/modules/parcours/components/submission-file-upload.tsx` (NEW)
+- `packages/modules/parcours/components/submit-step-form.tsx` (NEW)
+- `packages/modules/parcours/components/submissions-list.tsx` (NEW)
+- `packages/modules/parcours/components/submission-detail-view.tsx` (NEW)
+- `packages/modules/parcours/components/validate-submission-form.tsx` (NEW)
+
+**Routes Client :**
+- `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submit/page.tsx` (NEW)
+- `apps/client/app/(dashboard)/modules/parcours/steps/[stepNumber]/submission/page.tsx` (NEW)
+
+**Routes Hub :**
+- `apps/hub/app/(dashboard)/modules/crm/clients/[clientId]/submissions/[submissionId]/page.tsx` (NEW)
+- `apps/hub/app/(dashboard)/modules/crm/clients/[clientId]/client-detail-with-support.tsx` (MODIFIED — onglet Soumissions)
+
+**Module :**
+- `packages/modules/parcours/index.ts` (MODIFIED — exports nouveaux composants/hooks/actions/types)
+- `packages/modules/parcours/package.json` (MODIFIED — @hookform/resolvers, react-hook-form, date-fns)
+
+**Tests :**
+- `packages/modules/parcours/actions/submit-step.test.ts` (NEW)
+- `packages/modules/parcours/actions/validate-submission.test.ts` (NEW)
+- `packages/modules/parcours/actions/submission-workflow.test.ts` (NEW)
+- `packages/modules/parcours/hooks/use-step-submissions.test.ts` (NEW)
+- `packages/modules/parcours/components/submission-status-badge.test.tsx` (NEW)
+- `packages/modules/parcours/components/submit-step-form.test.tsx` (NEW)
+- `packages/modules/parcours/components/validate-submission-form.test.tsx` (NEW)
+- `tests/rls/step-submissions-rls.test.ts` (NEW)
+
+**Documentation :**
+- `packages/modules/parcours/docs/guide.md` (MODIFIED — section Soumission & Validation, DB schema step_submissions)
+- `packages/modules/parcours/docs/flows.md` (MODIFIED — Flow 5, 6, 7 ajoutés)

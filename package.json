@@ -24,5 +24,8 @@
   "packageManager": "npm@10.2.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0"
   }
 }

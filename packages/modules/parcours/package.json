@@ -13,8 +13,11 @@
     "@foxeo/types": "*",
     "@foxeo/ui": "*",
     "@foxeo/utils": "*",
+    "@hookform/resolvers": "*",
     "@tanstack/react-query": "^5.90.0",
+    "date-fns": "^4.1.0",
     "react": "^19.0.0",
+    "react-hook-form": "*",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
     "zod": "*"
