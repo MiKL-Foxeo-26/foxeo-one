@@ -52,6 +52,11 @@ vi.mock('./reject-dialog', () => ({
     open ? <div data-testid="reject-dialog" /> : null,
 }))
 
+vi.mock('./clarification-dialog', () => ({
+  ClarificationDialog: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="clarification-dialog" /> : null,
+}))
+
 const mockDetail: ValidationRequestDetail = {
   id: 'req-1',
   clientId: 'c-1',
@@ -197,5 +202,40 @@ describe('RequestDetail', () => {
     const RequestDetail = await importComponent()
     render(<RequestDetail requestId="req-1" />)
     expect(screen.queryByTestId('request-exchanges')).toBeNull()
+  })
+
+  it('should show 2 exchanges when client has resubmitted (status=pending with reviewerComment)', async () => {
+    const detailResubmitted = {
+      ...mockDetail,
+      status: 'pending' as const,
+      reviewerComment: 'Quel est le budget ?',
+      reviewedAt: '2026-02-21T09:00:00Z',
+      updatedAt: '2026-02-22T10:00:00Z',
+      content: 'Notre budget est de 5000€',
+    }
+    mockUseValidationRequest.mockReturnValue({
+      request: detailResubmitted,
+      isLoading: false,
+      error: null,
+    })
+
+    const RequestDetail = await importComponent()
+    render(<RequestDetail requestId="req-1" />)
+    expect(screen.getByTestId('request-exchanges')).toBeDefined()
+    // 2 exchanges: MiKL asked + Client resubmitted
+    expect(screen.getByTestId('request-exchanges').textContent).toBe('2')
+  })
+
+  it('should render ClarificationDialog (closed by default)', async () => {
+    mockUseValidationRequest.mockReturnValue({
+      request: mockDetail,
+      isLoading: false,
+      error: null,
+    })
+
+    const RequestDetail = await importComponent()
+    render(<RequestDetail requestId="req-1" />)
+    // Clarification dialog is closed by default
+    expect(screen.queryByTestId('clarification-dialog')).toBeNull()
   })
 })

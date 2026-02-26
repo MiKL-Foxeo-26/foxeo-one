@@ -12,6 +12,7 @@ export { RequestExchanges } from './components/request-exchanges'
 export { RequestActions } from './components/request-actions'
 export { ApproveDialog } from './components/approve-dialog'
 export { RejectDialog } from './components/reject-dialog'
+export { ClarificationDialog } from './components/clarification-dialog'
 export type { ExchangeEntry } from './components/request-exchanges'
 
 // Hooks
@@ -29,6 +30,8 @@ export { getClientPreviousRequests } from './actions/get-client-previous-request
 export { getClientRecentMessages } from './actions/get-client-recent-messages'
 export { approveRequest } from './actions/approve-request'
 export { rejectRequest } from './actions/reject-request'
+export { requestClarification } from './actions/request-clarification'
+export { resubmitRequest } from './actions/resubmit-request'
 
 // Types
 export type {

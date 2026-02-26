@@ -12,6 +12,7 @@ import { RequestExchanges } from './request-exchanges'
 import { RequestActions } from './request-actions'
 import { ApproveDialog } from './approve-dialog'
 import { RejectDialog } from './reject-dialog'
+import { ClarificationDialog } from './clarification-dialog'
 import type { ExchangeEntry } from './request-exchanges'
 
 type RequestDetailProps = {
@@ -22,6 +23,7 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
   const { request, isLoading, error } = useValidationRequest(requestId)
   const [isApproveOpen, setIsApproveOpen] = useState(false)
   const [isRejectOpen, setIsRejectOpen] = useState(false)
+  const [isClarificationOpen, setIsClarificationOpen] = useState(false)
 
   if (isLoading) {
     return <RequestDetailSkeleton />
@@ -56,7 +58,7 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
     )
   }
 
-  // Build exchanges from reviewer_comment (needs_clarification case)
+  // Build exchanges from reviewer_comment (needs_clarification and resubmission cases)
   const exchanges: ExchangeEntry[] = []
   if (request.reviewerComment && request.reviewedAt) {
     exchanges.push({
@@ -65,6 +67,15 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
       action: 'a demandé des précisions :',
       comment: request.reviewerComment,
     })
+    // If the status is back to 'pending', the client has resubmitted after the clarification
+    if (request.status === 'pending') {
+      exchanges.push({
+        date: request.updatedAt,
+        actor: 'Client',
+        action: 'a re-soumis avec :',
+        comment: request.content,
+      })
+    }
   }
 
   return (
@@ -95,7 +106,7 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
               documents={request.documents}
             />
 
-            {/* Section Échanges (si needs_clarification) */}
+            {/* Section Échanges (précisions demandées / re-soumissions) */}
             {exchanges.length > 0 && (
               <RequestExchanges exchanges={exchanges} />
             )}
@@ -118,9 +129,7 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
         status={request.status}
         onValidate={() => setIsApproveOpen(true)}
         onRefuse={() => setIsRejectOpen(true)}
-        onRequestClarification={() => {
-          // Story 7.4
-        }}
+        onRequestClarification={() => setIsClarificationOpen(true)}
         onTreatmentAction={() => {
           // Story 7.5
         }}
@@ -142,6 +151,15 @@ export function RequestDetail({ requestId }: RequestDetailProps) {
         onClose={() => setIsRejectOpen(false)}
         requestId={request.id}
         clientId={request.clientId}
+        title={request.title}
+        clientName={request.client.name}
+        type={request.type}
+      />
+
+      <ClarificationDialog
+        open={isClarificationOpen}
+        onClose={() => setIsClarificationOpen(false)}
+        requestId={request.id}
         title={request.title}
         clientName={request.client.name}
         type={request.type}

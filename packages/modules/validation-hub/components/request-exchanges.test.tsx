@@ -74,4 +74,56 @@ describe('RequestExchanges', () => {
     render(<RequestExchanges exchanges={exchanges} />)
     expect(screen.getByText('fmt:2026-02-20T14:30:00Z')).toBeDefined()
   })
+
+  it('should render resubmission exchange with client actor', async () => {
+    const RequestExchanges = await importComponent()
+    const exchanges: ExchangeEntry[] = [
+      {
+        date: '2026-02-20T10:00:00Z',
+        actor: 'MiKL',
+        action: 'a demandé des précisions :',
+        comment: 'Quel est le budget ?',
+      },
+      {
+        date: '2026-02-21T10:00:00Z',
+        actor: 'Client',
+        action: 'a re-soumis avec :',
+        comment: 'Notre budget est de 5000€',
+      },
+    ]
+    render(<RequestExchanges exchanges={exchanges} />)
+    expect(screen.getByText('Client')).toBeDefined()
+    expect(screen.getByText(/re-soumis/)).toBeDefined()
+    expect(screen.getByText('Notre budget est de 5000€')).toBeDefined()
+  })
+
+  it('should display multiple exchanges in chronological order (oldest first)', async () => {
+    const RequestExchanges = await importComponent()
+    const exchanges: ExchangeEntry[] = [
+      {
+        date: '2026-02-23T10:00:00Z',
+        actor: 'MiKL',
+        action: 'a demandé des précisions :',
+        comment: 'Deuxième question',
+      },
+      {
+        date: '2026-02-21T10:00:00Z',
+        actor: 'Client',
+        action: 'a re-soumis avec :',
+        comment: 'Première réponse',
+      },
+      {
+        date: '2026-02-20T10:00:00Z',
+        actor: 'MiKL',
+        action: 'a demandé des précisions :',
+        comment: 'Première question',
+      },
+    ]
+    render(<RequestExchanges exchanges={exchanges} />)
+
+    const actors = screen.getAllByText(/MiKL|Client/)
+    expect(actors[0].textContent).toBe('MiKL')
+    expect(actors[1].textContent).toBe('Client')
+    expect(actors[2].textContent).toBe('MiKL')
+  })
 })

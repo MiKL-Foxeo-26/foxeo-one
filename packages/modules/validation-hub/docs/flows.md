@@ -95,3 +95,69 @@ pending ──→ approved
         ──→ rejected
         ──→ needs_clarification ──→ pending (après réponse client)
 ```
+
+## Flux : Demande de précisions (Story 7.4)
+
+```
+MiKL clique "Demander des précisions"
+    │
+    ▼
+ClarificationDialog s'ouvre (modale @foxeo/ui Dialog)
+    │   - Résumé demande (titre + client)
+    │   - Champ question obligatoire (min 10 chars)
+    │   - 3 suggestions rapides (chips Button outline sm)
+    │
+    ▼
+MiKL soumet sa question
+    │
+    ▼
+Server Action: requestClarification(requestId, comment)
+    │   Chemin: packages/modules/validation-hub/actions/request-clarification.ts
+    │   1. Validation Zod (UUID + min 10 chars)
+    │   2. validation_requests.status → 'needs_clarification'
+    │   3. validation_requests.reviewer_comment → commentaire
+    │   4. validation_requests.reviewed_at → NOW()
+    │   5. Notification client: type='validation', link='/modules/parcours-lab' (brief_lab)
+    │
+    ▼
+Toast succès: "Question envoyée au client"
+    │
+    ├── Invalidation cache: ['validation-requests'] + ['validation-request', requestId]
+    └── Redirect: /modules/validation-hub
+```
+
+## Flux : Re-soumission client (Story 7.4 — API côté Lab/One)
+
+```
+Client reçoit notification "MiKL a une question sur '{titre}'"
+    │
+    ▼
+Client modifie son contenu (interface Lab/One — Epic 6)
+    │
+    ▼
+Server Action: resubmitRequest(requestId, newContent)
+    │   Chemin: packages/modules/validation-hub/actions/resubmit-request.ts
+    │   1. Validation Zod (UUID + contenu non vide)
+    │   2. validation_requests.content → nouveau contenu
+    │   3. validation_requests.status → 'pending'
+    │   4. validation_requests.updated_at → NOW()
+    │   5. Notification MiKL: type='validation', link='/modules/validation-hub/{requestId}'
+    │
+    ▼
+MiKL reçoit notification
+    │
+    └── La demande remonte dans la file d'attente
+```
+
+## Historique des échanges (AC 5)
+
+La section "Échanges" dans la vue détaillée affiche les allers-retours :
+
+- `reviewer_comment` présent + `status === 'needs_clarification'` :
+  → "MiKL a demandé des précisions : {comment}" (date = reviewed_at)
+
+- `reviewer_comment` présent + `status === 'pending'` (client a re-soumis) :
+  → "MiKL a demandé des précisions : {comment}" (date = reviewed_at)
+  → "Client a re-soumis avec : {content}" (date = updated_at)
+
+Ce cycle peut se répéter : MiKL redemande → client re-soumet → etc.
