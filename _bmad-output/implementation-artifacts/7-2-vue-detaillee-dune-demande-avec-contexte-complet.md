@@ -1,6 +1,6 @@
 # Story 7.2 : Vue détaillée d'une demande avec contexte complet
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -127,72 +127,72 @@ So that **je peux prendre une décision éclairée sans avoir à chercher les in
 ## Tasks / Subtasks
 
 ### Task 1 : Créer la route et la page de détail (AC: 1)
-- [ ] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/page.tsx`
-- [ ] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/loading.tsx` (skeleton)
-- [ ] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/error.tsx` (error boundary)
-- [ ] Tester la navigation depuis la file d'attente
+- [x] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/page.tsx`
+- [x] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/loading.tsx` (skeleton)
+- [x] Créer `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/error.tsx` (error boundary)
+- [x] Tester la navigation depuis la file d'attente
 
 ### Task 2 : Créer le hook use-validation-request (AC: 1)
-- [ ] Créer `packages/modules/validation-hub/hooks/use-validation-request.ts`
-- [ ] Implémenter TanStack Query avec queryKey `['validation-request', requestId]`
-- [ ] Requête Supabase avec jointures :
+- [x] Créer `packages/modules/validation-hub/hooks/use-validation-request.ts`
+- [x] Implémenter TanStack Query avec queryKey `['validation-request', requestId]`
+- [x] Requête Supabase avec jointures :
   - `clients` (avatar, nom, entreprise, type)
   - `parcours` (si parcours_id non null)
   - `documents` (si document_ids non vide)
-- [ ] Transformation snake_case → camelCase
-- [ ] Configurer staleTime à 1 minute
-- [ ] Écrire test `use-validation-request.test.ts`
+- [x] Transformation snake_case → camelCase
+- [x] Configurer staleTime à 1 minute
+- [x] Écrire test `use-validation-request.test.ts`
 
 ### Task 3 : Créer les types étendus (AC: 2-5)
-- [ ] Étendre `ValidationRequest` dans `types/validation.types.ts` avec :
+- [x] Étendre `ValidationRequest` dans `types/validation.types.ts` avec :
   - `client: ClientDetail` (avatar, nom, entreprise, type)
   - `parcours?: ParcoursDetail` (nom, progression, étape actuelle)
   - `documents: DocumentSummary[]` (nom, taille, type, url)
   - `previousRequests?: ValidationRequestSummary[]` (3 dernières)
   - `recentMessages?: MessageSummary[]` (3 derniers)
-- [ ] Définir les types `ClientDetail`, `ParcoursDetail`, `DocumentSummary`, `MessageSummary`
+- [x] Définir les types `ClientDetail`, `ParcoursDetail`, `DocumentSummary`, `MessageSummary`
 
 ### Task 4 : Créer le composant request-detail (AC: 2-8)
-- [ ] Créer `components/request-detail.tsx`
-- [ ] Implémenter Section 1 : En-tête (titre, badges, date, bouton retour)
-- [ ] Implémenter Section 2 : Informations client (avatar, nom, entreprise, type, lien CRM)
-- [ ] Implémenter Section 3 : Contenu (besoin markdown, documents joints)
-- [ ] Implémenter Section 4 : Historique (dernières demandes, messages, progression)
-- [ ] Implémenter Section Échanges (si needs_clarification)
-- [ ] Implémenter zone boutons d'action sticky (4 boutons)
-- [ ] Appliquer design responsive (1 col mobile, 2 col desktop)
-- [ ] Appliquer theme dark mode Hub
-- [ ] Écrire test `request-detail.test.tsx`
+- [x] Créer `components/request-detail.tsx`
+- [x] Implémenter Section 1 : En-tête (titre, badges, date, bouton retour)
+- [x] Implémenter Section 2 : Informations client (avatar, nom, entreprise, type, lien CRM)
+- [x] Implémenter Section 3 : Contenu (besoin markdown, documents joints)
+- [x] Implémenter Section 4 : Historique (dernières demandes, messages, progression)
+- [x] Implémenter Section Échanges (si needs_clarification)
+- [x] Implémenter zone boutons d'action sticky (4 boutons)
+- [x] Appliquer design responsive (1 col mobile, 2 col desktop)
+- [x] Appliquer theme dark mode Hub
+- [x] Écrire test `request-detail.test.tsx`
 
 ### Task 5 : Créer les composants auxiliaires (AC: 3-5)
-- [ ] Créer `components/request-header.tsx` (en-tête réutilisable)
-- [ ] Créer `components/client-info-card.tsx` (infos client réutilisable)
-- [ ] Créer `components/request-content.tsx` (contenu + documents)
-- [ ] Créer `components/request-history.tsx` (historique pertinent)
-- [ ] Créer `components/request-exchanges.tsx` (chronologie échanges)
-- [ ] Créer `components/request-actions.tsx` (boutons d'action sticky)
-- [ ] Écrire tests pour chaque composant
+- [x] Créer `components/request-header.tsx` (en-tête réutilisable)
+- [x] Créer `components/client-info-card.tsx` (infos client réutilisable)
+- [x] Créer `components/request-content.tsx` (contenu + documents)
+- [x] Créer `components/request-history.tsx` (historique pertinent)
+- [x] Créer `components/request-exchanges.tsx` (chronologie échanges)
+- [x] Créer `components/request-actions.tsx` (boutons d'action sticky)
+- [x] Écrire tests pour chaque composant
 
 ### Task 6 : Implémenter les requêtes Supabase (AC: 3-5)
-- [ ] Créer `actions/get-validation-request.ts` (requête complète avec jointures)
-- [ ] Créer `actions/get-client-previous-requests.ts` (3 dernières demandes client)
-- [ ] Créer `actions/get-client-recent-messages.ts` (3 derniers messages chat)
-- [ ] Transformer snake_case → camelCase dans toutes les actions
-- [ ] Écrire tests pour chaque action
+- [x] Créer `actions/get-validation-request.ts` (requête complète avec jointures)
+- [x] Créer `actions/get-client-previous-requests.ts` (3 dernières demandes client)
+- [x] Créer `actions/get-client-recent-messages.ts` (3 derniers messages chat)
+- [x] Transformer snake_case → camelCase dans toutes les actions
+- [x] Écrire tests pour chaque action
 
 ### Task 7 : Intégration avec les autres modules (AC: 3-4)
-- [ ] Lien vers fiche client CRM : `/modules/crm/clients/[clientId]`
-- [ ] Lien vers documents (module documents, Epic 4)
-- [ ] Lien vers chat (module chat, Epic 3)
-- [ ] Vérifier que les liens fonctionnent correctement
+- [x] Lien vers fiche client CRM : `/modules/crm/clients/[clientId]`
+- [x] Lien vers documents (module documents, Epic 4)
+- [x] Lien vers chat (module chat, Epic 3)
+- [x] Vérifier que les liens fonctionnent correctement
 
 ### Task 8 : Tests d'intégration (AC: 8)
-- [ ] Test navigation file d'attente → détail
-- [ ] Test chargement données complètes
-- [ ] Test responsive (mobile/desktop)
-- [ ] Test performance (< 2s chargement)
-- [ ] Test skeleton loaders
-- [ ] Test error boundary
+- [x] Test navigation file d'attente → détail
+- [x] Test chargement données complètes
+- [x] Test responsive (mobile/desktop)
+- [x] Test performance (< 2s chargement)
+- [x] Test skeleton loaders
+- [x] Test error boundary
 
 ## Dev Notes
 
@@ -576,16 +576,63 @@ Cette story interagit avec :
 
 ### Agent Model Used
 
-(À remplir par le dev agent)
+Claude Sonnet 4 (implementation) + Claude Sonnet 4 (code review)
 
 ### Debug Log References
 
-(À remplir par le dev agent lors de l'implémentation)
+- Fixed `require()` → `await import()` for ESM compatibility in hook tests
+- Fixed TanStack Query v5 `isPending` behavior when query `enabled: false`
+- Fixed `next/link` mock to forward all props for `aria-label` testing
+- Adapted parcours query to use `parcours_steps` table instead of non-existent columns
 
 ### Completion Notes List
 
-(À remplir par le dev agent après implémentation)
+- Migration 00044 created for `validation_requests` table (was missing from Story 7.1)
+- Added `avatar_url` column to `clients` table
+- Installed `react-markdown` in validation-hub workspace
+- Added `formatFullDate`, `getInitials`, `truncate` to `@foxeo/utils`
+- Code Review fixes: extracted shared STATUS_CONFIG to `utils/status-config.ts` (DRY), added operator auth check to `get-client-recent-messages.ts` (security), added missing `use-client-history.test.ts` (test coverage)
+- 2535 tests passing (up from 2451)
 
 ### File List
 
-(À remplir par le dev agent — liste des fichiers créés/modifiés)
+**New files:**
+- `supabase/migrations/00044_create_validation_requests.sql`
+- `packages/utils/src/string.ts`
+- `packages/utils/src/string.test.ts`
+- `packages/modules/validation-hub/utils/status-config.ts`
+- `packages/modules/validation-hub/actions/get-validation-request.ts`
+- `packages/modules/validation-hub/actions/get-validation-request.test.ts`
+- `packages/modules/validation-hub/actions/get-client-previous-requests.ts`
+- `packages/modules/validation-hub/actions/get-client-previous-requests.test.ts`
+- `packages/modules/validation-hub/actions/get-client-recent-messages.ts`
+- `packages/modules/validation-hub/actions/get-client-recent-messages.test.ts`
+- `packages/modules/validation-hub/hooks/use-validation-request.ts`
+- `packages/modules/validation-hub/hooks/use-validation-request.test.ts`
+- `packages/modules/validation-hub/hooks/use-client-history.ts`
+- `packages/modules/validation-hub/hooks/use-client-history.test.ts`
+- `packages/modules/validation-hub/components/request-detail.tsx`
+- `packages/modules/validation-hub/components/request-detail.test.tsx`
+- `packages/modules/validation-hub/components/request-header.tsx`
+- `packages/modules/validation-hub/components/request-header.test.tsx`
+- `packages/modules/validation-hub/components/client-info-card.tsx`
+- `packages/modules/validation-hub/components/client-info-card.test.tsx`
+- `packages/modules/validation-hub/components/request-content.tsx`
+- `packages/modules/validation-hub/components/request-content.test.tsx`
+- `packages/modules/validation-hub/components/request-history.tsx`
+- `packages/modules/validation-hub/components/request-history.test.tsx`
+- `packages/modules/validation-hub/components/request-exchanges.tsx`
+- `packages/modules/validation-hub/components/request-exchanges.test.tsx`
+- `packages/modules/validation-hub/components/request-actions.tsx`
+- `packages/modules/validation-hub/components/request-actions.test.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/page.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/loading.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/error.tsx`
+
+**Modified files:**
+- `packages/utils/src/date.ts` (added `formatFullDate`)
+- `packages/utils/src/date.test.ts` (added `formatFullDate` tests)
+- `packages/utils/src/index.ts` (added exports)
+- `packages/modules/validation-hub/types/validation.types.ts` (added detail types)
+- `packages/modules/validation-hub/index.ts` (added exports)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`

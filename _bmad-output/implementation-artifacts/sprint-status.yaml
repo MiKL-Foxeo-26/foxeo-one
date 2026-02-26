@@ -113,7 +113,7 @@ development_status:
   # Epic 7: Validation Hub (6 stories)
   epic-7: in-progress
   7-1-module-validation-hub-structure-types-file-attente-des-demandes: done
-  7-2-vue-detaillee-dune-demande-avec-contexte-complet: ready-for-dev
+  7-2-vue-detaillee-dune-demande-avec-contexte-complet: done
   7-3-validation-refus-de-demande-avec-commentaire: ready-for-dev
   7-4-demande-de-precisions-sur-une-soumission: ready-for-dev
   7-5-actions-de-traitement-workflows-post-decision: ready-for-dev

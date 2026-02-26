@@ -4,8 +4,9 @@
 
 export { cn } from './cn'
 export { getRequiredEnv } from './env'
-export { formatRelativeDate, formatShortDate, formatDate } from './date'
+export { formatRelativeDate, formatShortDate, formatDate, formatFullDate } from './date'
 export { toCamelCase, toSnakeCase } from './case-transform'
+export { getInitials, truncate } from './string'
 export { formatCurrency } from './format-currency'
 export {
   emailSchema,

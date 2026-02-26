@@ -1,14 +1,11 @@
-// Story 7.2 — Vue détaillée d'une demande (à implémenter)
-export default function ValidationRequestDetailPage({
+import { RequestDetail } from '@foxeo/modules-validation-hub'
+
+export default async function ValidationRequestDetailPage({
   params,
 }: {
-  params: { requestId: string }
+  params: Promise<{ requestId: string }>
 }) {
-  return (
-    <div className="p-6">
-      <p className="text-muted-foreground text-sm">
-        Détail de la demande {params.requestId} — Story 7.2
-      </p>
-    </div>
-  )
+  const { requestId } = await params
+
+  return <RequestDetail requestId={requestId} />
 }

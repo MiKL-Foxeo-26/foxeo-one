@@ -64,6 +64,24 @@ export function formatRelativeDate(dateString: string): string {
 }
 
 /**
+ * Formate une date en format complet avec heure "15 février 2026 à 14h30"
+ */
+export function formatFullDate(dateString: string): string {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Date inconnue';
+  }
+  const datePart = date.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${datePart} à ${hours}h${minutes}`;
+}
+
+/**
  * Formate une date en format court "12 jan. 2026"
  */
 export function formatShortDate(dateString: string): string {

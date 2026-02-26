@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatRelativeDate, formatShortDate, formatDate } from './date'
+import { formatRelativeDate, formatShortDate, formatDate, formatFullDate } from './date'
 
 describe('formatRelativeDate', () => {
   it('returns "Date inconnue" for invalid date', () => {
@@ -72,5 +72,22 @@ describe('formatDate', () => {
 
   it('returns "Date inconnue" for invalid date', () => {
     expect(formatDate('invalid')).toBe('Date inconnue')
+  })
+})
+
+describe('formatFullDate', () => {
+  it('formats a date with day, month, year and time', () => {
+    const result = formatFullDate('2026-02-15T14:30:00.000Z')
+    expect(result).toContain('2026')
+    expect(result).toMatch(/\d+h\d+/)
+  })
+
+  it('returns "Date inconnue" for invalid date', () => {
+    expect(formatFullDate('invalid')).toBe('Date inconnue')
+  })
+
+  it('includes "à" separator between date and time', () => {
+    const result = formatFullDate('2026-02-15T10:00:00.000Z')
+    expect(result).toContain('à')
   })
 })
