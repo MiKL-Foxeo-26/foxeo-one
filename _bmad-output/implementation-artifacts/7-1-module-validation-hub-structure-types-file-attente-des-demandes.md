@@ -1,6 +1,6 @@
 # Story 7.1 : Module Validation Hub — Structure, types & file d'attente des demandes
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -135,55 +135,55 @@ type ValidationQueueFilters = {
 ## Tasks / Subtasks
 
 ### Task 1 : Créer la structure du module (AC: 1)
-- [ ] Créer le dossier `packages/modules/validation-hub/`
-- [ ] Créer `manifest.ts` avec l'id 'validation-hub', targets ['hub'], dependencies ['crm', 'notifications']
-- [ ] Créer `index.ts` (barrel export)
-- [ ] Créer `docs/guide.md`, `docs/faq.md`, `docs/flows.md` (obligatoire CI)
-- [ ] Vérifier que le module apparaît dans la sidebar du Hub
+- [x] Créer le dossier `packages/modules/validation-hub/`
+- [x] Créer `manifest.ts` avec l'id 'validation-hub', targets ['hub'], dependencies ['crm', 'notifications']
+- [x] Créer `index.ts` (barrel export)
+- [x] Créer `docs/guide.md`, `docs/faq.md`, `docs/flows.md` (obligatoire CI)
+- [x] Vérifier que le module apparaît dans la sidebar du Hub
 
 ### Task 2 : Définir les types TypeScript (AC: 2)
-- [ ] Créer `types/validation.types.ts`
-- [ ] Définir `ValidationRequestType`, `ValidationRequestStatus`
-- [ ] Définir `ValidationRequest`, `ClientSummary`
-- [ ] Définir `ValidationQueueFilters`
-- [ ] Exporter tous les types depuis `index.ts`
+- [x] Créer `types/validation.types.ts`
+- [x] Définir `ValidationRequestType`, `ValidationRequestStatus`
+- [x] Définir `ValidationRequest`, `ClientSummary`
+- [x] Définir `ValidationQueueFilters`
+- [x] Exporter tous les types depuis `index.ts`
 
 ### Task 3 : Créer le hook use-validation-queue (AC: 3)
-- [ ] Créer `hooks/use-validation-queue.ts`
-- [ ] Implémenter TanStack Query avec queryKey `['validation-requests', filters]`
-- [ ] Requête Supabase avec jointure `clients`
-- [ ] Transformation snake_case → camelCase
-- [ ] Calculer `pendingCount` (nombre de demandes status='pending')
-- [ ] Configurer staleTime à 30 secondes
-- [ ] Gérer les filtres avec useState local
-- [ ] Écrire test `use-validation-queue.test.ts`
+- [x] Créer `hooks/use-validation-queue.ts`
+- [x] Implémenter TanStack Query avec queryKey `['validation-requests', filters]`
+- [x] Requête Supabase avec jointure `clients`
+- [x] Transformation snake_case → camelCase
+- [x] Calculer `pendingCount` (nombre de demandes status='pending')
+- [x] Configurer staleTime à 30 secondes
+- [x] Gérer les filtres avec useState local
+- [x] Écrire test `use-validation-queue.test.ts`
 
 ### Task 4 : Créer le composant validation-queue (AC: 4, 5)
-- [ ] Créer `components/validation-queue.tsx`
-- [ ] Afficher header avec compteur de demandes en attente
-- [ ] Créer les filtres (statut, type, tri)
-- [ ] Afficher la liste de cartes avec :
+- [x] Créer `components/validation-queue.tsx`
+- [x] Afficher header avec compteur de demandes en attente
+- [x] Créer les filtres (statut, type, tri)
+- [x] Afficher la liste de cartes avec :
   - Avatar + nom + entreprise (depuis ClientSummary)
   - Badge type (terracotta pour Brief Lab, orange pour Évolution One)
   - Titre de la demande
   - Date de soumission (formatRelativeDate)
   - Badge statut (pending=jaune, approved=vert, rejected=rouge, needs_clarification=bleu)
-- [ ] Implémenter l'état vide avec message et icône
-- [ ] Gérer le tri par défaut (pending en premier, puis par date soumission)
-- [ ] Appliquer le theme dark mode Hub
-- [ ] Écrire test `validation-queue.test.tsx`
+- [x] Implémenter l'état vide avec message et icône
+- [x] Gérer le tri par défaut (pending en premier, puis par date soumission)
+- [x] Appliquer le theme dark mode Hub
+- [x] Écrire test `validation-queue.test.tsx`
 
 ### Task 5 : Implémenter la navigation vers le détail (AC: 6)
-- [ ] Ajouter `onClick` sur chaque carte de demande
-- [ ] Rediriger vers `/modules/validation-hub/[requestId]`
-- [ ] Vérifier transition fluide (< 500ms)
-- [ ] Tester la navigation
+- [x] Ajouter `onClick` sur chaque carte de demande
+- [x] Rediriger vers `/modules/validation-hub/[requestId]`
+- [x] Vérifier transition fluide (< 500ms)
+- [x] Tester la navigation
 
 ### Task 6 : Documentation du module
-- [ ] Rédiger `docs/guide.md` (guide utilisateur)
-- [ ] Rédiger `docs/faq.md` (questions fréquentes)
-- [ ] Rédiger `docs/flows.md` (diagrammes de flux)
-- [ ] Vérifier que CI passe (présence docs obligatoire)
+- [x] Rédiger `docs/guide.md` (guide utilisateur)
+- [x] Rédiger `docs/faq.md` (questions fréquentes)
+- [x] Rédiger `docs/flows.md` (diagrammes de flux)
+- [x] Vérifier que CI passe (présence docs obligatoire)
 
 ## Dev Notes
 
@@ -684,16 +684,52 @@ Pas d'import direct entre modules. Communication via Supabase.
 
 ### Agent Model Used
 
-(À remplir par le dev agent)
+Claude Opus 4.6
 
 ### Debug Log References
 
-(À remplir par le dev agent lors de l'implémentation)
+- Test composant : `vi.mock` imbriqué dans `it()` hoisté → `mockPush` non défini. Fix : déclaration `const mockPush = vi.fn()` au niveau module.
+- Test composant : `getByText('Brief Lab')` → plusieurs éléments (option select + badge). Fix : `getAllByText().length > 0`.
 
 ### Completion Notes List
 
-(À remplir par le dev agent après implémentation)
+- Module `packages/modules/validation-hub/` créé avec la structure complète (manifest, index, types, hooks, actions, components, docs).
+- Server Action `get-validation-requests.ts` : jointure `validation_requests` + `clients`, filtré par `operator_id`, transformation snake_case → camelCase.
+- Hook `use-validation-queue.ts` : TanStack Query, staleTime 30s, filtres locaux via useState, calcul pendingCount.
+- Composant `validation-queue.tsx` : header avec badge pending count, filtres (statut/type/tri), liste de cartes avec Avatar/Badge/formatRelativeDate, état vide, gestion erreur, tri pending-first.
+- Routes Hub créées : `page.tsx`, `loading.tsx`, `error.tsx`, `[requestId]/page.tsx` (stub Story 7.2).
+- Module enregistré dans `apps/hub/app/(dashboard)/layout.tsx` via `registerModule(validationHubManifest)`.
+- 28 nouveaux tests ajoutés (6 hook + 15 composant + 7 server action). Total : 2451 tests passing.
+- **Code Review fixes** : H1 — supprimé double cast `as unknown as` dans get-validation-requests.ts ; M1 — ajouté `.limit(500)` à la requête Supabase ; M2 — ajouté test server action `get-validation-requests.test.ts` (7 tests) ; M3 — fusionné imports dupliqués `@foxeo/utils`.
 
 ### File List
 
-(À remplir par le dev agent — liste des fichiers créés/modifiés)
+**Créés :**
+- `packages/modules/validation-hub/package.json`
+- `packages/modules/validation-hub/vitest.config.ts`
+- `packages/modules/validation-hub/manifest.ts`
+- `packages/modules/validation-hub/index.ts`
+- `packages/modules/validation-hub/types/validation.types.ts`
+- `packages/modules/validation-hub/actions/get-validation-requests.ts`
+- `packages/modules/validation-hub/actions/get-validation-requests.test.ts`
+- `packages/modules/validation-hub/hooks/use-validation-queue.ts`
+- `packages/modules/validation-hub/hooks/use-validation-queue.test.ts`
+- `packages/modules/validation-hub/components/validation-queue.tsx`
+- `packages/modules/validation-hub/components/validation-queue.test.tsx`
+- `packages/modules/validation-hub/docs/guide.md`
+- `packages/modules/validation-hub/docs/faq.md`
+- `packages/modules/validation-hub/docs/flows.md`
+- `apps/hub/app/(dashboard)/modules/validation-hub/page.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/loading.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/error.tsx`
+- `apps/hub/app/(dashboard)/modules/validation-hub/[requestId]/page.tsx`
+
+**Modifiés :**
+- `apps/hub/app/(dashboard)/layout.tsx` (import + registerModule validation-hub)
+- `apps/hub/package.json` (ajout @foxeo/modules-validation-hub, @foxeo/modules-notifications)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (7-1 → review)
+
+### Change Log
+
+- 2026-02-26 : Story 7.1 implémentée — module Validation Hub créé (structure, types, hook, composant, routes, docs). 21 tests ajoutés. Total : 2444 tests passing.
+- 2026-02-26 : Code review adversarial — 6 issues (1H, 3M, 2L). Fixes appliqués : H1 double cast, M1 .limit(500), M2 server action test (7 tests), M3 duplicate imports. Total : 2451 tests passing.

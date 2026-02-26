@@ -1,13 +1,16 @@
 import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
-import { discoverModules, getModulesForTarget } from '@foxeo/utils'
+import { discoverModules, getModulesForTarget, registerModule } from '@foxeo/utils'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import { NotificationBadge } from '@foxeo/modules-notifications'
 import { PresenceProvider } from '@foxeo/modules-chat'
+import { manifest as validationHubManifest } from '@foxeo/modules-validation-hub'
 import { LogoutButton } from './logout-button'
 
 async function HubSidebar() {
-  // Auto-discover modules from packages/modules/
+  // Auto-discover core modules
   await discoverModules()
+  // Register hub-specific modules
+  registerModule(validationHubManifest)
   const modules = getModulesForTarget('hub')
 
   return <ModuleSidebar target="hub" modules={modules} />

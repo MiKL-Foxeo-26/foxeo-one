@@ -1,0 +1,26 @@
+import type { ModuleManifest } from '@foxeo/types'
+
+export const manifest: ModuleManifest = {
+  id: 'validation-hub',
+  name: 'Validation Hub',
+  description: 'File d\'attente des demandes de validation — briefs Lab et évolutions One',
+  version: '1.0.0',
+  targets: ['hub'],
+  navigation: {
+    label: 'Validation Hub',
+    icon: 'check-circle-2',
+    position: 20,
+  },
+  routes: [
+    {
+      path: '/modules/validation-hub',
+      component: 'ValidationQueue',
+    },
+    {
+      path: '/modules/validation-hub/:requestId',
+      component: 'ValidationDetail',
+    },
+  ],
+  requiredTables: ['validation_requests', 'clients'],
+  dependencies: ['crm', 'notifications'],
+}
