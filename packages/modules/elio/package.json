@@ -1,0 +1,28 @@
+{
+  "name": "@foxeo/module-elio",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@foxeo/supabase": "*",
+    "@foxeo/types": "*",
+    "@foxeo/ui": "*",
+    "@foxeo/utils": "*",
+    "@hookform/resolvers": "*",
+    "@tanstack/react-query": "^5.90.0",
+    "react": "^19.0.0",
+    "react-hook-form": "*",
+    "zod": "*"
+  },
+  "devDependencies": {
+    "@foxeo/tsconfig": "*",
+    "@testing-library/react": "*",
+    "@testing-library/user-event": "*",
+    "vitest": "*"
+  }
+}
