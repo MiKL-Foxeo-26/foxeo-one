@@ -1,7 +1,13 @@
 // Élio Module
 export { manifest } from './manifest'
 
-// Components
+// Components — Story 8.1 (infrastructure unifiée)
+export { ElioChat } from './components/elio-chat'
+export { ElioThinking } from './components/elio-thinking'
+export { ElioErrorMessage } from './components/elio-error-message'
+export { ElioMessageItem } from './components/elio-message'
+
+// Components — Stories 6.x (Lab)
 export { PersonalizeElioDialog } from './components/personalize-elio-dialog'
 export { ElioGuidedSuggestions } from './components/elio-guided-suggestions'
 export { GeneratedBriefDialog } from './components/generated-brief-dialog'
@@ -11,7 +17,14 @@ export { ElioModelSelector } from './components/elio-model-selector'
 export { ElioTemperatureSlider } from './components/elio-temperature-slider'
 export { ElioFeatureToggles } from './components/elio-feature-toggles'
 
-// Actions
+// Hooks — Story 8.1
+export { useElioChat } from './hooks/use-elio-chat'
+export { useElioConfig } from './hooks/use-elio-config'
+
+// Actions — Story 8.1
+export { sendToElio } from './actions/send-to-elio'
+
+// Actions — Stories 6.x
 export { createCommunicationProfile } from './actions/create-communication-profile'
 export { updateCommunicationProfile } from './actions/update-communication-profile'
 export { getCommunicationProfile } from './actions/get-communication-profile'
@@ -21,14 +34,34 @@ export { getElioConfig } from './actions/get-elio-config'
 export { updateElioConfig } from './actions/update-elio-config'
 export { resetElioConfig } from './actions/reset-elio-config'
 
-// Utils
+// Config — Story 8.1
+export { buildSystemPrompt } from './config/system-prompts'
+
+// Utils — Stories 6.x
 export { buildElioSystemPrompt } from './utils/build-system-prompt'
 export type { StepContext } from './utils/build-system-prompt'
 
 // Data
 export { ELIO_SUGGESTIONS_BY_STEP } from './data/elio-suggestions'
 
-// Types
+// Types — Story 8.1
+export type {
+  DashboardType,
+  ElioTier,
+  ElioMessage,
+  ElioMessageRole,
+  ElioError,
+  ElioErrorCode,
+  CommunicationProfileFR66,
+  TechnicalLevel,
+  ExchangeStyle,
+  AdaptedTone,
+  MessageLength,
+} from './types/elio.types'
+
+export { DEFAULT_COMMUNICATION_PROFILE_FR66 } from './types/elio.types'
+
+// Types — Stories 6.x
 export type {
   CommunicationProfile,
   CommunicationProfileDB,

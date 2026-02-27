@@ -14,3 +14,12 @@ Non dans cette version (Story 6.4). Les suggestions sont définies par étape de
 
 ## L'historique des conversations est-il géré ici ?
 Non. La gestion de l'historique des conversations est dans Epic 8 (Story 8.2).
+
+## Élio est disponible sur quels dashboards ?
+Depuis Story 8.1, Élio est disponible sur les 3 dashboards : Hub (cyan), Lab (violet), One (orange).
+
+## Que se passe-t-il si Élio ne répond pas ?
+L'indicateur "Élio réfléchit..." disparaît et un message d'erreur s'affiche avec un bouton "Réessayer". Le délai maximum est de 60 secondes (NFR-I2).
+
+## L'API DeepSeek est-elle sécurisée ?
+Oui. Les clés API ne transitent jamais côté client. Tout passe par une Supabase Edge Function qui gère l'authentification sécurisée (NFR-S8).

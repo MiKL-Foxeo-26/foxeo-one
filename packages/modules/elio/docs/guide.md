@@ -42,6 +42,29 @@ Le profil est modifiable à tout moment dans **Paramètres > Profil de communica
 - Clé API Anthropic : côté serveur uniquement (`ANTHROPIC_API_KEY`)
 - Logging : `[ELIO:GENERATE_BRIEF]`, `[ELIO:SUBMIT_BRIEF]`
 
+## Fonctionnalités Story 8.1 — Infrastructure unifiée
+
+### Architecture multi-dashboard
+Élio supporte maintenant 3 dashboards (`hub`, `lab`, `one`) via un composant unifié `elio-chat.tsx`.
+Le `dashboardType` détermine la palette de couleurs, le system prompt et les capacités disponibles.
+
+### Composants partagés
+- `ElioChat` : composant de chat principal (dashboard-agnostic)
+- `ElioThinking` : indicateur animé "Élio réfléchit..." (FR122)
+- `ElioErrorMessage` : bulle d'erreur avec bouton "Réessayer" (FR83)
+- `ElioMessageItem` : bulle de message utilisateur ou assistant
+
+### Hooks
+- `useElioChat` : état de la conversation, envoi, retry, gestion erreurs
+- `useElioConfig` : config Élio par dashboard (TanStack Query, 5min cache)
+
+### Gestion des erreurs (FR83, NFR-I2)
+4 types d'erreurs gérés : TIMEOUT (60s), NETWORK_ERROR, LLM_ERROR, UNKNOWN.
+Chaque erreur affiche un message clair et un bouton "Réessayer".
+
+### System prompts multi-dashboard
+`config/system-prompts.ts` construit le prompt adapté au `dashboardType` avec le profil de communication du client.
+
 ## Architecture
 
 - `types/communication-profile.types.ts` — Types TypeScript
