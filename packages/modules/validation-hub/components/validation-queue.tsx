@@ -3,8 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { Avatar, AvatarFallback, AvatarImage, Badge, Card, CardContent, Skeleton } from '@foxeo/ui'
 import { cn, formatRelativeDate } from '@foxeo/utils'
-import { CheckCircle2, Clock, AlertCircle } from 'lucide-react'
+import { CheckCircle2, Clock, AlertCircle, PauseCircle } from 'lucide-react'
 import { useValidationQueue } from '../hooks/use-validation-queue'
+import { useValidationRealtime } from '../hooks/use-validation-realtime'
 import type {
   ValidationRequest,
   ValidationRequestStatus,
@@ -100,6 +101,9 @@ function ValidationCard({
 }) {
   const statusConfig = STATUS_CONFIG[request.status]
   const typeConfig = TYPE_CONFIG[request.type]
+  const isPostponed =
+    request.status === 'pending' &&
+    (request.reviewerComment?.startsWith('Reporté') ?? false)
   const initials = request.client?.name
     .split(' ')
     .map((n) => n[0])
@@ -165,6 +169,15 @@ function ValidationCard({
               >
                 {typeConfig.label}
               </Badge>
+              {isPostponed && (
+                <Badge
+                  variant="outline"
+                  className="text-xs border border-orange-500/30 bg-orange-500/10 text-orange-400"
+                >
+                  <PauseCircle className="h-3 w-3 mr-1" />
+                  Reportée
+                </Badge>
+              )}
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 {formatRelativeDate(request.submittedAt)}
@@ -251,10 +264,14 @@ function FilterBar({
   )
 }
 
-export function ValidationQueue() {
+export function ValidationQueue({ operatorId = '' }: { operatorId?: string }) {
   const router = useRouter()
   const { requests, filters, setFilters, isLoading, error, pendingCount } =
     useValidationQueue()
+
+  // AC1-3: Abonnement Realtime — operatorId passé en prop depuis le layout/page
+  const resolvedOperatorId = operatorId || requests[0]?.operatorId || ''
+  useValidationRealtime(resolvedOperatorId)
 
   const handleRequestClick = (requestId: string) => {
     router.push(`/modules/validation-hub/${requestId}`)

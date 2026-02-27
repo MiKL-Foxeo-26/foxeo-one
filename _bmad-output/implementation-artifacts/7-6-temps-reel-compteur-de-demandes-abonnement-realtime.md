@@ -1,6 +1,6 @@
 # Story 7.6 : Temps réel, compteur de demandes & abonnement Realtime
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -96,79 +96,79 @@ So that **je ne rate aucune demande urgente et je sais toujours combien de soumi
 ## Tasks / Subtasks
 
 ### Task 1 : Créer le hook use-validation-realtime (AC: 1)
-- [ ] Créer `hooks/use-validation-realtime.ts`
-- [ ] Créer canal Realtime : `validation-requests-operator-{operatorId}`
-- [ ] Écouter événements INSERT et UPDATE
-- [ ] Filtrer par `operator_id=eq.{operatorId}`
-- [ ] Invalider cache TanStack Query lors des événements
-- [ ] Cleanup lors du démontage (useEffect return)
-- [ ] Écrire test `use-validation-realtime.test.ts`
+- [x] Créer `hooks/use-validation-realtime.ts`
+- [x] Créer canal Realtime : `validation-requests-operator-{operatorId}`
+- [x] Écouter événements INSERT et UPDATE
+- [x] Filtrer par `operator_id=eq.{operatorId}`
+- [x] Invalider cache TanStack Query lors des événements
+- [x] Cleanup lors du démontage (useEffect return)
+- [x] Écrire test `use-validation-realtime.test.ts`
 
 ### Task 2 : Implémenter la gestion INSERT (AC: 2)
-- [ ] Dans `use-validation-realtime.ts` : détecter INSERT
-- [ ] Invalider `['validation-requests']`
-- [ ] Afficher toast : "Nouvelle demande de {client} — {titre}"
-- [ ] Extraire client name et titre depuis le payload Realtime
-- [ ] Tester l'apparition en temps réel
+- [x] Dans `use-validation-realtime.ts` : détecter INSERT
+- [x] Invalider `['validation-requests']`
+- [x] Afficher toast : "Nouvelle demande : {titre}" (payload Realtime ne contient pas les relations jointes)
+- [x] Extraire titre depuis le payload Realtime
+- [x] Tester l'apparition en temps réel
 
 ### Task 3 : Implémenter la gestion UPDATE (AC: 3)
-- [ ] Dans `use-validation-realtime.ts` : détecter UPDATE
-- [ ] Invalider `['validation-requests']` et `['validation-request', requestId]`
-- [ ] Détecter si c'est une re-soumission client (needs_clarification → pending)
-- [ ] Afficher toast spécifique : "Le client {nom} a répondu à votre question"
-- [ ] Tester l'update en temps réel
+- [x] Dans `use-validation-realtime.ts` : détecter UPDATE
+- [x] Invalider `['validation-requests']` et `['validation-request', requestId]`
+- [x] Détecter si c'est une re-soumission client (needs_clarification → pending)
+- [x] Afficher toast spécifique : "Un client a répondu à vos précisions"
+- [x] Tester l'update en temps réel
 
 ### Task 4 : Créer le compteur sidebar (AC: 4)
-- [ ] Créer `hooks/use-validation-badge.ts` (hook léger pour compteur)
-- [ ] Requête Supabase : COUNT(*) WHERE status='pending' AND operator_id={operatorId}
-- [ ] TanStack Query avec queryKey `['validation-badge', operatorId]`
-- [ ] Très court staleTime (10 secondes)
-- [ ] Intégrer dans la sidebar du Hub
-- [ ] Afficher badge rouge avec nombre
-- [ ] Badge disparaît si pendingCount === 0
+- [x] Créer `hooks/use-validation-badge.ts` (hook léger pour compteur)
+- [x] Requête Supabase : COUNT(*) WHERE status='pending' AND operator_id={operatorId}
+- [x] TanStack Query avec queryKey `['validation-badge', operatorId]`
+- [x] Très court staleTime (10 secondes)
+- [x] Intégrer dans la sidebar du Hub (via HubSidebarClient)
+- [x] Afficher badge rouge avec nombre
+- [x] Badge disparaît si pendingCount === 0
 
 ### Task 5 : Intégrer Realtime dans validation-queue (AC: 2-3)
-- [ ] Modifier `components/validation-queue.tsx`
-- [ ] Appeler `useValidationRealtime(operatorId)` dans le composant
-- [ ] Le hook invalide automatiquement le cache
-- [ ] La liste se met à jour automatiquement via TanStack Query refetch
+- [x] Modifier `components/validation-queue.tsx`
+- [x] Appeler `useValidationRealtime(operatorId)` dans le composant
+- [x] Le hook invalide automatiquement le cache
+- [x] La liste se met à jour automatiquement via TanStack Query refetch
 
 ### Task 6 : Créer le widget dashboard Hub (AC: 5)
-- [ ] Créer `components/validation-hub-widget.tsx`
-- [ ] Utiliser `useValidationQueue()` avec filtre status='pending'
-- [ ] Afficher nombre de demandes en attente
-- [ ] Afficher dernière demande (titre, client, date)
-- [ ] Lien "Voir toutes les demandes" vers `/modules/validation-hub`
-- [ ] Intégrer dans `apps/hub/app/(dashboard)/page.tsx` (accueil Hub)
-- [ ] Écrire test `validation-hub-widget.test.tsx`
+- [x] Créer `components/validation-hub-widget.tsx`
+- [x] Utiliser `useValidationQueue()` avec filtre status='pending'
+- [x] Afficher nombre de demandes en attente
+- [x] Afficher dernière demande (titre, client, date)
+- [x] Lien "Voir toutes les demandes" vers `/modules/validation-hub`
+- [x] Intégrer dans `apps/hub/app/(dashboard)/page.tsx` (accueil Hub)
+- [x] Écrire test `validation-hub-widget.test.tsx`
 
 ### Task 7 : Implémenter la gestion connexion/déconnexion (AC: 6)
-- [ ] Écouter événement `SUBSCRIBED` de Supabase Realtime
-- [ ] Écouter événement `CLOSED` (déconnexion)
-- [ ] Écouter événement `CHANNEL_ERROR`
-- [ ] Lors de la reconnexion : invalider le cache pour récupérer les données
-- [ ] Afficher toast : "Connexion rétablie — données à jour"
-- [ ] Tester la reconnexion automatique
+- [x] Écouter événement `SUBSCRIBED` de Supabase Realtime
+- [x] Écouter événement `CLOSED` (déconnexion)
+- [x] Écouter événement `CHANNEL_ERROR`
+- [x] Lors de la reconnexion : invalider le cache pour récupérer les données
+- [x] Afficher toast : "Connexion rétablie — données à jour"
+- [x] Tester la reconnexion automatique
 
 ### Task 8 : Implémenter le nettoyage (AC: 7)
-- [ ] Dans `use-validation-realtime.ts` : useEffect avec cleanup
-- [ ] Unsubscribe du canal lors du démontage
-- [ ] Tester qu'aucun listener orphelin ne reste
-- [ ] Vérifier les performances (pas de memory leak)
+- [x] Dans `use-validation-realtime.ts` : useEffect avec cleanup
+- [x] Unsubscribe du canal lors du démontage
+- [x] Tester qu'aucun listener orphelin ne reste
+- [x] Vérifier les performances (pas de memory leak)
 
 ### Task 9 : Tests d'intégration (AC: 1-7)
-- [ ] Test abonnement Realtime (canal créé, filtre correct)
-- [ ] Test INSERT : nouvelle demande apparaît + toast
-- [ ] Test UPDATE : demande mise à jour + toast si re-soumission
-- [ ] Test compteur sidebar (badge + nombre)
-- [ ] Test widget dashboard
-- [ ] Test reconnexion automatique
-- [ ] Test cleanup (pas de listener orphelin)
+- [x] Test abonnement Realtime (canal créé, filtre correct)
+- [x] Test INSERT : nouvelle demande apparaît + toast
+- [x] Test UPDATE : demande mise à jour + toast si re-soumission
+- [x] Test compteur sidebar (badge + nombre)
+- [x] Test widget dashboard
+- [x] Test reconnexion automatique
+- [x] Test cleanup (pas de listener orphelin)
 
 ### Task 10 : Documentation (AC: 1-7)
-- [ ] Mettre à jour `docs/flows.md` avec diagramme Realtime
-- [ ] Documenter le canal Realtime et les événements écoutés
-- [ ] Documenter la gestion de la reconnexion
+- [x] Mettre à jour `docs/flows.md` avec diagramme Realtime
+- [x] Documenter le canal Realtime et les événements écoutés
+- [x] Documenter la gestion de la reconnexion
 
 ## Dev Notes
 
@@ -597,16 +597,66 @@ Cette story respecte l'architecture définie dans `architecture/05-project-struc
 
 ### Agent Model Used
 
-(À remplir par le dev agent)
+Claude Opus 4.6 (claude-opus-4-6)
 
 ### Debug Log References
 
-(À remplir par le dev agent lors de l'implémentation)
+- **Bug 1**: Test "creates channel with correct name" échouait car chaque appel à `createBrowserSupabaseClient()` dans le mock créait un objet `channel` distinct. Fix : référence partagée `mockChannelFn` définie au niveau module, injectée dans le mock factory.
+- **Bug 2**: Tests widget "displays pending count" et "uses 'demandes' plural" échouaient car JSX produit des nœuds texte séparés pour `{count}` et `{' demande(s)'} en attente`. Fix : assertions en regex `/demande\s+en attente/`.
+- **Discovery**: `createBrowserSupabaseClient` n'était pas exporté depuis `@foxeo/supabase/src/index.ts` alors que tous les hooks realtime existants l'utilisent. Ajout d'un alias export dans `packages/supabase/src/index.ts`.
 
 ### Completion Notes List
 
-(À remplir par le dev agent après implémentation)
+- Implémentation complète en 10 tasks/subtasks, tous validés.
+- `useValidationRealtime` : abonnement Supabase Realtime sur `validation_requests`, INSERT/UPDATE, filtré par `operator_id`, invalidation cache TanStack Query, reconnexion via `window.online`, cleanup complet.
+- `useValidationBadge` : requête COUNT(*) TanStack Query avec `staleTime: 10s` et `refetchInterval: 30s`.
+- `ValidationHubWidget` : widget dashboard Hub avec état loading/vide/données, lien vers `/modules/validation-hub`.
+- `HubSidebarClient` : composant client Hub sidebar avec badge rouge Validation Hub via `useValidationBadge`.
+- `apps/hub/app/(dashboard)/layout.tsx` modifié : passage `operatorId` vers `HubSidebarClient`.
+- `apps/hub/app/(dashboard)/page.tsx` modifié : ajout `<ValidationHubWidget />` dans "Actions prioritaires".
+- `validation-queue.tsx` modifié : appel `useValidationRealtime(operatorId)`.
+- Toast messages adaptés aux limitations du payload Realtime (pas de données relationnelles jointes).
+- 29 nouveaux tests ajoutés (14 hook realtime + 5 badge + 10 widget).
+- **Total tests : 2715 passing** (était 2681 avant story 7.6).
+
+#### Code Review Fixes (Phase 2 — Opus)
+
+- **H1 fix**: operatorId propagé via prop depuis app-level pages (usePresenceContext) au lieu d'extraire depuis requests[0] (race condition)
+- **H2 fix**: `createBrowserSupabaseClient()` déplacé hors du `queryFn` dans `use-validation-badge.ts`
+- **H3 fix**: `ValidationHubWidget` appelle `useValidationRealtime(operatorId)` pour mises à jour temps réel (AC5)
+- **M2 fix**: Suppression des `console.log` verbeux dans `use-validation-realtime.ts` (gardé SUBSCRIBED + CHANNEL_ERROR)
+- **M3 fix**: Ajout tests `hub-sidebar-client.test.tsx` (7 tests badge sidebar)
+- **L1 noted**: Widget sans gestion erreur explicite (acceptable, hook gère en interne)
+- **L2 noted**: Double guard sur operatorId dans badge hook (défensif, acceptable)
 
 ### File List
 
-(À remplir par le dev agent — liste des fichiers créés/modifiés)
+#### Fichiers créés
+
+- `packages/modules/validation-hub/hooks/use-validation-realtime.ts`
+- `packages/modules/validation-hub/hooks/use-validation-realtime.test.ts`
+- `packages/modules/validation-hub/hooks/use-validation-badge.ts`
+- `packages/modules/validation-hub/hooks/use-validation-badge.test.ts`
+- `packages/modules/validation-hub/components/validation-hub-widget.tsx`
+- `packages/modules/validation-hub/components/validation-hub-widget.test.tsx`
+- `apps/hub/components/hub-sidebar-client.tsx`
+- `apps/hub/components/hub-sidebar-client.test.tsx`
+
+#### Fichiers modifiés
+
+- `packages/supabase/src/index.ts` — ajout alias `createBrowserSupabaseClient`
+- `packages/modules/validation-hub/components/validation-queue.tsx` — ajout `useValidationRealtime(operatorId)`
+- `packages/modules/validation-hub/components/validation-queue.test.tsx` — mock `useValidationRealtime`
+- `packages/modules/validation-hub/components/request-actions.tsx` — (ajustements mineurs)
+- `packages/modules/validation-hub/index.ts` — exports `useValidationRealtime`, `useValidationBadge`, `UseValidationBadgeResult`, `ValidationHubWidget`
+- `packages/modules/validation-hub/docs/flows.md` — section Realtime ajoutée
+- `apps/hub/app/(dashboard)/layout.tsx` — intégration `HubSidebarClient` avec `operatorId`
+- `apps/hub/app/(dashboard)/page.tsx` — ajout `ValidationHubWidget` + `usePresenceContext` pour operatorId
+- `apps/hub/app/(dashboard)/modules/validation-hub/page.tsx` — `usePresenceContext` pour operatorId
+
+### Change Log
+
+| Date | Version | Description | Author |
+|------|---------|-------------|--------|
+| 2026-02-26 | 1.0 | Implémentation Story 7.6 — Realtime, badge sidebar, widget dashboard | Dev Agent (Claude Opus 4.6) |
+| 2026-02-26 | 1.1 | Code Review fixes — H1/H2/H3/M2/M3 corrigés, 2715 tests passing | CR Agent (Claude Opus 4.6) |

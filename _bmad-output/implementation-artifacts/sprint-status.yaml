@@ -111,13 +111,13 @@ development_status:
   epic-6-retrospective: optional
 
   # Epic 7: Validation Hub (6 stories)
-  epic-7: in-progress
+  epic-7: done
   7-1-module-validation-hub-structure-types-file-attente-des-demandes: done
   7-2-vue-detaillee-dune-demande-avec-contexte-complet: done
   7-3-validation-refus-de-demande-avec-commentaire: done
   7-4-demande-de-precisions-sur-une-soumission: done
   7-5-actions-de-traitement-workflows-post-decision: done
-  7-6-temps-reel-compteur-de-demandes-abonnement-realtime: ready-for-dev
+  7-6-temps-reel-compteur-de-demandes-abonnement-realtime: done
   epic-7-retrospective: optional
 
   # Epic 8: Agents IA Elio — Hub, Lab, One (11 stories)

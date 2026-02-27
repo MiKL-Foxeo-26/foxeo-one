@@ -161,3 +161,95 @@ La section "Échanges" dans la vue détaillée affiche les allers-retours :
   → "Client a re-soumis avec : {content}" (date = updated_at)
 
 Ce cycle peut se répéter : MiKL redemande → client re-soumet → etc.
+
+## Flux Realtime (Story 7.6)
+
+### Canal Supabase Realtime
+
+```
+Canal : validation-requests-operator-{operatorId}
+Table : validation_requests
+Filtre : operator_id=eq.{operatorId}
+Événements : INSERT, UPDATE
+```
+
+### Flux : Nouvelle demande (INSERT)
+
+```
+Client soumet un brief (Lab/One)
+    │
+    ▼
+INSERT dans validation_requests
+    │
+    ▼
+Supabase Realtime → useValidationRealtime (INSERT handler)
+    │
+    ├── queryClient.invalidateQueries(['validation-requests'])
+    ├── queryClient.invalidateQueries(['validation-badge', operatorId])
+    └── showInfo("Nouvelle demande : {titre}")
+            │
+            ▼
+    TanStack Query refetch automatique
+            │
+            ▼
+    Liste mise à jour sans rechargement de page
+```
+
+### Flux : Mise à jour de demande (UPDATE)
+
+```
+Status change (approbation, refus, re-soumission...)
+    │
+    ▼
+UPDATE dans validation_requests
+    │
+    ▼
+Supabase Realtime → useValidationRealtime (UPDATE handler)
+    │
+    ├── queryClient.invalidateQueries(['validation-requests'])
+    ├── queryClient.invalidateQueries(['validation-request', requestId])
+    ├── queryClient.invalidateQueries(['validation-badge', operatorId])
+    └── Si needs_clarification → pending :
+            showInfo("Un client a répondu à vos précisions")
+```
+
+### Flux : Badge sidebar (AC4)
+
+```
+useValidationBadge(operatorId)
+    │
+    ├── TanStack Query → Supabase COUNT(*) WHERE status='pending'
+    ├── staleTime: 10s
+    └── refetchInterval: 30s (fallback)
+            │
+            ▼
+    HubSidebarClient → Badge rouge si pendingCount > 0
+    Badge disparaît quand pendingCount === 0
+```
+
+### Flux : Reconnexion (AC6)
+
+```
+Connexion perdue (offline)
+    │
+    ▼
+Supabase Realtime gère automatiquement la reconnexion
+    │
+window 'online' event → handleReconnect()
+    │
+    ├── queryClient.invalidateQueries(['validation-requests'])
+    ├── queryClient.invalidateQueries(['validation-badge', operatorId])
+    └── showInfo("Connexion rétablie — données à jour")
+```
+
+### Flux : Cleanup (AC7)
+
+```
+Navigation vers une autre page
+    │
+    ▼
+useEffect cleanup
+    │
+    ├── supabase.removeChannel(channel)  ← fin de l'abonnement
+    └── window.removeEventListener('online', handleReconnect)
+```

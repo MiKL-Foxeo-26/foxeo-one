@@ -4,6 +4,7 @@
 
 // Clients
 export { createClient } from './client'
+export { createClient as createBrowserSupabaseClient } from './client'
 export { createServerSupabaseClient } from './server'
 export { createMiddlewareSupabaseClient } from './middleware'
 

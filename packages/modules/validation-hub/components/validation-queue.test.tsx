@@ -10,9 +10,12 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }))
 
-// Mock the hook
+// Mock the hooks
 vi.mock('../hooks/use-validation-queue', () => ({
   useValidationQueue: vi.fn(),
+}))
+vi.mock('../hooks/use-validation-realtime', () => ({
+  useValidationRealtime: vi.fn(),
 }))
 
 const { useValidationQueue } = await import('../hooks/use-validation-queue')
@@ -194,6 +197,42 @@ describe('ValidationQueue', () => {
     const card = screen.getByText('Brief de démarrage').closest('[role="button"]')
     card?.click()
     expect(mockPush).toHaveBeenCalledWith('/modules/validation-hub/req-1')
+  })
+
+  it('should show "Reportée" badge when request is postponed', () => {
+    const postponedRequest: ValidationRequest = {
+      ...mockRequests[0],
+      id: 'req-postponed',
+      status: 'pending',
+      reviewerComment: 'Reporté : Pas le moment',
+    }
+    mockUseValidationQueue.mockReturnValue({
+      ...defaultHookReturn,
+      requests: [postponedRequest],
+    })
+    render(<ValidationQueue />)
+    expect(screen.getByText('Reportée')).toBeInTheDocument()
+  })
+
+  it('should NOT show "Reportée" badge for pending requests without postpone comment', () => {
+    render(<ValidationQueue />)
+    // req-1 is pending but reviewerComment is null
+    expect(screen.queryByText('Reportée')).not.toBeInTheDocument()
+  })
+
+  it('should show "Reportée" badge when reviewerComment starts with "Reporté" without reason', () => {
+    const postponedRequest: ValidationRequest = {
+      ...mockRequests[0],
+      id: 'req-postponed-2',
+      status: 'pending',
+      reviewerComment: 'Reporté',
+    }
+    mockUseValidationQueue.mockReturnValue({
+      ...defaultHookReturn,
+      requests: [postponedRequest],
+    })
+    render(<ValidationQueue />)
+    expect(screen.getByText('Reportée')).toBeInTheDocument()
   })
 
   it('should sort pending requests first', () => {

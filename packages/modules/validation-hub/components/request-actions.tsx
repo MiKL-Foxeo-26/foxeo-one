@@ -9,7 +9,8 @@ type RequestActionsProps = {
   onValidate: () => void
   onRefuse: () => void
   onRequestClarification: () => void
-  onTreatmentAction: () => void
+  onTreatmentAction?: () => void
+  treatmentActionSlot?: React.ReactNode
 }
 
 export function RequestActions({
@@ -18,6 +19,7 @@ export function RequestActions({
   onRefuse,
   onRequestClarification,
   onTreatmentAction,
+  treatmentActionSlot,
 }: RequestActionsProps) {
   // Buttons are disabled if status is not 'pending' or 'needs_clarification'
   const isEditable = status === 'pending' || status === 'needs_clarification'
@@ -57,15 +59,17 @@ export function RequestActions({
         </Button>
 
         {/* Actions de traitement (toujours actif sur 'approved') */}
-        <Button
-          onClick={onTreatmentAction}
-          disabled={status === 'rejected'}
-          variant="outline"
-          className="border-border text-muted-foreground hover:text-foreground disabled:opacity-50"
-        >
-          Actions de traitement
-          <ChevronDown className="h-4 w-4 ml-2" />
-        </Button>
+        {treatmentActionSlot ?? (
+          <Button
+            onClick={onTreatmentAction}
+            disabled={status === 'rejected'}
+            variant="outline"
+            className="border-border text-muted-foreground hover:text-foreground disabled:opacity-50"
+          >
+            Actions de traitement
+            <ChevronDown className="h-4 w-4 ml-2" />
+          </Button>
+        )}
       </div>
     </div>
   )

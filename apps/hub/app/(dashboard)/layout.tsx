@@ -1,19 +1,20 @@
-import { DashboardShell, ThemeToggle, ModuleSidebar } from '@foxeo/ui'
+import { DashboardShell, ThemeToggle } from '@foxeo/ui'
 import { discoverModules, getModulesForTarget, registerModule } from '@foxeo/utils'
 import { createServerSupabaseClient } from '@foxeo/supabase'
 import { NotificationBadge } from '@foxeo/modules-notifications'
 import { PresenceProvider } from '@foxeo/modules-chat'
 import { manifest as validationHubManifest } from '@foxeo/modules-validation-hub'
+import { HubSidebarClient } from '../../components/hub-sidebar-client'
 import { LogoutButton } from './logout-button'
 
-async function HubSidebar() {
+async function HubSidebar({ operatorId }: { operatorId: string }) {
   // Auto-discover core modules
   await discoverModules()
   // Register hub-specific modules
   registerModule(validationHubManifest)
   const modules = getModulesForTarget('hub')
 
-  return <ModuleSidebar target="hub" modules={modules} />
+  return <HubSidebarClient modules={modules} operatorId={operatorId} />
 }
 
 function HubHeader({ authUserId }: { authUserId: string }) {
@@ -51,7 +52,7 @@ export default async function DashboardLayout({
   return (
     <DashboardShell
       density="compact"
-      sidebar={<HubSidebar />}
+      sidebar={<HubSidebar operatorId={operatorId} />}
       header={<HubHeader authUserId={user?.id ?? ''} />}
     >
       <PresenceProvider userId={userId} userType="operator" operatorId={operatorId}>
