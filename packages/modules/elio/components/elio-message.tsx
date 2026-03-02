@@ -6,9 +6,10 @@ interface ElioMessageProps {
   message: ElioMessage
   dashboardType: DashboardType
   feedbackSlot?: React.ReactNode
+  documentSlot?: React.ReactNode
 }
 
-export function ElioMessageItem({ message, dashboardType, feedbackSlot }: ElioMessageProps) {
+export function ElioMessageItem({ message, dashboardType, feedbackSlot, documentSlot }: ElioMessageProps) {
   const isUser = message.role === 'user'
 
   const paletteClass = {
@@ -19,7 +20,7 @@ export function ElioMessageItem({ message, dashboardType, feedbackSlot }: ElioMe
 
   return (
     <div
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'} w-full`}
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'} w-full group`}
       data-role={message.role}
       data-dashboard={dashboardType}
     >
@@ -36,6 +37,9 @@ export function ElioMessageItem({ message, dashboardType, feedbackSlot }: ElioMe
           .join(' ')}
       >
         <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        {documentSlot && (
+          <div className="mt-2">{documentSlot}</div>
+        )}
         {!isUser && feedbackSlot && (
           <div className="mt-2 border-t border-current/10 pt-2">{feedbackSlot}</div>
         )}

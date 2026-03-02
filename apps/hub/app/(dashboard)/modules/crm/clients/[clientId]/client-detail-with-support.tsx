@@ -3,6 +3,7 @@
 import { ClientDetailContent, type ExtraTab } from '@foxeo/modules/crm'
 import { ClientSupportTab } from '@foxeo/modules-support'
 import { SubmissionsList } from '@foxeo/module-parcours'
+import { ElioConfigSection } from '@foxeo/modules/elio'
 import type { Client } from '@foxeo/modules/crm'
 import { useMemo } from 'react'
 
@@ -22,6 +23,11 @@ export function ClientDetailWithSupport({ client }: ClientDetailWithSupportProps
         value: 'submissions',
         label: 'Soumissions',
         content: <SubmissionsList clientId={client.id} />,
+      },
+      {
+        value: 'elio-config',
+        label: 'Configuration Élio',
+        content: <ElioConfigSection clientId={client.id} />,
       },
     ],
     [client.id]

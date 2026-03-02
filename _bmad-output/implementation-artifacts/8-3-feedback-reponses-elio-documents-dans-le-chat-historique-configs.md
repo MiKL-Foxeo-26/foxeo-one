@@ -1,6 +1,6 @@
 # Story 8.3: Feedback réponses Élio, documents dans le chat & historique configs
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -55,66 +55,66 @@ So that **Élio s'améliore grâce aux retours, les documents sont accessibles s
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1** : Ajouter feedback dans `elio_messages.metadata`
-  - [ ] 1.1 : Modifier le type `ElioMessage` pour inclure `metadata.feedback`
-  - [ ] 1.2 : Créer le type `FeedbackRating = 'useful' | 'not_useful'`
+- [x] **Task 1** : Ajouter feedback dans `elio_messages.metadata`
+  - [x] 1.1 : Modifier le type `ElioMessage` pour inclure `metadata.feedback`
+  - [x] 1.2 : Créer le type `FeedbackRating = 'useful' | 'not_useful'`
 
-- [ ] **Task 2** : Créer le composant `elio-feedback.tsx` (AC: #1, FR126)
-  - [ ] 2.1 : Créer le composant avec 2 boutons 👍 / 👎
-  - [ ] 2.2 : Boutons discrets au survol (desktop)
-  - [ ] 2.3 : Boutons visibles (mobile < 768px)
-  - [ ] 2.4 : Toggle : un seul choix possible, cliquer à nouveau désactive
-  - [ ] 2.5 : Micro-feedback visuel (changement couleur bouton)
+- [x] **Task 2** : Créer le composant `elio-feedback.tsx` (AC: #1, FR126)
+  - [x] 2.1 : Créer le composant avec 2 boutons 👍 / 👎
+  - [x] 2.2 : Boutons discrets au survol (desktop)
+  - [x] 2.3 : Boutons visibles (mobile < 768px)
+  - [x] 2.4 : Toggle : un seul choix possible, cliquer à nouveau désactive
+  - [x] 2.5 : Micro-feedback visuel (changement couleur bouton)
 
-- [ ] **Task 3** : Créer la Server Action `submitFeedback()` (AC: #1)
-  - [ ] 3.1 : Créer `actions/submit-feedback.ts`
-  - [ ] 3.2 : Mettre à jour `elio_messages.metadata.feedback`
-  - [ ] 3.3 : Retourner `{ data: success, error: null }`
-  - [ ] 3.4 : Pas de notification envoyée (collecte silencieuse)
+- [x] **Task 3** : Créer la Server Action `submitFeedback()` (AC: #1)
+  - [x] 3.1 : Créer `actions/submit-feedback.ts`
+  - [x] 3.2 : Mettre à jour `elio_messages.metadata.feedback`
+  - [x] 3.3 : Retourner `{ data: success, error: null }`
+  - [x] 3.4 : Pas de notification envoyée (collecte silencieuse)
 
-- [ ] **Task 4** : Créer le composant `elio-document.tsx` (AC: #2, FR125)
-  - [ ] 4.1 : Créer le composant avec affichage nom + icône type
-  - [ ] 4.2 : Aperçu inline (markdown rendu, image thumbnail)
-  - [ ] 4.3 : Bouton "Voir le document complet" → module documents
-  - [ ] 4.4 : Bouton "Télécharger" (PDF)
-  - [ ] 4.5 : Badge "Brief généré par Élio" si applicable
+- [x] **Task 4** : Créer le composant `elio-document.tsx` (AC: #2, FR125)
+  - [x] 4.1 : Créer le composant avec affichage nom + icône type
+  - [x] 4.2 : Aperçu inline (markdown rendu, image thumbnail)
+  - [x] 4.3 : Bouton "Voir le document complet" → module documents
+  - [x] 4.4 : Bouton "Télécharger" (PDF)
+  - [x] 4.5 : Badge "Brief généré par Élio" si applicable
 
-- [ ] **Task 5** : Ajouter `document_id` dans `elio_messages.metadata`
-  - [ ] 5.1 : Modifier le type `ElioMessage.metadata.documentId`
-  - [ ] 5.2 : Créer la référence FK vers `documents.id`
+- [x] **Task 5** : Ajouter `document_id` dans `elio_messages.metadata`
+  - [x] 5.1 : Modifier le type `ElioMessage.metadata.documentId`
+  - [x] 5.2 : Créer la référence FK vers `documents.id`
 
-- [ ] **Task 6** : Créer la migration `elio_config_history` (AC: #3)
-  - [ ] 6.1 : Créer `supabase/migrations/00012_elio_config_history.sql`
-  - [ ] 6.2 : Table avec id, client_id, field_changed, old_value, new_value, changed_at, changed_by
-  - [ ] 6.3 : Policies RLS (opérateur voit historique de ses clients)
-  - [ ] 6.4 : Trigger pour enregistrer les modifications de `client_configs.elio_config`
+- [x] **Task 6** : Créer la migration `elio_config_history` (AC: #3)
+  - [x] 6.1 : Créer `supabase/migrations/00047_elio_config_history.sql` (00012 déjà pris par rls_policies)
+  - [x] 6.2 : Table avec id, client_id, field_changed, old_value, new_value, changed_at, changed_by
+  - [x] 6.3 : Policies RLS (opérateur voit historique de ses clients)
+  - [x] 6.4 : Trigger sur `elio_configs` (pas `client_configs.elio_config` qui n'existe pas)
 
-- [ ] **Task 7** : Créer le composant historique config (AC: #3, FR87)
-  - [ ] 7.1 : Créer `components/elio-config-history.tsx` (Hub uniquement)
-  - [ ] 7.2 : Afficher liste chronologique des modifications
-  - [ ] 7.3 : Affichage collapsible par entrée (détails au clic)
-  - [ ] 7.4 : Bouton "Restaurer cette version" avec confirmation modale
+- [x] **Task 7** : Créer le composant historique config (AC: #3, FR87)
+  - [x] 7.1 : Créer `components/elio-config-history.tsx` (Hub uniquement)
+  - [x] 7.2 : Afficher liste chronologique des modifications
+  - [x] 7.3 : Affichage collapsible par entrée (détails au clic)
+  - [x] 7.4 : Bouton "Restaurer cette version" avec confirmation modale
 
-- [ ] **Task 8** : Créer la Server Action `restoreElioConfig()`
-  - [ ] 8.1 : Créer `actions/restore-elio-config.ts`
-  - [ ] 8.2 : Restaurer la config depuis l'historique
-  - [ ] 8.3 : Invalider le cache `['elio-config']`
-  - [ ] 8.4 : Enregistrer la restauration dans l'historique
+- [x] **Task 8** : Créer la Server Action `restoreElioConfig()`
+  - [x] 8.1 : Créer `actions/restore-elio-config.ts`
+  - [x] 8.2 : Restaurer la config depuis l'historique
+  - [x] 8.3 : Invalider le cache `['elio-config']` et `['elio-config-history']`
+  - [x] 8.4 : La restauration est loguée automatiquement par le trigger DB
 
-- [ ] **Task 9** : Intégrer feedback dans `elio-message.tsx`
-  - [ ] 9.1 : Ajouter `elio-feedback.tsx` en bas de chaque message Élio
-  - [ ] 9.2 : Afficher le feedback existant si déjà donné
-  - [ ] 9.3 : Gérer l'état optimiste (TanStack Query)
+- [x] **Task 9** : Intégrer feedback dans `elio-message.tsx`
+  - [x] 9.1 : Ajouter `elio-feedback.tsx` en bas de chaque message Élio (slot pattern)
+  - [x] 9.2 : Afficher le feedback existant si déjà donné (prop `currentFeedback`)
+  - [x] 9.3 : État optimiste géré localement dans `elio-feedback.tsx`
 
-- [ ] **Task 10** : Intégrer documents dans les messages
-  - [ ] 10.1 : Détecter si `message.metadata.documentId` existe
-  - [ ] 10.2 : Afficher `elio-document.tsx` dans la bulle
-  - [ ] 10.3 : Fetch document info depuis la table `documents`
+- [x] **Task 10** : Intégrer documents dans les messages
+  - [x] 10.1 : Détecter si `message.metadata.documentId` existe dans `elio-chat.tsx`
+  - [x] 10.2 : Afficher `elio-document.tsx` dans la bulle (slot pattern)
+  - [x] 10.3 : Props passées depuis `metadata` (documentName, documentType, etc.)
 
-- [ ] **Task 11** : Tests
-  - [ ] 11.1 : Tester `submitFeedback()` (utile/pas utile, toggle)
-  - [ ] 11.2 : Tester `elio-document.tsx` (aperçu, download, navigation)
-  - [ ] 11.3 : Tester historique config (affichage, restauration)
+- [x] **Task 11** : Tests
+  - [x] 11.1 : Tester `submitFeedback()` (utile/pas utile, toggle, NOT_FOUND, DB_ERROR)
+  - [x] 11.2 : Tester `elio-document.tsx` (aperçu, download, navigation, badge, types)
+  - [x] 11.3 : Tester historique config (affichage, restauration, cache invalidation)
 
 ## Dev Notes
 
@@ -346,3 +346,63 @@ export function ElioDocument({
 **Story prête pour développement** : ✅ Oui
 **Dépendances** : Story 8.1, 8.2
 **FRs couvertes** : FR87 (historique configs), FR125 (documents dans chat), FR126 (feedback)
+
+---
+
+## Dev Agent Record
+
+**Agent** : Amelia (Dev Agent)
+**Date** : 2026-03-02
+**Statut** : Done — Code Review Phase 2 complète (6 fixes appliqués)
+
+### Implementation Notes
+
+- **Migration** : Numéro 00047 utilisé (00012 déjà occupé par `rls_policies.sql`)
+- **Trigger** : Appliqué sur `elio_configs` (trigger AFTER UPDATE), pas sur `client_configs.elio_config` qui n'existe pas en tant que table séparée
+- **Slot pattern** : `feedbackSlot` et `documentSlot` dans `ElioMessage` → `ElioChat` injecte les composants
+- **Feedback optimiste** : Géré localement dans `elio-feedback.tsx` via `useState` + `useTransition` (pas TanStack mutation)
+- **ElioConfigSection** : Composant Hub uniquement, wraps `OrpheusConfigForm` (existant) + `ElioConfigHistory` en sub-tabs
+- **Test fix** : Sélecteur `getByTestId('expand-btn-{id}')` ajouté pour le bouton expand dans `elio-config-history.tsx`
+
+### Completion Notes
+
+Tous les ACs implémentés :
+- **AC1** ✅ : Feedback 👍/👎 avec toggle, couleur active, collecte silencieuse
+- **AC2** ✅ : Documents dans le chat (carte, icône type, aperçu, liens, badge Élio)
+- **AC3** ✅ : Historique configs Hub, collapsible, restauration avec modale + invalidation cache
+
+### Code Review Fixes (Phase 2 — Opus)
+
+- **H1** : Ajouté `group` class sur `elio-message.tsx`, inversé logique visibilité feedback → mobile visible, desktop hover
+- **H2** : Corrigé `created_at` → `createdAt` dans `submit-feedback.ts` metadata (alignement TypeScript)
+- **H3** : Supprimé policy INSERT `WITH CHECK (true)` → trigger SECURITY DEFINER bypass RLS, plus de faux historique possible
+- **M1** : Supprimé conditionnel mort `docsBasePath` dans `elio-document.tsx`
+- **M2** : Remplacé type local `HistoryEntry` par import `ElioConfigHistoryEntry` dans `elio-config-history.tsx`
+- **M3** : Ajouté commentaire alignement schema dans `restore-elio-config.ts`
+- **L1** : Documenté (JSON.stringify comparaison acceptable pour valeurs simples)
+- **L2** : Documenté (feedback optimiste sans rollback, acceptable pour story)
+
+### File List
+
+**Créés :**
+- `packages/modules/elio/components/elio-feedback.tsx`
+- `packages/modules/elio/components/elio-feedback.test.tsx`
+- `packages/modules/elio/components/elio-document.tsx`
+- `packages/modules/elio/components/elio-document.test.tsx`
+- `packages/modules/elio/components/elio-config-history.tsx`
+- `packages/modules/elio/components/elio-config-history.test.tsx`
+- `packages/modules/elio/components/elio-config-section.tsx`
+- `packages/modules/elio/actions/submit-feedback.ts`
+- `packages/modules/elio/actions/submit-feedback.test.ts`
+- `packages/modules/elio/actions/get-elio-config-history.ts`
+- `packages/modules/elio/actions/get-elio-config-history.test.ts`
+- `packages/modules/elio/actions/restore-elio-config.ts`
+- `packages/modules/elio/actions/restore-elio-config.test.ts`
+- `supabase/migrations/00047_elio_config_history.sql`
+
+**Modifiés :**
+- `packages/modules/elio/types/elio.types.ts` (FeedbackRating, ElioMessageMetadata)
+- `packages/modules/elio/components/elio-message.tsx` (documentSlot prop)
+- `packages/modules/elio/components/elio-chat.tsx` (feedbackSlot + documentSlot injection)
+- `packages/modules/elio/index.ts` (exports ElioFeedback, ElioDocument, ElioConfigHistory, ElioConfigSection + actions + types)
+- `apps/hub/app/(dashboard)/modules/crm/clients/[clientId]/client-detail-with-support.tsx` (onglet Configuration Élio)

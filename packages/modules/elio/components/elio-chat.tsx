@@ -8,6 +8,8 @@ import { useElioMessages } from '../hooks/use-elio-messages'
 import { ElioThinking } from './elio-thinking'
 import { ElioErrorMessage } from './elio-error-message'
 import { ElioMessageItem } from './elio-message'
+import { ElioFeedback } from './elio-feedback'
+import { ElioDocument } from './elio-document'
 import { ConversationList } from './conversation-list'
 import { newConversation } from '../actions/new-conversation'
 import { generateWelcomeMessage } from '../actions/generate-welcome-message'
@@ -309,6 +311,7 @@ function ElioChatPersisted({
       createdAt: pm.createdAt,
       dashboardType,
       conversationId: pm.conversationId,
+      metadata: pm.metadata,
     })),
     ...localMessages,
   ]
@@ -355,9 +358,37 @@ function ElioChatPersisted({
             </div>
           )}
 
-          {displayMessages.map((msg) => (
-            <ElioMessageItem key={msg.id} message={msg} dashboardType={dashboardType} />
-          ))}
+          {displayMessages.map((msg) => {
+            const feedbackSlot =
+              msg.role === 'assistant' && msg.id && !msg.id.startsWith('local-') ? (
+                <ElioFeedback
+                  messageId={msg.id}
+                  currentFeedback={msg.metadata?.feedback?.rating}
+                />
+              ) : undefined
+
+            const documentSlot =
+              msg.metadata?.documentId ? (
+                <ElioDocument
+                  documentId={msg.metadata.documentId}
+                  documentName={msg.metadata.documentName ?? 'Document'}
+                  documentType={msg.metadata.documentType ?? 'pdf'}
+                  isElioGenerated={msg.metadata.isElioGenerated}
+                  preview={msg.metadata.documentPreview}
+                  dashboardType={dashboardType}
+                />
+              ) : undefined
+
+            return (
+              <ElioMessageItem
+                key={msg.id}
+                message={msg}
+                dashboardType={dashboardType}
+                feedbackSlot={feedbackSlot}
+                documentSlot={documentSlot}
+              />
+            )
+          })}
           {isLoading && <ElioThinking dashboardType={dashboardType} />}
           {error && !isLoading && <ElioErrorMessage error={error} onRetry={retrySend} />}
           <div ref={messagesEndRef} aria-hidden="true" />

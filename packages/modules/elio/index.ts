@@ -7,6 +7,12 @@ export { ElioThinking } from './components/elio-thinking'
 export { ElioErrorMessage } from './components/elio-error-message'
 export { ElioMessageItem } from './components/elio-message'
 
+// Components — Story 8.3
+export { ElioFeedback } from './components/elio-feedback'
+export { ElioDocument } from './components/elio-document'
+export { ElioConfigHistory } from './components/elio-config-history'
+export { ElioConfigSection } from './components/elio-config-section'
+
 // Components — Stories 6.x (Lab)
 export { PersonalizeElioDialog } from './components/personalize-elio-dialog'
 export { ElioGuidedSuggestions } from './components/elio-guided-suggestions'
@@ -36,6 +42,11 @@ export { generateWelcomeMessage, getWelcomeMessage } from './actions/generate-we
 export { generateConversationTitle } from './actions/generate-conversation-title'
 export { updateConversationTitle } from './actions/update-conversation-title'
 export { saveElioMessage } from './actions/save-elio-message'
+
+// Actions — Story 8.3
+export { submitFeedback } from './actions/submit-feedback'
+export { getElioConfigHistory } from './actions/get-elio-config-history'
+export { restoreElioConfig } from './actions/restore-elio-config'
 
 // Actions — Stories 6.x
 export { createCommunicationProfile } from './actions/create-communication-profile'
@@ -80,6 +91,15 @@ export type {
   ElioMessagePersisted,
   ConversationSummary,
 } from './types/elio.types'
+
+// Types — Story 8.3
+export type {
+  FeedbackRating,
+  ElioMessageMetadata,
+} from './types/elio.types'
+
+export type { ElioConfigHistoryEntry } from './actions/get-elio-config-history'
+export type { DocumentType } from './components/elio-document'
 
 // Types — Stories 6.x
 export type {

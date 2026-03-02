@@ -10,6 +10,25 @@ export type ElioTier = 'one' | 'one_plus'
 
 export type ElioMessageRole = 'user' | 'assistant'
 
+// Story 8.3: feedback rating type
+export type FeedbackRating = 'useful' | 'not_useful'
+
+// Story 8.3: metadata interface for persisted messages
+export interface ElioMessageMetadata {
+  feedback?: {
+    rating: FeedbackRating
+    createdAt: string
+  }
+  documentId?: string
+  documentName?: string
+  documentType?: 'pdf' | 'doc' | 'image' | 'markdown'
+  isElioGenerated?: boolean
+  documentPreview?: string
+  profileObservation?: string
+  draftType?: 'email' | 'validation_hub' | 'chat'
+  evolutionBrief?: boolean
+}
+
 export interface ElioMessage {
   id: string
   role: ElioMessageRole
@@ -19,6 +38,8 @@ export interface ElioMessage {
   isError?: boolean
   // Story 8.2: persistance en base
   conversationId?: string
+  // Story 8.3: metadata pour feedback + documents
+  metadata?: ElioMessageMetadata
 }
 
 // --- Conversation Types (Story 8.2) ---
@@ -38,13 +59,7 @@ export interface ElioMessagePersisted {
   conversationId: string
   role: ElioMessageRole
   content: string
-  metadata: {
-    feedback?: 'useful' | 'not_useful'
-    documentId?: string
-    profileObservation?: string
-    draftType?: 'email' | 'validation_hub' | 'chat'
-    evolutionBrief?: boolean
-  }
+  metadata: ElioMessageMetadata
   createdAt: string
 }
 
