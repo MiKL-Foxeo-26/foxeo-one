@@ -88,6 +88,8 @@ export interface ElioConversation {
   createdAt: string
   updatedAt: string
   lastMessagePreview?: string
+  /** Story 9.2 — conversations Lab consultables en lecture seule depuis One */
+  isReadOnly?: boolean
 }
 
 export interface ElioMessagePersisted {

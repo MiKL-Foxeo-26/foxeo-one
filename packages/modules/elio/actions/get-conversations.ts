@@ -9,6 +9,11 @@ import type { DashboardType, ElioConversation } from '../types/elio.types'
  * Server Action — Récupère les conversations Élio d'un utilisateur.
  * Inclut le dernier message de chaque conversation (AC2 : aperçu 30 char).
  * Triées par dernière activité (updated_at DESC).
+ *
+ * Pour les clients One (dashboardType='one') :
+ * - Inclut les conversations One (actives)
+ * - Inclut les conversations Lab en lecture seule (isReadOnly=true) — Story 9.2 AC4
+ *
  * Retourne toujours { data, error } — jamais throw.
  */
 export async function getConversations(
@@ -21,11 +26,14 @@ export async function getConversations(
     return errorResponse('Utilisateur non authentifié', 'AUTH_ERROR')
   }
 
+  // Pour les clients One, inclure aussi les conversations Lab (lecture seule)
+  const dashboardTypes: DashboardType[] = dashboardType === 'one' ? ['one', 'lab'] : [dashboardType]
+
   const { data, error } = await supabase
     .from('elio_conversations')
     .select('*, elio_messages(content, created_at)')
     .eq('user_id', user.user.id)
-    .eq('dashboard_type', dashboardType)
+    .in('dashboard_type', dashboardTypes)
     .order('updated_at', { ascending: false })
 
   if (error) {
@@ -43,6 +51,12 @@ export async function getConversations(
     const { elio_messages: _msgs, ...convRow } = row
     const conv = toCamelCase(convRow) as unknown as ElioConversation
     conv.lastMessagePreview = lastMsg?.content ?? ''
+
+    // Marquer les conversations Lab comme lecture seule pour les clients One
+    if (dashboardType === 'one' && row.dashboard_type === 'lab') {
+      conv.isReadOnly = true
+    }
+
     return conv
   })
 

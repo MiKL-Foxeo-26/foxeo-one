@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bienvenue dans Foxeo One</title>
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #111111;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #2a2a2a;
+    }
+    .header {
+      background: linear-gradient(135deg, #F7931E 0%, #e07a12 100%);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .header p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      margin: 0;
+    }
+    .body {
+      padding: 32px;
+    }
+    .greeting {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #f5f5f5;
+    }
+    .text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #c0c0c0;
+      margin-bottom: 24px;
+    }
+    .recap {
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      border: 1px solid #2a2a2a;
+    }
+    .recap h3 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #F7931E;
+      margin: 0 0 12px 0;
+    }
+    .recap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #2a2a2a;
+      font-size: 14px;
+    }
+    .recap-item:last-child {
+      border-bottom: none;
+    }
+    .recap-item .label {
+      color: #888888;
+    }
+    .recap-item .value {
+      color: #f5f5f5;
+      font-weight: 500;
+    }
+    .modules {
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      border: 1px solid #2a2a2a;
+    }
+    .modules h3 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #F7931E;
+      margin: 0 0 12px 0;
+    }
+    .module-tag {
+      display: inline-block;
+      background-color: #2a2a2a;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 13px;
+      color: #f5f5f5;
+      margin: 4px 4px 4px 0;
+    }
+    .cta {
+      text-align: center;
+      margin: 32px 0;
+    }
+    .cta a {
+      display: inline-block;
+      background-color: #F7931E;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: 8px;
+    }
+    .footer {
+      text-align: center;
+      padding: 24px 32px;
+      font-size: 12px;
+      color: #555555;
+      border-top: 1px solid #2a2a2a;
+    }
+    .footer a {
+      color: #F7931E;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎉 Félicitations, {{clientName}} !</h1>
+      <p>Votre espace professionnel Foxeo One est prêt</p>
+    </div>
+
+    <div class="body">
+      <p class="greeting">Bonjour {{clientName}},</p>
+      <p class="text">
+        Votre parcours d'incubation Lab est terminé avec succès. Nous sommes ravis de vous accueillir
+        dans Foxeo One — votre espace professionnel dédié pour développer votre activité avec les
+        meilleurs outils IA.
+      </p>
+
+      <div class="recap">
+        <h3>Récapitulatif de votre parcours</h3>
+        <div class="recap-item">
+          <span class="label">Entreprise</span>
+          <span class="value">{{companyName}}</span>
+        </div>
+        <div class="recap-item">
+          <span class="label">Durée du parcours Lab</span>
+          <span class="value">{{labDuration}}</span>
+        </div>
+        <div class="recap-item">
+          <span class="label">Étapes complétées</span>
+          <span class="value">{{labStepsCompleted}}</span>
+        </div>
+        <div class="recap-item">
+          <span class="label">Date de graduation</span>
+          <span class="value">{{graduationDate}}</span>
+        </div>
+      </div>
+
+      <div class="modules">
+        <h3>Vos modules activés</h3>
+        {{modules}}
+      </div>
+
+      <p class="text">
+        Votre dashboard personnalisé est disponible dès maintenant. Élio One, votre assistant IA,
+        a hérité de votre profil de communication et connaît déjà votre projet.
+      </p>
+
+      <div class="cta">
+        <a href="{{instanceUrl}}">Accéder à mon espace Foxeo One →</a>
+      </div>
+
+      <p class="text" style="font-size: 13px; color: #666666;">
+        Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
+        <a href="{{instanceUrl}}" style="color: #F7931E;">{{instanceUrl}}</a>
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>
+        Cet email vous a été envoyé par <a href="https://foxeo.io">Foxeo</a>.<br />
+        Vous recevez cet email car vous êtes client Foxeo One.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -293,4 +293,83 @@ describe('middleware routing logic', () => {
       expect(isOnboardingExcluded('/graduation/celebrate')).toBe(true)
     })
   })
+
+  describe('One instance redirect logic (Story 9.2)', () => {
+    it('client gradué avec screen montré ET dashboard_type=one doit être redirigé vers instance One', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: true }
+      const clientConfig = { dashboard_type: 'one' }
+      const instance = { instance_url: 'https://jean.foxeo.io', status: 'active' }
+
+      const currentHost = 'lab.foxeo.io'
+      const instanceHost = new URL(instance.instance_url).host
+
+      const shouldRedirect =
+        !!client.graduated_at &&
+        client.graduation_screen_shown &&
+        clientConfig.dashboard_type === 'one' &&
+        instance.status === 'active' &&
+        currentHost !== instanceHost
+
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('client gradué mais screen PAS encore montré NE doit PAS être redirigé vers One (→ graduation/celebrate)', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: false }
+      const clientConfig = { dashboard_type: 'one' }
+      const instance = { instance_url: 'https://jean.foxeo.io', status: 'active' }
+
+      const currentHost = 'lab.foxeo.io'
+      const instanceHost = new URL(instance.instance_url).host
+
+      const shouldRedirectToOne =
+        !!client.graduated_at &&
+        client.graduation_screen_shown &&
+        clientConfig.dashboard_type === 'one' &&
+        instance.status === 'active' &&
+        currentHost !== instanceHost
+
+      expect(shouldRedirectToOne).toBe(false)
+    })
+
+    it('client en provisioning doit être redirigé vers page d\'attente', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: true }
+      const clientConfig = { dashboard_type: 'one' }
+      const instance = { instance_url: 'https://jean.foxeo.io', status: 'provisioning' }
+
+      const shouldShowProvisioning =
+        !!client.graduated_at &&
+        client.graduation_screen_shown &&
+        clientConfig.dashboard_type === 'one' &&
+        instance.status === 'provisioning'
+
+      expect(shouldShowProvisioning).toBe(true)
+    })
+
+    it('client déjà sur son instance One (même host) NE doit PAS être redirigé', () => {
+      const client = { graduated_at: '2026-02-24T10:00:00Z', graduation_screen_shown: true }
+      const clientConfig = { dashboard_type: 'one' }
+      const instance = { instance_url: 'https://jean.foxeo.io', status: 'active' }
+
+      const currentHost = 'jean.foxeo.io' // même host que l'instance
+      const instanceHost = new URL(instance.instance_url).host
+
+      const shouldRedirect =
+        !!client.graduated_at &&
+        client.graduation_screen_shown &&
+        clientConfig.dashboard_type === 'one' &&
+        instance.status === 'active' &&
+        currentHost !== instanceHost
+
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('préserve le path et les query params dans la redirect URL', () => {
+      const instanceUrl = 'https://jean.foxeo.io'
+      const pathname = '/modules/crm'
+      const search = '?filter=active'
+
+      const redirectUrl = `${instanceUrl}${pathname}${search}`
+      expect(redirectUrl).toBe('https://jean.foxeo.io/modules/crm?filter=active')
+    })
+  })
 })
