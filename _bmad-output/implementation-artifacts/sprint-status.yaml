@@ -132,7 +132,7 @@ development_status:
   8-8-elio-one-collecte-devolutions-soumission-validation-hub: done
   8-9a-elio-one-plus-systeme-de-tiers-actions-modules: done
   8-9b-elio-one-plus-generation-de-documents: done
-  8-9c-elio-one-plus-alertes-proactives: ready-for-dev
+  8-9c-elio-one-plus-alertes-proactives: done
   epic-8-retrospective: optional
 
   # Epic 9: Graduation Lab vers One & Cycle de Vie Client (7 stories)

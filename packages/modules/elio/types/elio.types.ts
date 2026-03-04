@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import type { ActionError } from '@foxeo/types'
 
 // --- Dashboard Types ---
@@ -144,6 +145,44 @@ export const DEFAULT_COMMUNICATION_PROFILE_FR66: CommunicationProfileFR66 = {
   privilege: [],
   styleNotes: '',
 }
+
+// --- Proactive Alerts (Story 8.9c) ---
+
+export interface ProactiveAlert {
+  id: string
+  moduleId: string
+  condition: string          // SQL-like : "SELECT COUNT(*) FROM ... WHERE ..."
+  message: string            // Template : "Vous avez {count} cotisations impayées"
+  frequency: 'daily' | 'weekly' | 'on_event'
+  lastTriggered: string | null
+  enabled: boolean
+}
+
+export interface ElioAlertsPreferences {
+  alerts: ProactiveAlert[]
+  max_per_day: number
+  sent_today: number
+  last_reset: string          // Date du dernier reset du compteur (YYYY-MM-DD)
+}
+
+// --- Zod Schemas (Story 8.9c) ---
+
+export const proactiveAlertSchema = z.object({
+  id: z.string().min(1, 'id requis'),
+  moduleId: z.string().min(1, 'moduleId requis'),
+  condition: z.string().min(1, 'condition requise'),
+  message: z.string().min(1, 'message requis'),
+  frequency: z.enum(['daily', 'weekly', 'on_event']),
+  lastTriggered: z.string().nullable(),
+  enabled: z.boolean(),
+})
+
+export const elioAlertsPreferencesSchema = z.object({
+  alerts: z.array(proactiveAlertSchema),
+  max_per_day: z.number().int().min(1).max(10),
+  sent_today: z.number().int().min(0),
+  last_reset: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format YYYY-MM-DD requis'),
+})
 
 // --- Elio Config (unified) ---
 // Note: ElioUnifiedConfig sera ajouté quand getElioConfig sera enrichi (Story 8.2+)
