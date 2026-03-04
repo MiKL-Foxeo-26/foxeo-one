@@ -1,10 +1,11 @@
 import type { DashboardType } from './auth.types'
+import type { CommunicationProfile } from './communication-profile.types'
 
 export type ElioTier = 'lab' | 'one-basic' | 'one-plus'
 
 export type ElioConfig = {
   tier: ElioTier
-  communicationProfile?: Record<string, unknown>
+  communicationProfile?: CommunicationProfile
   customInstructions?: string
 }
 

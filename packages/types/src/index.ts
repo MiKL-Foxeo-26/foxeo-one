@@ -22,3 +22,11 @@ export type {
 } from './client-config.types'
 
 export type { Json, Database } from './database.types'
+
+export type {
+  TechnicalLevel,
+  ExchangeStyle,
+  AdaptedTone,
+  MessageLength,
+  CommunicationProfile,
+} from './communication-profile.types'

@@ -48,6 +48,8 @@ export { ImportCsvDialog } from './components/import-csv-dialog'
 export { CsvPreviewTable } from './components/csv-preview-table'
 export { CsvTemplateDownload } from './components/csv-template-download'
 export { NotificationItem } from './components/notification-item'
+export { CommunicationProfileForm } from './components/communication-profile-form'
+export { ElioObservations } from './components/elio-observations'
 
 // Hooks
 export { useClients } from './hooks/use-clients'
@@ -97,6 +99,9 @@ export { upgradeClient } from './actions/upgrade-client'
 export { importClientsCsv } from './actions/import-clients-csv'
 export { getNotifications } from './actions/get-notifications'
 export { markNotificationRead } from './actions/mark-notification-read'
+export { updateCommunicationProfile as updateElioCommunicationProfile } from './actions/update-communication-profile'
+export { integrateObservation, type ObservationTarget } from './actions/integrate-observation'
+export { getElioObservations, type ElioObservation } from './actions/get-elio-observations'
 
 // Utils
 export {

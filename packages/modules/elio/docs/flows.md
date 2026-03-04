@@ -72,3 +72,40 @@ Client va dans Paramètres > Profil de communication
   → Cache TanStack Query invalidé
   → Prochains messages utilisent le nouveau profil
 ```
+
+## Flow 7 — Affinement profil par Élio Lab (Story 8.4 — AC3)
+
+```
+Élio Lab en conversation avec un client
+  → system prompt inclut instruction d'observation (LAB_OBSERVATION_INSTRUCTIONS)
+  → Élio détecte une préférence implicite
+  → Élio inclut profile_observation dans metadata du message
+    (ex: "Client préfère les listes à puces")
+  → Observation stockée dans elio_messages.metadata.profile_observation
+
+MiKL consulte la fiche client (Hub)
+  → Section "Observations Élio" via ElioObservations component
+  → getElioObservations(clientId) charge les observations Lab
+  → MiKL clique "Valider" sur une observation
+  → Sélection de la cible (avoid | privilege | styleNotes)
+  → integrateObservation() Server Action
+  → Observation intégrée dans client_configs.elio_config.communication_profile
+  → Toast confirmation + refresh
+```
+
+## Flow 8 — Transmission du profil à la graduation (Story 8.4 — AC5, FR68)
+
+```
+Graduation Lab → One déclenchée (Epic 9)
+  → compileLabLearnings(clientId) Server Action appelée
+    → Fetch elio_messages[dashboard_type='lab'] avec profile_observation
+    → Compile les observations en string[]
+    → Met à jour communication_profile.lab_learnings dans client_configs.elio_config
+
+Résultat :
+  → Le même champ client_configs.elio_config.communication_profile est lu par Élio One
+  → lab_learnings disponible pour contexte additionnel (éventuellement dans le prompt)
+  → Historique Lab accessible via elio_conversations[dashboard_type='lab'] (même table)
+  → Aucune rupture de ton : Élio One démarre avec le profil complet du parcours Lab
+  → Aucune migration DB nécessaire : elio_config JSONB est flexible
+```

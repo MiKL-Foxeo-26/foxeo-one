@@ -57,3 +57,8 @@ export {
   type AllowedFileType,
   type FileValidationResult,
 } from './file-validation'
+export {
+  communicationProfileSchema,
+  DEFAULT_COMMUNICATION_PROFILE,
+  type CommunicationProfileInput,
+} from './defaults'
