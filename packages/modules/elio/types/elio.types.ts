@@ -29,6 +29,11 @@ export interface ElioMessageMetadata {
   evolutionBrief?: boolean
   // Story 8.7: escalade MiKL quand confiance basse
   needsEscalation?: boolean
+  // Story 8.8: évolution détectée — lancer la collecte côté client
+  evolutionDetected?: boolean
+  evolutionInitialRequest?: string
+  // Story 8.8: fonctionnalité existante détectée
+  existingFeatureInstructions?: string
 }
 
 // Story 8.7 — Task 3.1 : Structure documentation module actif (injectée par MiKL, Story 10.3)

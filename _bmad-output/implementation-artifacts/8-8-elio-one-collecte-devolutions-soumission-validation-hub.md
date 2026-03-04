@@ -1,6 +1,6 @@
 # Story 8.8: Élio One — Collecte d'évolutions & soumission Validation Hub
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -100,54 +100,89 @@ Vous validez ? Je l'envoie à MiKL pour évaluation.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1** : Créer la détection intention "évolution" (AC: #1, FR47)
-  - [ ] 1.1 : Modifier `utils/detect-intent.ts`
-  - [ ] 1.2 : Patterns : "je voudrais", "on pourrait", "il faudrait", "ajouter", "nouveau"
-  - [ ] 1.3 : Extraire le besoin exprimé
+- [x] **Task 1** : Créer la détection intention "évolution" (AC: #1, FR47)
+  - [x] 1.1 : Modifier `utils/detect-intent.ts`
+  - [x] 1.2 : Patterns : "je voudrais", "on pourrait", "il faudrait", "ajouter", "nouveau"
+  - [x] 1.3 : Extraire le besoin exprimé
 
-- [ ] **Task 2** : Créer le système de collecte guidée (AC: #2)
-  - [ ] 2.1 : Créer `utils/evolution-collection.ts`
-  - [ ] 2.2 : State machine : initial → clarification → priorité → exemple (optionnel) → summary
-  - [ ] 2.3 : Adapter les questions au profil de communication
-  - [ ] 2.4 : Limite 3 questions max
+- [x] **Task 2** : Créer le système de collecte guidée (AC: #2)
+  - [x] 2.1 : Créer `utils/evolution-collection.ts`
+  - [x] 2.2 : State machine : initial → clarification → priorité → exemple (optionnel) → summary
+  - [x] 2.3 : Adapter les questions au profil de communication
+  - [x] 2.4 : Limite 3 questions max
 
-- [ ] **Task 3** : Créer la génération du mini-brief (AC: #3)
-  - [ ] 3.1 : Créer `actions/generate-evolution-brief.ts`
-  - [ ] 3.2 : Auto-générer le titre (résumé en 5-8 mots)
-  - [ ] 3.3 : Structurer le contenu : Besoin, Contexte, Priorité, Exemple
-  - [ ] 3.4 : Afficher le mini-brief pour validation
+- [x] **Task 3** : Créer la génération du mini-brief (AC: #3)
+  - [x] 3.1 : Créer `actions/generate-evolution-brief.ts`
+  - [x] 3.2 : Auto-générer le titre (résumé en 5-8 mots)
+  - [x] 3.3 : Structurer le contenu : Besoin, Contexte, Priorité, Exemple
+  - [x] 3.4 : Afficher le mini-brief pour validation
 
-- [ ] **Task 4** : Créer la Server Action soumission (AC: #4)
-  - [ ] 4.1 : Créer `actions/submit-evolution-request.ts`
-  - [ ] 4.2 : Créer l'entrée dans `validation_requests` avec `type='evolution_one'`
-  - [ ] 4.3 : Créer la notification pour MiKL
-  - [ ] 4.4 : Stocker `metadata.evolution_brief: true` dans le message Élio
-  - [ ] 4.5 : Invalider le cache `['validation-requests']`
-  - [ ] 4.6 : Confirmer au client
+- [x] **Task 4** : Créer la Server Action soumission (AC: #4)
+  - [x] 4.1 : Créer `actions/submit-evolution-request.ts`
+  - [x] 4.2 : Créer l'entrée dans `validation_requests` avec `type='evolution_one'`
+  - [x] 4.3 : Créer la notification pour MiKL
+  - [x] 4.4 : Stocker `metadata.evolution_brief: true` dans le message Élio
+  - [x] 4.5 : Invalider le cache `['validation-requests']`
+  - [x] 4.6 : Confirmer au client
 
-- [ ] **Task 5** : Implémenter l'annulation (AC: #5)
-  - [ ] 5.1 : Détecter "Non laisse tomber", "En fait non", "Annuler"
-  - [ ] 5.2 : Sortir du mode collecte
-  - [ ] 5.3 : Message de confirmation
+- [x] **Task 5** : Implémenter l'annulation (AC: #5)
+  - [x] 5.1 : Détecter "Non laisse tomber", "En fait non", "Annuler"
+  - [x] 5.2 : Sortir du mode collecte
+  - [x] 5.3 : Message de confirmation
 
-- [ ] **Task 6** : Détecter fonctionnalité existante (AC: #5)
-  - [ ] 6.1 : Vérifier si le besoin correspond à un module actif
-  - [ ] 6.2 : Répondre avec instructions (mode FAQ)
-  - [ ] 6.3 : Ne pas lancer la collecte
+- [x] **Task 6** : Détecter fonctionnalité existante (AC: #5)
+  - [x] 6.1 : Vérifier si le besoin correspond à un module actif
+  - [x] 6.2 : Répondre avec instructions (mode FAQ)
+  - [x] 6.3 : Ne pas lancer la collecte
 
-- [ ] **Task 7** : Intégrer dans `send-to-elio.ts`
-  - [ ] 7.1 : Détecter intention "évolution"
-  - [ ] 7.2 : Lancer la collecte guidée
-  - [ ] 7.3 : Gérer la state machine (questions → réponses)
-  - [ ] 7.4 : Générer et afficher le mini-brief
+- [x] **Task 7** : Intégrer dans `send-to-elio.ts`
+  - [x] 7.1 : Détecter intention "évolution"
+  - [x] 7.2 : Lancer la collecte guidée
+  - [x] 7.3 : Gérer la state machine (questions → réponses)
+  - [x] 7.4 : Générer et afficher le mini-brief
 
-- [ ] **Task 8** : Tests
-  - [ ] 8.1 : Tester détection intention évolution
-  - [ ] 8.2 : Tester collecte guidée (2-3 questions)
-  - [ ] 8.3 : Tester génération mini-brief
-  - [ ] 8.4 : Tester soumission (création validation_request, notification)
-  - [ ] 8.5 : Tester annulation
-  - [ ] 8.6 : Tester détection fonctionnalité existante
+- [x] **Task 8** : Tests
+  - [x] 8.1 : Tester détection intention évolution
+  - [x] 8.2 : Tester collecte guidée (2-3 questions)
+  - [x] 8.3 : Tester génération mini-brief
+  - [x] 8.4 : Tester soumission (création validation_request, notification)
+  - [x] 8.5 : Tester annulation
+  - [x] 8.6 : Tester détection fonctionnalité existante
+
+## Dev Agent Record
+
+### Implementation Plan
+- Task 1: Extended `detect-intent.ts` with `request_evolution` action + 6 EVOLUTION_PATTERNS regexes
+- Task 2+5: Created `evolution-collection.ts` — pure function state machine with cancel detection
+- Task 3: Created `generate-evolution-brief.ts` — generates structured brief from collected data
+- Task 4: Created `submit-evolution-request.ts` — server action inserting `validation_requests` + notification
+- Task 6: Created `detect-existing-feature.ts` — keyword-to-module mapping with active modules doc check
+- Task 7: Integration in `send-to-elio.ts` (server-side intent detection) + `elio-chat.tsx` (client-side state machine)
+
+### Completion Notes
+- 84 story tests passing across 5 test files, 0 failures (172 total with pre-existing)
+- State machine is pure functions (no side effects) — easy to test and maintain
+- Cancel detection handles French colloquial expressions ("laisse tomber", "tant pis", "oublie")
+- Priority extraction supports both numeric ("2") and text ("ça me manque souvent")
+- Existing feature detection checks both request keywords AND active modules documentation
+- Evolution flow is client-side after initial detection to avoid unnecessary LLM calls
+- Brief confirmation UI uses banner with "Oui, envoyer à MiKL" / "Annuler" buttons
+- CR fixes: HIGH-1 (persist cancel msg), HIGH-2 (use tutoiement prop in evolution profile), HIGH-3 (invalidate validation-requests cache), MEDIUM-4 (brief modification feedback), MEDIUM-5 (oublie pas false positive)
+
+### File List
+- `packages/modules/elio/utils/detect-intent.ts` (modified — added request_evolution action)
+- `packages/modules/elio/utils/detect-intent.test.ts` (modified — 9 new tests)
+- `packages/modules/elio/utils/evolution-collection.ts` (created — state machine)
+- `packages/modules/elio/utils/evolution-collection.test.ts` (created — 17 tests)
+- `packages/modules/elio/utils/detect-existing-feature.ts` (created — feature check)
+- `packages/modules/elio/utils/detect-existing-feature.test.ts` (created — 8 tests)
+- `packages/modules/elio/actions/generate-evolution-brief.ts` (created — brief generation)
+- `packages/modules/elio/actions/generate-evolution-brief.test.ts` (created — 10 tests)
+- `packages/modules/elio/actions/submit-evolution-request.ts` (created — server action)
+- `packages/modules/elio/actions/submit-evolution-request.test.ts` (created — 8 tests)
+- `packages/modules/elio/actions/send-to-elio.ts` (modified — evolution detection in One flow)
+- `packages/modules/elio/components/elio-chat.tsx` (modified — evolution collection UI)
+- `packages/modules/elio/types/elio.types.ts` (modified — metadata fields)
 
 ## Dev Notes
 

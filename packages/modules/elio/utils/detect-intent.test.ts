@@ -185,3 +185,55 @@ describe('detectIntent (Story 8.6 — Task 1)', () => {
     })
   })
 })
+
+describe('detectIntent (Story 8.8 — Task 1)', () => {
+  describe('action: request_evolution (AC1, FR47)', () => {
+    it('Task 1.2 — détecte "Je voudrais pouvoir envoyer des SMS"', () => {
+      const intent = detectIntent('Je voudrais pouvoir envoyer des SMS de rappel')
+      expect(intent.action).toBe('request_evolution')
+      expect(intent.initialRequest).toBeTruthy()
+    })
+
+    it('Task 1.2 — détecte "On pourrait ajouter une fonction export"', () => {
+      const intent = detectIntent('On pourrait ajouter une fonction export Excel')
+      expect(intent.action).toBe('request_evolution')
+    })
+
+    it('Task 1.2 — détecte "Il faudrait un module calendrier"', () => {
+      const intent = detectIntent('Il faudrait un module calendrier')
+      expect(intent.action).toBe('request_evolution')
+    })
+
+    it('Task 1.2 — détecte "Est-ce qu\'on peut ajouter un système de réservation ?"', () => {
+      const intent = detectIntent("Est-ce qu'on peut ajouter un système de réservation ?")
+      expect(intent.action).toBe('request_evolution')
+    })
+
+    it('Task 1.2 — détecte "J\'aimerais avoir un nouveau tableau de bord"', () => {
+      const intent = detectIntent("J'aimerais avoir un nouveau tableau de bord")
+      expect(intent.action).toBe('request_evolution')
+    })
+
+    it('Task 1.3 — extrait le besoin exprimé dans initialRequest', () => {
+      const intent = detectIntent('Je voudrais pouvoir envoyer des SMS de rappel')
+      expect(intent.action).toBe('request_evolution')
+      expect(intent.initialRequest).toContain('SMS')
+    })
+
+    it('Task 1.3 — extrait le besoin pour "il faudrait"', () => {
+      const intent = detectIntent('Il faudrait un export CSV')
+      expect(intent.action).toBe('request_evolution')
+      expect(intent.initialRequest).toContain('export CSV')
+    })
+
+    it('ne détecte pas une question FAQ comme évolution', () => {
+      const intent = detectIntent('Comment je crée un événement ?')
+      expect(intent.action).not.toBe('request_evolution')
+    })
+
+    it('ne détecte pas un message général comme évolution', () => {
+      const intent = detectIntent('Merci beaucoup Élio')
+      expect(intent.action).not.toBe('request_evolution')
+    })
+  })
+})

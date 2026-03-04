@@ -18,6 +18,10 @@ import { saveElioMessage } from '../actions/save-elio-message'
 import { updateConversationTitle } from '../actions/update-conversation-title'
 import { sendToElio } from '../actions/send-to-elio'
 import { escalateToMiKL } from '../actions/escalate-to-mikl'
+import { submitEvolutionRequest } from '../actions/submit-evolution-request'
+import { getNextQuestion, processResponse, isCancel, type EvolutionCollectionData } from '../utils/evolution-collection'
+import { generateEvolutionBrief } from '../actions/generate-evolution-brief'
+import { DEFAULT_COMMUNICATION_PROFILE_FR66 } from '../types/elio.types'
 import type { DashboardType, ElioMessage, ElioError } from '../types/elio.types'
 
 interface ElioChatProps {
@@ -158,6 +162,15 @@ function ElioChatPersisted({
   const [escalationConfirmed, setEscalationConfirmed] = useState(false)
   // CR fix HIGH-1: capturer les messages au moment de la détection (avant setLocalMessages([]))
   const [escalationMessages, setEscalationMessages] = useState<string[]>([])
+  // Story 8.8 — collecte d'évolution
+  const [evolutionData, setEvolutionData] = useState<EvolutionCollectionData | null>(null)
+  const [evolutionBriefPending, setEvolutionBriefPending] = useState<{
+    title: string
+    content: string
+    displayText: string
+  } | null>(null)
+  // CR fix HIGH-2: profil de communication basé sur la prop tutoiement (AC2)
+  const evolutionProfile = { ...DEFAULT_COMMUNICATION_PROFILE_FR66, tutoiement }
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -259,6 +272,54 @@ function ElioChatPersisted({
     [clientId, escalationMessages, escalationConfirmed]
   )
 
+  // Story 8.8 — Confirmer le brief d'évolution
+  const handleConfirmEvolution = useCallback(async () => {
+    if (!evolutionBriefPending || !clientId) return
+    const { error: submitError } = await submitEvolutionRequest(
+      clientId,
+      evolutionBriefPending.title,
+      evolutionBriefPending.content
+    )
+    if (submitError) {
+      console.error('[ELIO:EVOLUTION] Submit failed:', submitError)
+      return
+    }
+    // CR fix HIGH-3: invalider le cache validation-requests (AC4)
+    void queryClient.invalidateQueries({ queryKey: ['validation-requests'] })
+    // Confirmation au client (AC4 — Task 4.6)
+    const confirmMsg: ElioMessage = {
+      id: makeId(),
+      role: 'assistant',
+      content: "C'est envoyé ! MiKL va examiner votre demande et vous tiendra informé.",
+      createdAt: new Date().toISOString(),
+      dashboardType,
+      metadata: { evolutionBrief: true },
+    }
+    setLocalMessages((prev) => [...prev, confirmMsg])
+    if (activeConversationId) {
+      await saveElioMessage(activeConversationId, 'assistant', confirmMsg.content, { evolution_brief: true })
+    }
+    setEvolutionBriefPending(null)
+    setEvolutionData(null)
+  }, [evolutionBriefPending, clientId, dashboardType, activeConversationId, queryClient])
+
+  // Story 8.8 — Annuler le brief d'évolution
+  const handleCancelEvolution = useCallback(async () => {
+    const cancelMsg: ElioMessage = {
+      id: makeId(),
+      role: 'assistant',
+      content: "Pas de souci ! N'hésitez pas si vous changez d'avis.",
+      createdAt: new Date().toISOString(),
+      dashboardType,
+    }
+    setLocalMessages((prev) => [...prev, cancelMsg])
+    if (activeConversationId) {
+      await saveElioMessage(activeConversationId, 'assistant', cancelMsg.content)
+    }
+    setEvolutionBriefPending(null)
+    setEvolutionData(null)
+  }, [dashboardType, activeConversationId])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const content = inputValue.trim()
@@ -287,10 +348,77 @@ function ElioChatPersisted({
       dashboardType,
     }
     setLocalMessages((prev) => [...prev, userMsg])
-    setIsLoading(true)
 
     // Persister le message utilisateur
     await saveElioMessage(convId, 'user', content)
+
+    // Story 8.8 — Mode collecte d'évolution actif
+    if (evolutionData && dashboardType === 'one') {
+      // Task 5 — Annulation
+      if (isCancel(content)) {
+        handleCancelEvolution()
+        return
+      }
+
+      // Avancer la state machine
+      const updated = processResponse(evolutionData, content)
+      setEvolutionData(updated)
+
+      if (updated.state === 'summary') {
+        // Collecter terminée → générer le mini-brief (Task 3)
+        const brief = generateEvolutionBrief(updated)
+        setEvolutionBriefPending(brief)
+        const briefMsg: ElioMessage = {
+          id: makeId(),
+          role: 'assistant',
+          content: brief.displayText,
+          createdAt: new Date().toISOString(),
+          dashboardType,
+        }
+        setLocalMessages((prev) => [...prev, briefMsg])
+        await saveElioMessage(convId, 'assistant', brief.displayText)
+      } else {
+        // Poser la question suivante
+        const nextQ = getNextQuestion(updated.state, evolutionProfile)
+        if (nextQ) {
+          const qMsg: ElioMessage = {
+            id: makeId(),
+            role: 'assistant',
+            content: nextQ,
+            createdAt: new Date().toISOString(),
+            dashboardType,
+          }
+          setLocalMessages((prev) => [...prev, qMsg])
+          await saveElioMessage(convId, 'assistant', nextQ)
+        }
+      }
+      return
+    }
+
+    // Confirmation brief en attente — "Oui envoie"
+    if (evolutionBriefPending && dashboardType === 'one') {
+      const lowerContent = content.toLowerCase()
+      if (lowerContent.includes('oui') || lowerContent.includes('envoie') || lowerContent.includes('valide')) {
+        await handleConfirmEvolution()
+        return
+      }
+      if (lowerContent.includes('non') || lowerContent.includes('annul') || isCancel(content)) {
+        handleCancelEvolution()
+        return
+      }
+      // CR fix MEDIUM-4: modification du brief — informer et garder en attente
+      const modifyMsg: ElioMessage = {
+        id: makeId(),
+        role: 'assistant',
+        content: 'Je ne peux pas modifier le brief automatiquement pour le moment. Vous pouvez valider tel quel ou annuler et reformuler votre demande.',
+        createdAt: new Date().toISOString(),
+        dashboardType,
+      }
+      setLocalMessages((prev) => [...prev, modifyMsg])
+      return
+    }
+
+    setIsLoading(true)
 
     // Envoyer à Élio
     const { data: elioMsg, error: sendError } = await sendToElio(dashboardType, content, clientId)
@@ -302,6 +430,26 @@ function ElioChatPersisted({
     }
 
     if (elioMsg) {
+      // Story 8.8 — Évolution détectée → lancer la collecte
+      if (elioMsg.metadata?.evolutionDetected && dashboardType === 'one') {
+        const initialRequest = elioMsg.metadata.evolutionInitialRequest ?? content
+        const newData: EvolutionCollectionData = { state: 'initial', initialRequest }
+        setEvolutionData(newData)
+
+        // Poser la première question
+        const firstQ = getNextQuestion('initial', evolutionProfile)
+        const qMsg: ElioMessage = {
+          id: makeId(),
+          role: 'assistant',
+          content: firstQ,
+          createdAt: new Date().toISOString(),
+          dashboardType,
+        }
+        setLocalMessages((prev) => [...prev, qMsg])
+        await saveElioMessage(convId, 'assistant', firstQ)
+        return
+      }
+
       // Persister la réponse
       await saveElioMessage(convId, 'assistant', elioMsg.content)
 
@@ -503,6 +651,37 @@ function ElioChatPersisted({
             >
               ✓ Question transmise à MiKL
             </p>
+          )}
+
+          {/* Story 8.8 — Brief évolution en attente de validation (AC3) */}
+          {evolutionBriefPending && (
+            <div
+              className="mx-4 mb-2 p-3 rounded-lg border border-border bg-muted text-sm"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="flex gap-2">
+                <button
+                  onClick={handleConfirmEvolution}
+                  className={[
+                    'px-3 py-1 text-xs font-medium rounded-md',
+                    'bg-primary text-primary-foreground hover:bg-primary/90',
+                    'focus-visible:outline-none focus-visible:ring-2',
+                    focusRing,
+                  ].join(' ')}
+                  aria-label="Valider et envoyer à MiKL"
+                >
+                  Oui, envoyer à MiKL
+                </button>
+                <button
+                  onClick={handleCancelEvolution}
+                  className="px-3 py-1 text-xs font-medium rounded-md border border-border hover:bg-muted transition-colors"
+                  aria-label="Annuler la demande d'évolution"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
           )}
 
           <ChatInput

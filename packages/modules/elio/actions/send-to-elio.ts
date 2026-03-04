@@ -10,6 +10,7 @@ import { generateDraft } from './generate-draft'
 import { adjustDraft } from './adjust-draft'
 import { detectIntent } from '../utils/detect-intent'
 import { detectLowConfidence } from '../utils/detect-low-confidence'
+import { checkIfFeatureExists } from '../utils/detect-existing-feature'
 import type { DashboardType, ElioMessage, CommunicationProfileFR66 } from '../types/elio.types'
 import { DEFAULT_COMMUNICATION_PROFILE_FR66 } from '../types/elio.types'
 
@@ -236,6 +237,36 @@ export async function sendToElio(
           return `- **${b.title}** : ${contentStr.substring(0, 200)}...`
         })
         .join('\n')
+    }
+
+    // Story 8.8 — Task 7 : détecter intention évolution avant appel LLM
+    const oneIntent = detectIntent(message)
+    if (oneIntent.action === 'request_evolution' && oneIntent.initialRequest) {
+      // Task 6 : vérifier si la fonctionnalité existe déjà dans les modules actifs
+      const featureCheck = checkIfFeatureExists(oneIntent.initialRequest, modulesDocumentation ?? '')
+      if (featureCheck.exists) {
+        return successResponse<ElioMessage>({
+          id: makeMessageId(),
+          role: 'assistant',
+          content: featureCheck.instructions ?? '',
+          createdAt: new Date().toISOString(),
+          dashboardType,
+          metadata: { existingFeatureInstructions: featureCheck.instructions },
+        })
+      }
+
+      // Fonctionnalité non existante → signaler au client pour lancer la collecte
+      return successResponse<ElioMessage>({
+        id: makeMessageId(),
+        role: 'assistant',
+        content: '',
+        createdAt: new Date().toISOString(),
+        dashboardType,
+        metadata: {
+          evolutionDetected: true,
+          evolutionInitialRequest: oneIntent.initialRequest,
+        },
+      })
     }
 
     const systemPrompt = buildSystemPrompt({

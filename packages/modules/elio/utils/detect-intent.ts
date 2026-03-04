@@ -1,11 +1,12 @@
 export interface Intent {
-  action: 'search_client' | 'help_feature' | 'general' | 'correct_text' | 'generate_draft' | 'adjust_draft'
+  action: 'search_client' | 'help_feature' | 'general' | 'correct_text' | 'generate_draft' | 'adjust_draft' | 'request_evolution'
   query?: string          // search_client
   feature?: string        // help_feature
   clientName?: string     // correct_text | generate_draft
   originalText?: string   // correct_text
   draftType?: 'email' | 'validation_hub' | 'chat'  // generate_draft
   draftSubject?: string   // generate_draft
+  initialRequest?: string // request_evolution — besoin exprimé par le client
 }
 
 const CLIENT_PATTERNS: Array<{ pattern: RegExp; groupIndex: number }> = [
@@ -33,6 +34,16 @@ const DRAFT_PATTERNS: RegExp[] = [
   /génère\s+(?:un|une)\s+(email|message|brouillon|réponse\s+validation\s+hub|réponse)\s+pour\s+(\w[\w\s-]*?)(?:\s+pour\s+(.+))?$/is,
   /écris\s+(?:un|une)\s+(email|message|brouillon|réponse\s+validation\s+hub|réponse)\s+pour\s+(\w[\w\s-]*?)(?:\s+(?:pour|afin de|pour lui dire)\s+(.+))?$/is,
   /rédige\s+(?:un|une)\s+(email|message|brouillon|réponse)\s+pour\s+(\w[\w\s-]*?)(?:\s+(.+))?$/is,
+]
+
+// Story 8.8 — Evolution request patterns (AC1, FR47)
+const EVOLUTION_PATTERNS: Array<{ pattern: RegExp; groupIndex: number }> = [
+  { pattern: /je voudrais\s+(?:pouvoir\s+)?(.+)/i, groupIndex: 1 },
+  { pattern: /j['']aimerais\s+(?:avoir\s+|pouvoir\s+)?(.+)/i, groupIndex: 1 },
+  { pattern: /on pourrait\s+(.+)/i, groupIndex: 1 },
+  { pattern: /il faudrait\s+(.+)/i, groupIndex: 1 },
+  { pattern: /(?:est-ce qu['']on peut|peut-on)\s+ajouter\s+(.+)/i, groupIndex: 1 },
+  { pattern: /(?:ce serait bien d['']avoir|il manque)\s+(.+)/i, groupIndex: 1 },
 ]
 
 // Adjustment patterns (short imperative commands for draft tweaks)
@@ -98,7 +109,16 @@ export function detectIntent(userMessage: string): Intent {
     }
   }
 
-  // 4. Recherche client
+  // 4. Demande d'évolution (Story 8.8)
+  for (const { pattern, groupIndex } of EVOLUTION_PATTERNS) {
+    const match = msg.match(pattern)
+    if (match) {
+      const initialRequest = match[groupIndex]?.trim() ?? msg
+      return { action: 'request_evolution', initialRequest }
+    }
+  }
+
+  // 5. Recherche client
   for (const { pattern, groupIndex } of CLIENT_PATTERNS) {
     const match = msg.match(pattern)
     if (match) {
@@ -107,7 +127,7 @@ export function detectIntent(userMessage: string): Intent {
     }
   }
 
-  // 5. Aide fonctionnalités
+  // 6. Aide fonctionnalités
   for (const { pattern, groupIndex } of HELP_PATTERNS) {
     const match = msg.match(pattern)
     if (match) {
