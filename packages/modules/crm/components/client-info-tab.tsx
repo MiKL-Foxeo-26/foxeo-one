@@ -13,6 +13,8 @@ import { ClientNotesSection } from './client-notes-section'
 import { GraduationDialog } from './graduation-dialog'
 import { ReactivateParcoursDialog } from './reactivate-parcours-dialog'
 import { ChangeTierDialog } from './change-tier-dialog'
+import { TransferInstanceDialog } from './transfer-instance-dialog'
+import { useClientInstance } from '../hooks/use-client-instance'
 import { TIER_INFO, TIER_BADGE_CLASSES } from '../utils/tier-helpers'
 import type { SubscriptionTier } from '../types/subscription.types'
 import { format } from 'date-fns'
@@ -44,8 +46,10 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
   const [graduationDialogOpen, setGraduationDialogOpen] = useState(false)
   const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false)
   const [changeTierDialogOpen, setChangeTierDialogOpen] = useState(false)
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false)
   const [isExporting, startExportTransition] = useTransition()
+  const { data: clientInstance } = useClientInstance(clientId)
 
   // Story 9.3 — Parcours abandonné
   const parcoursAbandoned = parcours?.status === 'abandoned'
@@ -421,7 +425,18 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
         />
       )}
 
-      {/* Administration — Story 9.5a */}
+      {/* Story 9.5b — Dialog transfert instance */}
+      {isOneClient && (
+        <TransferInstanceDialog
+          clientId={clientId}
+          clientName={client.name}
+          clientEmail={client.email}
+          open={transferDialogOpen}
+          onOpenChange={setTransferDialogOpen}
+        />
+      )}
+
+      {/* Administration — Story 9.5a + 9.5b */}
       <Card>
         <CardHeader>
           <CardTitle>Administration</CardTitle>
@@ -474,6 +489,25 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
               >
                 Exporter les données client
               </Button>
+            )}
+            {/* Story 9.5b — Transfert instance One */}
+            {isOneClient && clientInstance?.status === 'active' && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Transférez l&apos;instance One au client sortant (code source, DB, documentation).
+                  </p>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setTransferDialogOpen(true)}
+                    data-testid="transfer-instance-button"
+                  >
+                    Transférer l&apos;instance au client
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         </CardContent>

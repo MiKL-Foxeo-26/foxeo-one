@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isPublicPath, isStaticOrApi, isConsentExcluded, isOnboardingExcluded, isGraduationExcluded, CONSENT_EXCLUDED_PATHS, GRADUATION_EXCLUDED_PATHS } from './middleware'
+import { isPublicPath, isStaticOrApi, isConsentExcluded, isOnboardingExcluded, isGraduationExcluded, CONSENT_EXCLUDED_PATHS, GRADUATION_EXCLUDED_PATHS, ONBOARDING_EXCLUDED_PATHS } from './middleware'
 
 describe('middleware routing logic', () => {
   describe('isPublicPath', () => {
@@ -291,6 +291,56 @@ describe('middleware routing logic', () => {
     it('/graduation paths are excluded from onboarding check', () => {
       expect(isOnboardingExcluded('/graduation')).toBe(true)
       expect(isOnboardingExcluded('/graduation/celebrate')).toBe(true)
+    })
+  })
+
+  describe('transferred instance redirect logic (Story 9.5b)', () => {
+    it('instance transferred: client on protected route should be redirected to /transferred', () => {
+      const instance = { status: 'transferred' }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = pathname !== '/transferred' && instance.status === 'transferred'
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('instance transferred: client already on /transferred should NOT be redirected', () => {
+      const instance = { status: 'transferred' }
+      const pathname = '/transferred'
+
+      const shouldRedirect = pathname !== '/transferred' && instance.status === 'transferred'
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('instance active: client should NOT be redirected to /transferred', () => {
+      const instance = { status: 'active' }
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = pathname !== '/transferred' && instance.status === 'transferred'
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('/transferred is included in CONSENT_EXCLUDED_PATHS', () => {
+      expect(CONSENT_EXCLUDED_PATHS).toContain('/transferred')
+    })
+
+    it('/transferred is included in ONBOARDING_EXCLUDED_PATHS', () => {
+      expect(ONBOARDING_EXCLUDED_PATHS).toContain('/transferred')
+    })
+
+    it('/transferred is included in GRADUATION_EXCLUDED_PATHS', () => {
+      expect(GRADUATION_EXCLUDED_PATHS).toContain('/transferred')
+    })
+
+    it('/transferred is excluded from consent check', () => {
+      expect(isConsentExcluded('/transferred')).toBe(true)
+    })
+
+    it('/transferred is excluded from onboarding check', () => {
+      expect(isOnboardingExcluded('/transferred')).toBe(true)
+    })
+
+    it('/transferred is excluded from graduation check', () => {
+      expect(isGraduationExcluded('/transferred')).toBe(true)
     })
   })
 

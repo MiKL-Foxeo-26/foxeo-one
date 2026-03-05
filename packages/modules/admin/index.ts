@@ -1,3 +1,5 @@
 export { manifest } from './manifest'
 export { exportClientData } from './actions/export-client-data'
 export type { ExportClientDataInput, ExportResult, ExportStatus, DataExport } from './types/export.types'
+export { transferInstanceToClient } from './actions/transfer-instance'
+export type { TransferInstanceInput, TransferResult, TransferStatus, InstanceTransfer } from './types/transfer.types'

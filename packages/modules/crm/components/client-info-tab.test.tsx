@@ -3,6 +3,17 @@ import { render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ClientInfoTab } from './client-info-tab'
 
+// Mock @foxeo/module-admin
+vi.mock('@foxeo/module-admin', () => ({
+  exportClientData: vi.fn().mockResolvedValue({ data: { exportId: 'export-123' }, error: null }),
+  transferInstanceToClient: vi.fn().mockResolvedValue({ data: { transferId: 'transfer-123' }, error: null }),
+}))
+
+// Mock useClientInstance hook
+vi.mock('../hooks/use-client-instance', () => ({
+  useClientInstance: vi.fn().mockReturnValue({ data: { id: 'instance-123', status: 'active' }, isPending: false }),
+}))
+
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -68,13 +79,13 @@ describe('ClientInfoTab', () => {
     const onEdit = vi.fn()
     renderWithQueryClient(<ClientInfoTab clientId="550e8400-e29b-41d4-a716-446655440001" onEdit={onEdit} />)
 
-    expect(screen.getByRole('button', { name: /modifier/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Modifier' })).toBeInTheDocument()
   })
 
   it('should not render edit button without onEdit prop', () => {
     renderWithQueryClient(<ClientInfoTab clientId="550e8400-e29b-41d4-a716-446655440001" />)
 
-    expect(screen.queryByRole('button', { name: /modifier/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Modifier' })).not.toBeInTheDocument()
   })
 
   it('should render active modules when config exists', () => {

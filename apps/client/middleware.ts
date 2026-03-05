@@ -4,9 +4,9 @@ import { checkConsentVersion } from './middleware-consent'
 import { detectLocale, setLocaleCookie } from './middleware-locale'
 
 export const PUBLIC_PATHS = ['/login', '/signup', '/auth/callback']
-export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended', '/graduation']
-export const ONBOARDING_EXCLUDED_PATHS = ['/onboarding', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/graduation']
-export const GRADUATION_EXCLUDED_PATHS = ['/graduation', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/onboarding']
+export const CONSENT_EXCLUDED_PATHS = ['/consent-update', '/legal', '/api', '/suspended', '/transferred', '/graduation']
+export const ONBOARDING_EXCLUDED_PATHS = ['/onboarding', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/transferred', '/graduation']
+export const GRADUATION_EXCLUDED_PATHS = ['/graduation', '/login', '/signup', '/auth/callback', '/consent-update', '/legal', '/api', '/suspended', '/transferred', '/onboarding']
 
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
@@ -88,6 +88,21 @@ export async function middleware(request: NextRequest) {
         const suspendedResponse = NextResponse.redirect(suspendedUrl)
         setLocaleCookie(suspendedResponse, locale)
         return suspendedResponse
+      }
+
+      // Story 9.5b — Check if instance has been transferred
+      if (request.nextUrl.pathname !== '/transferred') {
+        const instance = Array.isArray(client.client_instances)
+          ? client.client_instances[0]
+          : client.client_instances
+
+        if (instance?.status === 'transferred') {
+          console.log('[TRANSFER:BLOCKED] Instance transferred for client:', user.id)
+          const transferredUrl = new URL('/transferred', request.url)
+          const transferredResponse = NextResponse.redirect(transferredUrl)
+          setLocaleCookie(transferredResponse, locale)
+          return transferredResponse
+        }
       }
 
       // Check consent version
