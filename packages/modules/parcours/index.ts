@@ -26,6 +26,9 @@ export { useParcours } from './hooks/use-parcours'
 export { useParcoursSteps } from './hooks/use-parcours-steps'
 export { useStepSubmissions } from './hooks/use-step-submissions'
 
+// Components — Abandonment (Story 9.3)
+export { AbandonParcoursDialog } from './components/abandon-parcours-dialog'
+
 // Actions
 export { getParcours } from './actions/get-parcours'
 export { updateStepStatus } from './actions/update-step-status'
@@ -35,6 +38,8 @@ export { submitStep } from './actions/submit-step'
 export { validateSubmission } from './actions/validate-submission'
 export { getSubmissions } from './actions/get-submissions'
 export { getSubmissionById } from './actions/get-submission-by-id'
+export { requestParcoursAbandonment } from './actions/request-abandonment'
+export { reactivateParcours } from './actions/reactivate-parcours'
 
 // Types
 export type {
@@ -62,4 +67,10 @@ export type {
   ValidateSubmissionResult,
 } from './types/parcours.types'
 
-export { ParcoursStepStatusValues, SubmissionStatusValues, ValidateDecisionValues } from './types/parcours.types'
+export { ParcoursStepStatusValues, SubmissionStatusValues, ValidateDecisionValues, ParcoursStatusValues, ABANDONMENT_REASONS } from './types/parcours.types'
+
+export type {
+  ParcoursStatus,
+  RequestAbandonmentInput,
+  ReactivateParcoursInput,
+} from './types/parcours.types'

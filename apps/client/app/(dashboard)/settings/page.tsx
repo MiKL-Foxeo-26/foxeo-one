@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { RestartTourButton } from '../../components/onboarding/restart-tour-button'
+import { ParcoursSettingsSection } from './parcours-settings-section'
 
 export default function SettingsPage() {
   return (
@@ -40,6 +41,9 @@ export default function SettingsPage() {
         </div>
         <RestartTourButton />
       </div>
+
+      {/* Story 9.3 — Section Mon parcours Lab */}
+      <ParcoursSettingsSection />
     </div>
   )
 }

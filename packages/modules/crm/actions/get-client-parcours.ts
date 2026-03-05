@@ -32,7 +32,7 @@ export async function getClientParcours(clientId: string): Promise<ActionRespons
       .from('parcours')
       .select('*')
       .eq('client_id', clientId)
-      .in('status', ['en_cours', 'suspendu'])
+      .in('status', ['en_cours', 'suspendu', 'abandoned'])
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -60,6 +60,7 @@ export async function getClientParcours(clientId: string): Promise<ActionRespons
       startedAt: data.started_at,
       suspendedAt: data.suspended_at,
       completedAt: data.completed_at,
+      abandonmentReason: data.abandonment_reason ?? null,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     })

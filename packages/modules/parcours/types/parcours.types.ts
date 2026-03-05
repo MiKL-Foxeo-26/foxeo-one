@@ -15,6 +15,7 @@ export interface ParcoursDB {
   description: string | null
   status: string
   completed_at: string | null
+  abandonment_reason: string | null
   created_at: string
   updated_at: string
 }
@@ -47,6 +48,7 @@ export interface Parcours {
   description: string | null
   status: string
   completedAt: string | null
+  abandonmentReason: string | null
   createdAt: string
   updatedAt: string
 }
@@ -181,3 +183,25 @@ export interface SubmitStepResult {
 export interface ValidateSubmissionResult {
   stepCompleted: boolean
 }
+
+// --- Parcours Abandonment (Story 9.3) ---
+
+export const ParcoursStatusValues = ['en_cours', 'suspendu', 'termine', 'abandoned'] as const
+export type ParcoursStatus = typeof ParcoursStatusValues[number]
+
+export const RequestAbandonmentInput = z.object({
+  clientId: z.string().uuid('clientId invalide'),
+  reason: z.string().max(1000, 'La raison ne peut pas dépasser 1000 caractères').optional(),
+})
+export type RequestAbandonmentInput = z.infer<typeof RequestAbandonmentInput>
+
+export const ReactivateParcoursInput = z.object({
+  clientId: z.string().uuid('clientId invalide'),
+})
+export type ReactivateParcoursInput = z.infer<typeof ReactivateParcoursInput>
+
+export const ABANDONMENT_REASONS = [
+  "Je n'ai plus le temps en ce moment",
+  'Le parcours ne correspond pas à mes attentes',
+  "J'ai trouvé une autre solution",
+] as const

@@ -32,6 +32,8 @@ interface ElioChatProps {
   placeholder?: string
   // Story 8.7: greeting custom depuis config Orpheus (Story 6.6)
   customGreeting?: string
+  // Story 9.3: désactiver Élio Lab si parcours abandonné
+  parcoursAbandoned?: boolean
 }
 
 export const PALETTE_CLASSES: Record<DashboardType, string> = {
@@ -775,7 +777,29 @@ export function ElioChat({
   tutoiement = false,
   placeholder,
   customGreeting,
+  parcoursAbandoned = false,
 }: ElioChatProps) {
+  // Story 9.3 — Désactiver Élio Lab si parcours abandonné
+  if (parcoursAbandoned && dashboardType === 'lab') {
+    return (
+      <div
+        className={`flex flex-col h-full bg-background text-foreground ${PALETTE_CLASSES[dashboardType]}`}
+        data-dashboard-type={dashboardType}
+      >
+        <header className="border-b border-border px-4 py-3 shrink-0">
+          <h2 className="text-sm font-semibold text-foreground">{HEADER_LABELS[dashboardType]}</h2>
+        </header>
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Votre parcours est en pause. Contactez MiKL si vous souhaitez reprendre.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Task 1.3 — Placeholder adapté au profil pour One
   const defaultPlaceholder =
     dashboardType === 'hub'

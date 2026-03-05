@@ -16,6 +16,32 @@ vi.mock('../hooks/use-parcours', () => ({
   useParcours: (...args: unknown[]) => mockUseParcours(...args),
 }))
 
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({
+    invalidateQueries: vi.fn(),
+  }),
+}))
+
+vi.mock('@foxeo/ui', async (importOriginal) => {
+  const actual = await importOriginal() as Record<string, unknown>
+  return {
+    ...actual,
+    showSuccess: vi.fn(),
+    showError: vi.fn(),
+    Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
+      open ? <div data-testid="dialog">{children}</div> : null,
+    DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+    DialogDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
+    Button: ({ children, onClick, disabled, ...props }: {
+      children: React.ReactNode; onClick?: () => void; disabled?: boolean
+    } & Record<string, unknown>) =>
+      <button onClick={onClick} disabled={disabled} {...props}>{children}</button>,
+    Textarea: (props: Record<string, unknown>) => <textarea {...props} />,
+  }
+})
+
 const CLIENT_ID = '00000000-0000-0000-0000-000000000001'
 
 const mockParcours: ParcoursWithSteps = {
@@ -26,6 +52,7 @@ const mockParcours: ParcoursWithSteps = {
   description: 'Votre parcours de création.',
   status: 'in_progress',
   completedAt: null,
+  abandonmentReason: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   steps: [
@@ -116,5 +143,59 @@ describe('ParcoursOverview', () => {
 
     render(<ParcoursOverview clientId={CLIENT_ID} />)
     expect(mockUseParcours).toHaveBeenCalledWith(CLIENT_ID)
+  })
+
+  // Story 9.3 — Abandon button
+  it('renders abandon button when parcours is in_progress', () => {
+    mockUseParcours.mockReturnValue({ data: mockParcours, isPending: false, error: null })
+
+    render(<ParcoursOverview clientId={CLIENT_ID} />)
+    expect(screen.getByText(/Quitter le parcours/i)).toBeDefined()
+  })
+
+  it('renders abandon button when parcours status is en_cours', () => {
+    mockUseParcours.mockReturnValue({
+      data: { ...mockParcours, status: 'en_cours' },
+      isPending: false,
+      error: null,
+    })
+
+    render(<ParcoursOverview clientId={CLIENT_ID} />)
+    expect(screen.getByText(/Quitter le parcours/i)).toBeDefined()
+  })
+
+  it('does NOT render abandon button when parcours is completed', () => {
+    mockUseParcours.mockReturnValue({
+      data: { ...mockParcours, status: 'termine' },
+      isPending: false,
+      error: null,
+    })
+
+    render(<ParcoursOverview clientId={CLIENT_ID} />)
+    expect(screen.queryByText(/Quitter le parcours/i)).toBeNull()
+  })
+
+  it('does NOT render abandon button when parcours is abandoned', () => {
+    mockUseParcours.mockReturnValue({
+      data: { ...mockParcours, status: 'abandoned' },
+      isPending: false,
+      error: null,
+    })
+
+    render(<ParcoursOverview clientId={CLIENT_ID} />)
+    expect(screen.queryByText(/Quitter le parcours/i)).toBeNull()
+  })
+
+  // Story 9.3 — Abandoned state (pause message)
+  it('shows pause message when parcours is abandoned', () => {
+    mockUseParcours.mockReturnValue({
+      data: { ...mockParcours, status: 'abandoned' },
+      isPending: false,
+      error: null,
+    })
+
+    render(<ParcoursOverview clientId={CLIENT_ID} />)
+    expect(screen.getByText(/Votre parcours est en pause/)).toBeDefined()
+    expect(screen.getByText(/MiKL va vous contacter/)).toBeDefined()
   })
 })

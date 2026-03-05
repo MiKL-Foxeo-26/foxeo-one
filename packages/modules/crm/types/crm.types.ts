@@ -149,7 +149,7 @@ export type ClientExchange = z.infer<typeof ClientExchange>
 export const ParcoursTypeEnum = z.enum(['complet', 'partiel', 'ponctuel'])
 export type ParcoursType = z.infer<typeof ParcoursTypeEnum>
 
-export const ParcoursStatusEnum = z.enum(['en_cours', 'suspendu', 'termine'])
+export const ParcoursStatusEnum = z.enum(['en_cours', 'suspendu', 'termine', 'abandoned'])
 export type ParcoursStatus = z.infer<typeof ParcoursStatusEnum>
 
 export const StageStatusEnum = z.enum(['pending', 'in_progress', 'completed', 'skipped'])
@@ -199,6 +199,7 @@ export const Parcours = z.object({
   startedAt: z.string().datetime(),
   suspendedAt: z.string().datetime().nullable(),
   completedAt: z.string().datetime().nullable(),
+  abandonmentReason: z.string().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 })
@@ -244,10 +245,11 @@ export type ParcoursDB = {
   template_id: string | null
   operator_id: string
   active_stages: ActiveStage[]
-  status: 'en_cours' | 'suspendu' | 'termine'
+  status: 'en_cours' | 'suspendu' | 'termine' | 'abandoned'
   started_at: string
   suspended_at: string | null
   completed_at: string | null
+  abandonment_reason: string | null
   created_at: string
   updated_at: string
 }

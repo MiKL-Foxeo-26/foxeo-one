@@ -10,6 +10,7 @@ import { AccessToggles } from './access-toggles'
 import { ParcoursStatusBadge } from './parcours-status-badge'
 import { ClientNotesSection } from './client-notes-section'
 import { GraduationDialog } from './graduation-dialog'
+import { ReactivateParcoursDialog } from './reactivate-parcours-dialog'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
@@ -37,6 +38,10 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
   const { data: pendingValidations } = useClientPendingValidations(clientId)
   const [assignDialogOpen, setAssignDialogOpen] = useState(false)
   const [graduationDialogOpen, setGraduationDialogOpen] = useState(false)
+  const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false)
+
+  // Story 9.3 — Parcours abandonné
+  const parcoursAbandoned = parcours?.status === 'abandoned'
 
   // Graduation conditions
   const isLabClient = client?.config?.dashboardType === 'lab'
@@ -213,6 +218,30 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
                   {format(new Date(parcours.startedAt), 'd MMMM yyyy', { locale: fr })}
                 </span>
               </div>
+              {/* Story 9.3 — Bouton réactiver parcours abandonné */}
+              {parcoursAbandoned && (
+                <>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive">Abandonné</Badge>
+                      {parcours.abandonmentReason && (
+                        <span className="text-xs text-muted-foreground">
+                          {parcours.abandonmentReason}
+                        </span>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setReactivateDialogOpen(true)}
+                      data-testid="reactivate-parcours-button"
+                    >
+                      Réactiver le parcours
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Aucun parcours Lab assigné.</p>
@@ -283,6 +312,16 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
           parcours={parcours}
           open={graduationDialogOpen}
           onOpenChange={setGraduationDialogOpen}
+        />
+      )}
+
+      {/* Story 9.3 — Dialog réactivation parcours */}
+      {isLabClient && parcours && parcoursAbandoned && (
+        <ReactivateParcoursDialog
+          clientId={clientId}
+          clientName={client.name}
+          open={reactivateDialogOpen}
+          onOpenChange={setReactivateDialogOpen}
         />
       )}
 

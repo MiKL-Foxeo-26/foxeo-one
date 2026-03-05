@@ -9,6 +9,7 @@ export function toParcours(db: ParcoursDB): Parcours {
     description: db.description,
     status: db.status,
     completedAt: db.completed_at,
+    abandonmentReason: db.abandonment_reason ?? null,
     createdAt: db.created_at,
     updatedAt: db.updated_at,
   }

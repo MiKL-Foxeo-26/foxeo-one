@@ -11,6 +11,7 @@ const statusConfig: Record<ParcoursStatus, { label: string; variant: 'default' |
   en_cours: { label: 'En cours', variant: 'default' },
   suspendu: { label: 'Suspendu', variant: 'secondary' },
   termine: { label: 'Terminé', variant: 'outline' },
+  abandoned: { label: 'Abandonné', variant: 'destructive' },
 }
 
 export function ParcoursStatusBadge({ status }: ParcoursStatusBadgeProps) {
