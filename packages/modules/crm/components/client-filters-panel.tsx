@@ -24,7 +24,8 @@ const CLIENT_TYPE_OPTIONS: { value: ClientType; label: string }[] = [
 const CLIENT_STATUS_OPTIONS: { value: ClientStatus; label: string }[] = [
   { value: 'active', label: 'Actif' },
   { value: 'suspended', label: 'Suspendu' },
-  { value: 'archived', label: 'Clôturé' },
+  { value: 'archived', label: 'Archivé' },
+  { value: 'deleted', label: 'Supprimé' },
 ]
 
 const ALL_VALUE = '__all__'

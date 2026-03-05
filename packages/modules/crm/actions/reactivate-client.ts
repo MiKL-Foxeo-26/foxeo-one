@@ -49,9 +49,10 @@ export async function reactivateClient(
     const { clientId } = parsed.data
 
     // Check client exists and is owned by operator
+    // Fetch retention_until and previous_status for archived-specific logic (Story 9.5c)
     const { data: client, error: clientError } = await supabase
       .from('clients')
-      .select('id, status, operator_id')
+      .select('id, status, operator_id, retention_until, previous_status')
       .eq('id', clientId)
       .eq('operator_id', operatorId)
       .single()
@@ -81,14 +82,31 @@ export async function reactivateClient(
       )
     }
 
-    // Reactivate client (clear both suspended_at and archived_at)
+    // Story 9.5c: For archived clients, check retention period has not expired
+    if (client.status === 'archived' && client.retention_until) {
+      const now = new Date()
+      const retentionUntil = new Date(client.retention_until)
+      if (retentionUntil <= now) {
+        return errorResponse(
+          'La période de rétention est expirée — les données ont été anonymisées',
+          'CLIENT_DATA_PURGED'
+        )
+      }
+    }
+
+    // Determine target status: restore previous_status if available, fallback to 'active'
+    const targetStatus = (client.previous_status as string | null) ?? 'active'
+
+    // Reactivate client
     const now = new Date().toISOString()
     const { error: updateError } = await supabase
       .from('clients')
       .update({
-        status: 'active',
+        status: targetStatus,
         suspended_at: null,
         archived_at: null,
+        retention_until: null,
+        previous_status: null,
         updated_at: now,
       })
       .eq('id', clientId)
@@ -116,6 +134,21 @@ export async function reactivateClient(
     if (logError) {
       console.error('[CRM:REACTIVATE_CLIENT] Activity log error:', logError)
       // Don't fail the operation if logging fails
+    }
+
+    // Story 9.5c: Send notification to client on reactivation
+    const { error: notifError } = await supabase.from('notifications').insert({
+      recipient_type: 'client',
+      recipient_id: clientId,
+      type: 'system',
+      title: 'Votre compte Foxeo a été réactivé',
+      body: 'Votre accès à votre espace Foxeo a été rétabli. Bienvenue de retour !',
+      link: null,
+    })
+
+    if (notifError) {
+      console.error('[CRM:REACTIVATE_CLIENT] Notification error:', notifError)
+      // Don't fail the operation if notification fails
     }
 
     // Revalidate paths

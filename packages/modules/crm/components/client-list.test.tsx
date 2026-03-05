@@ -18,6 +18,13 @@ vi.mock('../actions/create-client', () => ({
 vi.mock('../actions/import-clients-csv', () => ({
   importClientsCsv: vi.fn().mockResolvedValue({ data: null, error: null }),
 }))
+vi.mock('../actions/reactivate-client', () => ({
+  reactivateClient: vi.fn().mockResolvedValue({ data: { success: true }, error: null }),
+}))
+vi.mock('@foxeo/ui', async (importOriginal) => {
+  const actual = await importOriginal()
+  return { ...actual, showSuccess: vi.fn(), showError: vi.fn() }
+})
 
 describe('ClientList', () => {
   const mockClients: ClientListItem[] = [
@@ -94,5 +101,70 @@ describe('ClientList', () => {
     render(<ClientList clients={[]} />)
 
     expect(screen.getByText(/aucun client/i)).toBeInTheDocument()
+  })
+
+  // Story 9.5c — Archived client tests
+  describe('Archived clients (Story 9.5c)', () => {
+    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    const pastDate = new Date(Date.now() - 1000).toISOString()
+
+    const archivedClient: ClientListItem = {
+      id: '550e8400-e29b-41d4-a716-446655440002',
+      name: 'Marie Martin',
+      company: 'Archive Corp',
+      clientType: 'complet',
+      status: 'archived',
+      createdAt: '2024-01-01T00:00:00Z',
+      archivedAt: '2025-01-01T00:00:00Z',
+      retentionUntil: futureDate,
+    }
+
+    it('should render archived badge with date for archived client', () => {
+      render(<ClientList clients={[archivedClient]} />)
+
+      expect(screen.getByTestId(`archived-badge-${archivedClient.id}`)).toBeInTheDocument()
+    })
+
+    it('should show retention date for archived client', () => {
+      render(<ClientList clients={[archivedClient]} />)
+
+      expect(screen.getByTestId(`retention-until-${archivedClient.id}`)).toBeInTheDocument()
+    })
+
+    it('should show Réactiver button for archived client within retention period', () => {
+      render(<ClientList clients={[archivedClient]} />)
+
+      expect(screen.getByTestId(`reactivate-button-${archivedClient.id}`)).toBeInTheDocument()
+    })
+
+    it('should NOT show Réactiver button when retention period expired', () => {
+      const expiredClient: ClientListItem = {
+        ...archivedClient,
+        id: '550e8400-e29b-41d4-a716-446655440003',
+        retentionUntil: pastDate,
+      }
+
+      render(<ClientList clients={[expiredClient]} />)
+
+      expect(screen.queryByTestId(`reactivate-button-${expiredClient.id}`)).not.toBeInTheDocument()
+    })
+
+    it('should show Réactiver button when retention_until is null (legacy archived)', () => {
+      const legacyClient: ClientListItem = {
+        ...archivedClient,
+        id: '550e8400-e29b-41d4-a716-446655440004',
+        retentionUntil: null,
+      }
+
+      render(<ClientList clients={[legacyClient]} />)
+
+      expect(screen.getByTestId(`reactivate-button-${legacyClient.id}`)).toBeInTheDocument()
+    })
+
+    it('should NOT show archived badge for active clients', () => {
+      render(<ClientList clients={mockClients} />)
+
+      expect(screen.queryByTestId(`archived-badge-${mockClients[0].id}`)).not.toBeInTheDocument()
+    })
   })
 })

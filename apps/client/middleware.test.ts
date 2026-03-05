@@ -422,4 +422,70 @@ describe('middleware routing logic', () => {
       expect(redirectUrl).toBe('https://jean.foxeo.io/modules/crm?filter=active')
     })
   })
+
+  describe('archived client redirect logic (Story 9.5c)', () => {
+    it('archived client on protected route should be redirected to /archived', () => {
+      const clientStatus = 'archived'
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = (clientStatus === 'archived' || clientStatus === 'deleted') && pathname !== '/archived'
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('archived client already on /archived should NOT be redirected', () => {
+      const clientStatus = 'archived'
+      const pathname = '/archived'
+
+      const shouldRedirect = (clientStatus === 'archived' || clientStatus === 'deleted') && pathname !== '/archived'
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('active client should NOT be redirected to /archived', () => {
+      const clientStatus = 'active'
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = (clientStatus === 'archived' || clientStatus === 'deleted') && pathname !== '/archived'
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('deleted client on protected route should be redirected to /archived', () => {
+      const clientStatus = 'deleted'
+      const pathname = '/modules/crm'
+
+      const shouldRedirect = (clientStatus === 'archived' || clientStatus === 'deleted') && pathname !== '/archived'
+      expect(shouldRedirect).toBe(true)
+    })
+
+    it('deleted client already on /archived should NOT be redirected', () => {
+      const clientStatus = 'deleted'
+      const pathname = '/archived'
+
+      const shouldRedirect = (clientStatus === 'archived' || clientStatus === 'deleted') && pathname !== '/archived'
+      expect(shouldRedirect).toBe(false)
+    })
+
+    it('/archived is included in CONSENT_EXCLUDED_PATHS', () => {
+      expect(CONSENT_EXCLUDED_PATHS).toContain('/archived')
+    })
+
+    it('/archived is included in ONBOARDING_EXCLUDED_PATHS', () => {
+      expect(ONBOARDING_EXCLUDED_PATHS).toContain('/archived')
+    })
+
+    it('/archived is included in GRADUATION_EXCLUDED_PATHS', () => {
+      expect(GRADUATION_EXCLUDED_PATHS).toContain('/archived')
+    })
+
+    it('/archived is excluded from consent check (isConsentExcluded)', () => {
+      expect(isConsentExcluded('/archived')).toBe(true)
+    })
+
+    it('/archived is excluded from onboarding check (isOnboardingExcluded)', () => {
+      expect(isOnboardingExcluded('/archived')).toBe(true)
+    })
+
+    it('/archived is excluded from graduation check (isGraduationExcluded)', () => {
+      expect(isGraduationExcluded('/archived')).toBe(true)
+    })
+  })
 })

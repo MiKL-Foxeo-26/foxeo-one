@@ -31,6 +31,9 @@ const mockFrom = vi.fn((table: string) => {
   if (table === 'activity_logs') {
     return { insert: mockInsert }
   }
+  if (table === 'notifications') {
+    return { insert: mockInsert }
+  }
   return {}
 })
 
@@ -290,6 +293,122 @@ describe('reactivateClient Server Action', () => {
         status: 'active',
         suspended_at: null,
         archived_at: null,
+      })
+    )
+  })
+
+  // Story 9.5c — Archived-specific tests
+
+  it('should restore previous_status when reactivating an archived client', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        status: 'archived',
+        operator_id: validOperatorUuid,
+        retention_until: futureDate,
+        previous_status: 'active',
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { reactivateClient } = await import('./reactivate-client')
+    await reactivateClient({ clientId: '550e8400-e29b-41d4-a716-446655440001' })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'active',
+        archived_at: null,
+        retention_until: null,
+        previous_status: null,
+      })
+    )
+  })
+
+  it('should return CLIENT_DATA_PURGED when retention period has expired', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    const pastDate = new Date(Date.now() - 1000).toISOString()
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        status: 'archived',
+        operator_id: validOperatorUuid,
+        retention_until: pastDate,
+        previous_status: 'active',
+      },
+      error: null,
+    })
+
+    const { reactivateClient } = await import('./reactivate-client')
+    const result = await reactivateClient({ clientId: '550e8400-e29b-41d4-a716-446655440001' })
+
+    expect(result.data).toBeNull()
+    expect(result.error?.code).toBe('CLIENT_DATA_PURGED')
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('should allow reactivation of archived client when retention_until is null (legacy)', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        status: 'archived',
+        operator_id: validOperatorUuid,
+        retention_until: null,
+        previous_status: null,
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { reactivateClient } = await import('./reactivate-client')
+    const result = await reactivateClient({ clientId: '550e8400-e29b-41d4-a716-446655440001' })
+
+    expect(result.error).toBeNull()
+    expect(result.data).toEqual({ success: true })
+  })
+
+  it('should fallback to active status when previous_status is null', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: validAuthUuid } },
+      error: null,
+    })
+
+    mockFetchSingle.mockResolvedValue({
+      data: {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        status: 'archived',
+        operator_id: validOperatorUuid,
+        retention_until: null,
+        previous_status: null,
+      },
+      error: null,
+    })
+
+    mockUpdateEqSecond.mockReturnValue({ error: null })
+
+    const { reactivateClient } = await import('./reactivate-client')
+    await reactivateClient({ clientId: '550e8400-e29b-41d4-a716-446655440001' })
+
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'active',
       })
     )
   })

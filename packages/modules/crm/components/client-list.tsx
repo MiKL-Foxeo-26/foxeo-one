@@ -1,13 +1,17 @@
 'use client'
 
+import { useTransition } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { DataTable, type ColumnDef } from '@foxeo/ui'
-import { Badge } from '@foxeo/ui'
+import { Badge, Button } from '@foxeo/ui'
+import { showSuccess, showError } from '@foxeo/ui'
 import { CreateClientDialog } from './create-client-dialog'
 import { ImportCsvDialog } from './import-csv-dialog'
 import { PinButton } from './pin-button'
 import { ClientStatusBadge } from './client-status-badge'
 import { PresenceDot } from './presence-dot'
-import type { ClientListItem, ClientType, ClientStatus } from '../types/crm.types'
+import { reactivateClient } from '../actions/reactivate-client'
+import type { ClientListItem, ClientType } from '../types/crm.types'
 
 interface ClientListProps {
   clients: ClientListItem[]
@@ -38,6 +42,41 @@ const formatDate = (isoDate: string): string => {
 const isDeferred = (client: ClientListItem): boolean =>
   !!client.deferredUntil && new Date(client.deferredUntil) > new Date()
 
+// Story 9.5c: Check if archived client can still be reactivated
+const canReactivate = (client: ClientListItem): boolean =>
+  client.status === 'archived' &&
+  (!client.retentionUntil || new Date(client.retentionUntil) > new Date())
+
+function ReactivateButton({ clientId }: { clientId: string }) {
+  const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
+
+  const handleReactivate = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    startTransition(async () => {
+      const result = await reactivateClient({ clientId })
+      if (result.error) {
+        showError(result.error.message)
+        return
+      }
+      showSuccess('Client réactivé')
+      await queryClient.invalidateQueries({ queryKey: ['clients'] })
+    })
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={isPending}
+      onClick={handleReactivate}
+      data-testid={`reactivate-button-${clientId}`}
+    >
+      {isPending ? '...' : 'Réactiver'}
+    </Button>
+  )
+}
+
 export function ClientList({ clients, onRowClick, showCreateButton = true, onlineUserIds = [] }: ClientListProps) {
   const onlineSet = new Set(onlineUserIds)
 
@@ -62,6 +101,12 @@ export function ClientList({ clients, onRowClick, showCreateButton = true, onlin
           {isDeferred(client) && (
             <Badge variant="outline" className="text-xs" data-testid={`deferred-badge-${client.id}`}>
               Reporté
+            </Badge>
+          )}
+          {/* Story 9.5c: Archived badge */}
+          {client.status === 'archived' && client.archivedAt && (
+            <Badge variant="secondary" className="text-xs" data-testid={`archived-badge-${client.id}`}>
+              Archivé le {formatDate(client.archivedAt)}
             </Badge>
           )}
         </div>
@@ -101,7 +146,28 @@ export function ClientList({ clients, onRowClick, showCreateButton = true, onlin
       accessorKey: 'createdAt',
       cell: (client) => formatDate(client.createdAt),
       sortable: true,
-    }
+    },
+    {
+      // Story 9.5c: Retention info + reactivate button for archived clients
+      id: 'retention',
+      header: 'Rétention',
+      accessorKey: 'retentionUntil',
+      cell: (client) => {
+        if (client.status !== 'archived') return null
+        return (
+          <div className="flex items-center gap-2">
+            {client.retentionUntil && (
+              <span className="text-xs text-muted-foreground" data-testid={`retention-until-${client.id}`}>
+                Jusqu&apos;au {formatDate(client.retentionUntil)}
+              </span>
+            )}
+            {canReactivate(client) && (
+              <ReactivateButton clientId={client.id} />
+            )}
+          </div>
+        )
+      },
+    },
   ]
 
   return (

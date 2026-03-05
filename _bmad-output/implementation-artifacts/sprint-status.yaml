@@ -143,7 +143,7 @@ development_status:
   9-4-changement-de-tier-abonnement-client-one: done
   9-5a-export-rgpd-des-donnees-client: done
   9-5b-transfert-instance-one-au-client-sortant: done
-  9-5c-anonymisation-retention-des-donnees-apres-resiliation: ready-for-dev
+  9-5c-anonymisation-retention-des-donnees-apres-resiliation: done
   epic-9-retrospective: optional
 
   # Epic 10: Dashboard One & Modules Commerciaux (4 stories)

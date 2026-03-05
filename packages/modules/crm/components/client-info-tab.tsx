@@ -14,6 +14,7 @@ import { GraduationDialog } from './graduation-dialog'
 import { ReactivateParcoursDialog } from './reactivate-parcours-dialog'
 import { ChangeTierDialog } from './change-tier-dialog'
 import { TransferInstanceDialog } from './transfer-instance-dialog'
+import { ArchiveClientDialog } from './archive-client-dialog'
 import { useClientInstance } from '../hooks/use-client-instance'
 import { TIER_INFO, TIER_BADGE_CLASSES } from '../utils/tier-helpers'
 import type { SubscriptionTier } from '../types/subscription.types'
@@ -48,6 +49,7 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
   const [changeTierDialogOpen, setChangeTierDialogOpen] = useState(false)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false)
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false)
   const [isExporting, startExportTransition] = useTransition()
   const { data: clientInstance } = useClientInstance(clientId)
 
@@ -509,9 +511,38 @@ export function ClientInfoTab({ clientId, onEdit }: ClientInfoTabProps) {
                 </div>
               </>
             )}
+            {/* Story 9.5c — Archivage client (RGPD) */}
+            {client.status !== 'archived' && client.status !== 'deleted' && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Archivez le client pour bloquer son accès. Les données seront anonymisées après la période de rétention (RGPD).
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setArchiveDialogOpen(true)}
+                    data-testid="archive-client-button"
+                  >
+                    Archiver le client
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Story 9.5c — Dialog archivage */}
+      {client.status !== 'archived' && client.status !== 'deleted' && (
+        <ArchiveClientDialog
+          clientId={clientId}
+          clientName={client.name}
+          open={archiveDialogOpen}
+          onOpenChange={setArchiveDialogOpen}
+        />
+      )}
 
       {/* Notes privées (Story 2.6) */}
       <ClientNotesSection clientId={clientId} />

@@ -3,7 +3,7 @@ import { createClientSchema, updateClientSchema } from '@foxeo/utils'
 
 // Client type enums
 export const ClientTypeEnum = z.enum(['complet', 'direct_one', 'ponctuel'])
-export const ClientStatusEnum = z.enum(['active', 'suspended', 'archived'])
+export const ClientStatusEnum = z.enum(['active', 'suspended', 'archived', 'deleted'])
 
 // Client Config types (from client_configs table)
 export const ClientConfig = z.object({
@@ -33,6 +33,8 @@ export const Client = z.object({
   notes: z.string().optional(),
   suspendedAt: z.string().datetime().nullable().optional(),
   archivedAt: z.string().datetime().nullable().optional(),
+  retentionUntil: z.string().datetime().nullable().optional(),
+  previousStatus: z.string().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   config: ClientConfig.optional(),
@@ -54,6 +56,8 @@ export const ClientListItem = z.object({
   createdAt: z.string().datetime(),
   isPinned: z.boolean().optional(),
   deferredUntil: z.string().datetime().nullable().optional(),
+  archivedAt: z.string().datetime().nullable().optional(),
+  retentionUntil: z.string().datetime().nullable().optional(),
 })
 
 export type ClientListItem = z.infer<typeof ClientListItem>
@@ -83,13 +87,15 @@ export type ClientDB = {
   company: string
   email: string
   client_type: 'complet' | 'direct_one' | 'ponctuel'
-  status: 'active' | 'suspended' | 'archived'
+  status: 'active' | 'suspended' | 'archived' | 'deleted'
   sector?: string
   phone?: string
   website?: string
   notes?: string
   suspended_at?: string | null
   archived_at?: string | null
+  retention_until?: string | null
+  previous_status?: string | null
   created_at: string
   updated_at: string
 }
@@ -435,6 +441,14 @@ export type ClientTimeEstimate = z.infer<typeof ClientTimeEstimate>
 // ============================================================
 // Client Lifecycle types (Story 2.9a)
 // ============================================================
+
+// Archive client input (Story 9.5c)
+export const ArchiveClientInput = z.object({
+  clientId: z.string().uuid(),
+  retentionDays: z.number().int().min(30, 'Minimum 30 jours').max(365, 'Maximum 365 jours').optional().default(90),
+})
+
+export type ArchiveClientInput = z.infer<typeof ArchiveClientInput>
 
 // Suspend client input (AC2)
 export const SuspendClientInput = z.object({

@@ -53,7 +53,9 @@ export async function getClients(
         status,
         created_at,
         is_pinned,
-        deferred_until
+        deferred_until,
+        archived_at,
+        retention_until
       `
       )
       .eq('operator_id', operatorId)
@@ -66,6 +68,8 @@ export async function getClients(
     } else {
       // Story 2.9b AC2: Exclude archived clients by default when no status filter is active
       query = query.neq('status', 'archived')
+      // Story 9.5c: Also exclude deleted (anonymized) clients by default
+      query = query.neq('status', 'deleted')
     }
 
     if (filters?.clientType && filters.clientType.length > 0) {
@@ -103,6 +107,8 @@ export async function getClients(
         createdAt: client.created_at,
         isPinned: client.is_pinned ?? false,
         deferredUntil: client.deferred_until ?? null,
+        archivedAt: client.archived_at ?? null,
+        retentionUntil: client.retention_until ?? null,
       })
     )
 
