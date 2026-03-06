@@ -69,7 +69,7 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Communication Temps Reel & Notifications (7 stories)
-  epic-3: in-progress
+  epic-3: done
   3-1-module-chat-migration-messages-messagerie-temps-reel-mikl-client: done
   3-2-module-notifications-infrastructure-in-app-temps-reel: done
   3-3-notifications-email-transactionnelles: done
@@ -91,7 +91,7 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Visioconference & Onboarding Prospect (6 stories)
-  epic-5: in-progress
+  epic-5: done
   5-1-module-visio-migration-meetings-salle-de-visio-openvidu: done
   5-2-enregistrement-visio-transcription-automatique-historique: done
   5-3-demande-de-visio-prise-de-rdv-calcom-salle-attente: done
@@ -101,7 +101,7 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Parcours Lab — Accompagnement Creation (6 stories)
-  epic-6: in-progress
+  epic-6: done
   6-1-module-parcours-lab-migration-structure-vue-parcours-progression: done
   6-2-consultation-des-briefs-par-etape-teasing-foxeo-one: done
   6-3-soumission-de-brief-pour-validation-notifications: done
@@ -121,11 +121,11 @@ development_status:
   epic-7-retrospective: optional
 
   # Epic 8: Agents IA Elio — Hub, Lab, One (11 stories)
-  epic-8: in-progress
+  epic-8: done
   8-1-consolidation-infrastructure-elio-module-unifie-composants-partages-gestion-des-erreurs: done
   8-2-conversations-elio-liste-commutation-historique-persistant-complet: done
   8-3-feedback-reponses-elio-documents-dans-le-chat-historique-configs: done
-  8-4-profil-de-communication-stockage-affinement-transmission-graduation: review
+  8-4-profil-de-communication-stockage-affinement-transmission-graduation: done
   8-5-elio-hub-interface-chat-mikl-aide-fonctionnalites-recherche-client: done
   8-6-elio-hub-correction-redaction-generation-de-brouillons: done
   8-7-elio-one-chat-faq-guidance-dashboard-heritage-lab: done
@@ -136,7 +136,7 @@ development_status:
   epic-8-retrospective: optional
 
   # Epic 9: Graduation Lab vers One & Cycle de Vie Client (7 stories)
-  epic-9: in-progress
+  epic-9: done
   9-1-graduation-lab-vers-one-declenchement-migration-automatique-du-contexte: done
   9-2-graduation-lab-vers-one-notification-client-activation-acces-one: done
   9-3-demande-abandon-de-parcours-lab-par-le-client: done
@@ -147,11 +147,11 @@ development_status:
   epic-9-retrospective: optional
 
   # Epic 10: Dashboard One & Modules Commerciaux (4 stories)
-  epic-10: backlog
-  10-1-dashboard-one-accueil-personnalise-navigation-modules-actives: backlog
-  10-2-documents-herites-du-lab-livrables-teasing-lab: backlog
-  10-3-configuration-modules-actifs-par-mikl-injection-documentation-elio-one: backlog
-  10-4-personnalisation-branding-dashboard-one-par-client: backlog
+  epic-10: in-progress
+  10-1-dashboard-one-accueil-personnalise-navigation-modules-actives: done
+  10-2-documents-herites-du-lab-livrables-teasing-lab: ready-for-dev
+  10-3-configuration-modules-actifs-par-mikl-injection-documentation-elio-one: ready-for-dev
+  10-4-personnalisation-branding-dashboard-one-par-client: ready-for-dev
   epic-10-retrospective: optional
 
   # Epic 11: Facturation & Abonnements — Pennylane (6 stories)

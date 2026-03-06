@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   registerModule,
   getModuleRegistry,
   getModule,
   getModulesForTarget,
   clearRegistry,
+  discoverModules,
 } from './module-registry'
 import type { ModuleManifest } from '@foxeo/types'
 
@@ -86,5 +87,95 @@ describe('module-registry', () => {
     registerModule(mockManifest)
     clearRegistry()
     expect(getModuleRegistry().size).toBe(0)
+  })
+
+  describe('client-one target filtering', () => {
+    const oneModule: ModuleManifest = {
+      id: 'chat',
+      name: 'Chat',
+      version: '1.0.0',
+      description: 'Chat module',
+      navigation: { icon: 'MessageCircle', label: 'Chat', position: 20 },
+      routes: [],
+      requiredTables: [],
+      targets: ['client-lab', 'client-one'],
+      dependencies: [],
+    }
+    const labOnlyModule: ModuleManifest = {
+      id: 'parcours',
+      name: 'Parcours',
+      version: '1.0.0',
+      description: 'Parcours Lab',
+      navigation: { icon: 'Map', label: 'Parcours', position: 10 },
+      routes: [],
+      requiredTables: [],
+      targets: ['client-lab'],
+      dependencies: [],
+    }
+
+    it('returns only client-one modules for target client-one', () => {
+      registerModule(oneModule)
+      registerModule(labOnlyModule)
+
+      const oneModules = getModulesForTarget('client-one')
+      expect(oneModules).toHaveLength(1)
+      expect(oneModules[0]?.id).toBe('chat')
+    })
+
+    it('supports active_modules filter pattern (consumer-side)', () => {
+      const docsModule: ModuleManifest = {
+        id: 'documents',
+        name: 'Documents',
+        version: '1.0.0',
+        description: 'Docs module',
+        navigation: { icon: 'FileText', label: 'Documents', position: 30 },
+        routes: [],
+        requiredTables: [],
+        targets: ['client-one'],
+        dependencies: [],
+      }
+      registerModule(oneModule)
+      registerModule(docsModule)
+
+      const activeModules = ['chat'] // only chat is active
+      const filtered = getModulesForTarget('client-one').filter((m) =>
+        activeModules.includes(m.id)
+      )
+      expect(filtered).toHaveLength(1)
+      expect(filtered[0]?.id).toBe('chat')
+    })
+
+    it('returns empty array when no active_modules match', () => {
+      registerModule(oneModule)
+      const activeModules: string[] = []
+      const filtered = getModulesForTarget('client-one').filter((m) =>
+        activeModules.includes(m.id)
+      )
+      expect(filtered).toHaveLength(0)
+    })
+  })
+
+  describe('discoverModules', () => {
+    it('resolves without throwing', async () => {
+      // discoverModules uses try/catch internally — should never throw
+      await expect(discoverModules()).resolves.toBeUndefined()
+    }, 15000)
+
+    it('sets isDiscovered flag so second call is a no-op', async () => {
+      // First call discovers and fills the registry
+      await discoverModules()
+      const sizeAfterFirst = getModuleRegistry().size
+      expect(sizeAfterFirst).toBeGreaterThan(0)
+      // Second call should be a no-op (isDiscovered guard)
+      await discoverModules()
+      expect(getModuleRegistry().size).toBe(sizeAfterFirst)
+    }, 15000)
+
+    it('registers at least one module on discovery', async () => {
+      clearRegistry()
+      await discoverModules()
+      // After discovery, at least core-dashboard should be registered
+      expect(getModuleRegistry().size).toBeGreaterThan(0)
+    }, 15000)
   })
 })

@@ -12,23 +12,42 @@ export function registerModule(manifest: ModuleManifest): void {
 }
 
 /**
- * Auto-discover modules from packages/modules/
- * Scans for manifest.ts files and registers them automatically
- * NOTE: This uses dynamic imports which only work in Node.js context (build time)
- * For runtime, modules must be registered manually via registerModule()
+ * Auto-discover all modules from packages/modules/
+ * Each module is imported with try/catch — missing modules are silently skipped.
  */
 export async function discoverModules(): Promise<void> {
   if (isDiscovered) return
 
-  try {
-    // Dynamic import of core-dashboard (only available module for now)
-    // In production, this would scan packages/modules/ directory
-    const { coreDashboardManifest } = await import('@foxeo/module-core-dashboard')
-    registerModule(coreDashboardManifest)
-    isDiscovered = true
-  } catch (error) {
-    console.warn('Module discovery failed:', error)
+  const moduleImports: Array<{
+    pkg: string
+    named?: string
+  }> = [
+    { pkg: '@foxeo/module-core-dashboard', named: 'coreDashboardManifest' },
+    { pkg: '@foxeo/modules-chat' },
+    { pkg: '@foxeo/module-documents' },
+    { pkg: '@foxeo/module-elio' },
+    { pkg: '@foxeo/module-parcours' },
+    { pkg: '@foxeo/modules-validation-hub' },
+    { pkg: '@foxeo/modules-crm' },
+    { pkg: '@foxeo/modules-notifications' },
+    { pkg: '@foxeo/module-visio' },
+    { pkg: '@foxeo/modules-support' },
+    { pkg: '@foxeo/module-admin' },
+  ]
+
+  for (const { pkg, named } of moduleImports) {
+    try {
+      const mod = await import(pkg)
+      const manifest: ModuleManifest = named ? mod[named] : mod.manifest
+      if (manifest) {
+        registerModule(manifest)
+      }
+    } catch {
+      // Module not available — skip silently (tolerant to missing modules)
+    }
   }
+
+  isDiscovered = true
 }
 
 export function getModuleRegistry(): Map<string, ModuleManifest> {

@@ -5,14 +5,32 @@ import { createServerSupabaseClient } from '@foxeo/supabase'
 import { NotificationBadge } from '@foxeo/modules-notifications'
 import { PresenceProvider } from '@foxeo/modules-chat'
 import { LogoutButton } from './logout-button'
+import type { ModuleTarget } from '@foxeo/types'
 
-async function ClientSidebar() {
-  // Auto-discover modules from packages/modules/
+async function ClientSidebar({
+  dashboardType,
+  activeModules,
+}: {
+  dashboardType: string
+  activeModules: string[]
+}) {
   await discoverModules()
-  // For Lab, use 'client-lab'; for One, use 'client-one' (dynamic in future story)
-  const modules = getModulesForTarget('client-lab')
+  const target: ModuleTarget =
+    dashboardType === 'one' ? 'client-one' : 'client-lab'
 
-  return <ModuleSidebar target="client-lab" modules={modules} />
+  const modules = activeModules.length > 0
+    ? getModulesForTarget(target).filter((m) => activeModules.includes(m.id))
+    : []
+
+  if (modules.length === 0) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground">
+        Contactez MiKL pour activer vos modules.
+      </div>
+    )
+  }
+
+  return <ModuleSidebar target={target} modules={modules} />
 }
 
 function ClientHeader({ authUserId }: { authUserId: string }) {
@@ -39,33 +57,38 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  // AC2, AC4: Mount PresenceProvider once at layout level
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Look up client record to get operator_id and client.id
+  // Single query: fetch client record with joined client_configs
   const { data: clientRecord } = user
     ? await supabase
         .from('clients')
-        .select('id, operator_id')
+        .select('id, first_name, name, operator_id, client_configs(dashboard_type, active_modules, density)')
         .eq('auth_user_id', user.id)
         .maybeSingle()
     : { data: null }
 
-  // userId = client's record ID (used as presence key)
-  // operatorId = the operator this client belongs to (channel identifier)
-  const userId = clientRecord?.id ?? ''
+  const clientId = clientRecord?.id ?? ''
   const operatorId = clientRecord?.operator_id ?? ''
 
-  // Density determined by client_config (Lab=spacious, One=comfortable)
-  // Default to spacious for Lab — will be dynamic in Story 1.5+
+  // Normalize joined relation (array or object)
+  const configRelation = clientRecord?.client_configs
+  const clientConfig = Array.isArray(configRelation) ? configRelation[0] : configRelation
+
+  const dashboardType = clientConfig?.dashboard_type ?? 'lab'
+  const activeModules: string[] = clientConfig?.active_modules ?? ['core-dashboard']
+  const density = dashboardType === 'one' ? 'comfortable' : 'spacious'
+
   return (
     <DashboardShell
-      density="spacious"
-      sidebar={<ClientSidebar />}
+      density={density}
+      sidebar={
+        <ClientSidebar dashboardType={dashboardType} activeModules={activeModules} />
+      }
       header={<ClientHeader authUserId={user?.id ?? ''} />}
     >
-      <PresenceProvider userId={userId} userType="client" operatorId={operatorId}>
+      <PresenceProvider userId={clientId} userType="client" operatorId={operatorId}>
         {children}
       </PresenceProvider>
     </DashboardShell>

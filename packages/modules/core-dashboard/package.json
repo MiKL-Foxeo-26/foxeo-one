@@ -14,14 +14,18 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
+    "@foxeo/supabase": "*",
     "@foxeo/types": "*",
     "@foxeo/ui": "*",
-    "@foxeo/utils": "*"
+    "@foxeo/utils": "*",
+    "@tanstack/react-query": "^5.90.0"
   },
   "devDependencies": {
     "@foxeo/tsconfig": "*",
+    "@testing-library/react": "*",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "*"
   }
 }

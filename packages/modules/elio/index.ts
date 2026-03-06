@@ -183,3 +183,6 @@ export {
   DEFAULT_ELIO_CONFIG,
   toElioConfig,
 } from './types/elio-config.types'
+
+// Components — Story 10.1
+export { ElioFloatingButton } from './components/elio-floating-button'
