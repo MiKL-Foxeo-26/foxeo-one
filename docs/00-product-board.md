@@ -210,6 +210,7 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 | Fournir `VERCEL_TOKEN` / `SUPABASE_MANAGEMENT_TOKEN` pour un kit de sortie complet (non urgent) | MiKL | F-007 si rouvert | 2026-07-03 |
 | Confirmer DNS/SSL `hub.`/`app.`/vitrine — **suspect deja fait**, commits d'aout montrent la bascule | MiKL | Mise en prod | 2026-04-15 |
 | Compte Pennylane prod actif, backups Supabase actives | MiKL | Onboarding client | 2026-04-15 |
+| Trancher : capitaliser le PRINCIPE de mise en page d'un tableau de bord (hierarchie par nature d'attention + cockpit 2 colonnes) dans `~/.claude/ui-patterns-kits.md`, entree « Page d'accueil / Dashboard ». Le code lui-meme (2 briques + un mode compact) ne vaut pas un kit — c'est le raisonnement qui se reutilise. Argument renforce par l'echec de la v2 : l'entree actuelle du catalogue ne dit RIEN de la hierarchie ni de la mise en page, et c'est exactement la que la v2 s'est plantee. Cout : ~20 min | MiKL | F-014, F-015 | 2026-09-08 |
 
 > Suspects "traite mais jamais coche" (a trancher MiKL, non retires) : DNS ci-dessus ; T-010 ; T-003.
 
