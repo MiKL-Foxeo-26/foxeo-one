@@ -195,12 +195,15 @@ function ThreadDialog({ messageId, onClose }: { messageId: string | null; onClos
           )}
         </div>
 
-        {/* Zone de réponse */}
+        {/* Zone de réponse.
+            `max-h-[25vh]` : la zone est en `shrink-0`, une réponse longue la ferait grandir
+            jusqu'à écraser le fil de discussion et pousser les boutons hors de la pop-up. */}
         <div className="shrink-0 border-t border-white/10 px-5 py-4 space-y-2">
           <Textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             rows={3}
+            className="max-h-[25vh]"
             placeholder="Écris ta réponse… (elle arrive en temps réel dans l'app du client)"
           />
           <div className="flex flex-wrap items-center gap-2">

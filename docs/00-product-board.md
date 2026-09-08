@@ -29,9 +29,7 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 
 | ID | Idee | Origine | Date | A qualifier avec |
 |---|---|---|---|---|
-| | | | | |
-
-> Rien en attente de tri — le flux d'idees recentes a ete qualifie directement en backlog.
+| F-012 | Coin "Mes projets" sur l'accueil du Hub : widgets configurables par projet (MiKL choisit quoi afficher). Cas MenuFacile : nb de messages non traites + nb de foyers utilisant l'appli | MiKL 2026-09-08 | 2026-09-08 | OTTO + FORGE (widget generique, jamais code en dur pour MenuFacile) |
 
 ---
 
@@ -64,6 +62,7 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 | T-018 | SPF de monprojet-pro.com obsolete (OVH) — n'autorise pas Resend, ne correspond plus au MX reel (Google). Fait DNS reel, mais fausse piste sur l'incident du 09-01 (cause reelle : Outlook local MiKL) | Dette technique | MiKL 2026-09-01 (signalement sans email recu) | Should | Interne | M | S | Qualifie — DNS chez MiKL, sans urgence | — | 2026-09-01 | — | 2026-09-01 |
 | T-016 | Upload de capture d'ecran bloque en silence dans "Signaler un probleme" (Lab) | Bug | MiKL 2026-08-31 | Must | A qualifier | H | S | Livre | — | 2026-08-31 | 2026-08-31 | 2026-08-31 |
 | F-011 | Rendre "Signaler un probleme" visible dans le Lab (bouton + onglet Mes signalements, icone alerte header) + suppression page orpheline /support | Feature | MiKL 2026-08-31 | Should | A qualifier | M | S | Livre | — | 2026-08-31 | 2026-08-31 | 2026-08-31 |
+| T-019 | Zone de saisie des reponses : le texte deborde de la pop-up et les boutons d'envoi deviennent inatteignables (toutes les `Textarea` du produit) | Bug | MiKL 2026-09-08 (capture, fil MenuFacile) | Must | Interne | H | S | Livre | — | 2026-09-08 | 2026-09-08 | 2026-09-08 |
 | T-017 | Signalement Lab : jusqu'a 3 pieces jointes (au lieu d'1), compression image avant upload, upload direct navigateur->Supabase (pattern GuardVeto) | Amelioration | MiKL 2026-08-31 | Should | A qualifier | M | M | Livre | — | 2026-08-31 | 2026-08-31 | 2026-08-31 |
 
 > Perimetre `Interne` = dette invisible du client (jamais `Devis` par defaut, regle OTTO).
@@ -80,6 +79,12 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 
 | ID | Ce qui etait annonce | Ce qui est reellement livre | Verdict |
 |---|---|---|---|
+| T-019 | Cause racine du debordement identifiee, pas un fix a l'aveugle | `packages/ui/src/textarea.tsx` portait `field-sizing-content` (la zone grandit avec le texte) SANS aucun plafond de hauteur : une reponse longue pousse la zone et les boutons hors de la pop-up | OK |
+| T-019 | La zone de saisie cesse de grandir et devient defilable | `max-h-[40vh]` + `overflow-y-auto` ajoutes au composant `Textarea` partage ; classes reellement generees dans le CSS de prod (`grep` dans `apps/hub/.next/static/css/6f0a9aed19848155.css` -> `.max-h-[40vh]{max-height:40vh}`) | OK |
+| T-019 | Le fil de discussion reste lisible quand la reponse est longue | `messages-tab.tsx` : `max-h-[25vh]` sur la zone de reponse du `ThreadDialog` (zone en `shrink-0`, elle aurait sinon ecrase les bulles) ; classe generee (`.max-h-[25vh]{max-height:25vh}`) | OK |
+| T-019 | Correction valable pour toutes les pop-ups de reponse, pas seulement MenuFacile | Fix pose dans le composant partage : 28 fichiers utilisent `<Textarea>` (validation-hub approve/reject/clarification/postpone, support, chat, crm, parcours, elio, email, moderation MenuFacile) — tous couverts ; un appelant peut toujours imposer son propre `max-h-*` (tailwind-merge) | OK |
+| T-019 | Rien de casse | `npx turbo build --filter=@monprojetpro/hub` -> 1 successful, 1 total (3m15) | OK |
+| T-019 | Verification visuelle sur la pop-up reelle | NON VERIFIE — demande une session Hub authentifiee ; a confirmer par MiKL sur la preview | non verifie |
 | T-016 | Bucket/policies Supabase `screenshots` fonctionnels | Verifie en base reelle (`execute_sql`) : bucket public 5 Mo, policies insert/delete owner actives — non fautifs | OK |
 | T-016 | Cause racine du blocage identifiee et corrigee | `apps/client/next.config.ts` : aucune limite `serverActions.bodySizeLimit` declaree -> defaut Next.js 1 Mo, trop bas pour une capture (5 Mo autorises cote action) ; ajout de `bodySizeLimit: '6mb'` | OK |
 | T-016 | Le bouton reste bloque sans erreur si l'upload echoue | `screenshot-upload.tsx` : l'appel serveur n'etait pas dans un try/catch -> ajout try/catch/finally, erreur affichee, `uploading` toujours remis a `false` | OK |
