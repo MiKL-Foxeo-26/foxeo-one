@@ -180,7 +180,6 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 | Fournir `VERCEL_TOKEN` / `SUPABASE_MANAGEMENT_TOKEN` pour un kit de sortie complet (non urgent) | MiKL | F-007 si rouvert | 2026-07-03 |
 | Confirmer DNS/SSL `hub.`/`app.`/vitrine — **suspect deja fait**, commits d'aout montrent la bascule | MiKL | Mise en prod | 2026-04-15 |
 | Compte Pennylane prod actif, backups Supabase actives | MiKL | Onboarding client | 2026-04-15 |
-| Trancher : le coin « Mes projets » (tuiles configurables) doit-il entrer au catalogue FORGE pour resservir ailleurs ? Question posee le 2026-09-08, sans reponse a ce jour — l'item reste candidat | MiKL | F-012 (extraction) | 2026-09-08 |
 
 > Suspects "traite mais jamais coche" (a trancher MiKL, non retires) : DNS ci-dessus ; T-010 ; T-003.
 
@@ -190,6 +189,7 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 
 | Date | Evenement | Items concernes | Decide par |
 |---|---|---|---|
+| 2026-09-08 | MiKL tranche la question FORGE : le coin « Mes projets » DOIT resservir. Extrait sous `installation WF base/kits/tuiles-dashboard-configurables/`. La recherche prealable dans les 7 autres projets MPP a trouve une 2e implementation du meme pattern, jamais reperee : `preferences_affichage` de GuardVeto (colonnes de compteurs choisies, `colonnesCompteurs.ts` + `CompteursPanel.tsx`). Le kit combine les deux et corrige l'angle mort de chacune — GuardVeto ne gerait pas une source de donnees injoignable, foxeo-one ne savait pas reordonner. Le reordonnancement etait pourtant liste comme « implication oubliee » du pattern Dashboard dans `ui-patterns-kits.md` : aucune des deux implementations ne l'avait. Kit inscrit au catalogue (etat vert), au bloc `capacites` du hook OTTO et au README des kits ; 20 tests sur la logique pure, executes hors du projet d'origine | F-012 | MiKL |
 | 2026-09-01 | T-017 confirme en conditions reelles : MiKL a cree un signalement avec 1 piece jointe depuis la prod (c'est ce test qui a declenche l'investigation email ci-dessous) — upload direct + compression fonctionnent | T-017 | MiKL |
 | 2026-09-01 | Suite : fausse piste. MiKL confirme avoir bien recu l'email — le probleme venait de son client Outlook (local, hors du systeme), pas de l'envoi. Le SPF obsolete reste un fait DNS reel et verifie, mais n'etait PAS la cause de cet incident precis : T-018 reste ouvert comme dette technique a corriger (bonne pratique deliverabilite), redescendu de "cause probable" a "a corriger un jour, sans urgence" | T-018 | MiKL |
 | 2026-09-01 | MiKL signale ne rien recevoir en boite mail pour un signalement, alors que Resend confirme l'envoi. Verifie en base : notification + `activity_logs` (`email_sent`) bien crees pour `contact@monprojet-pro.com`, donc pas un bug applicatif. DNS reel (`nslookup`) montre un SPF obsolete (`v=spf1 include:mx.ovh.com -all`) qui n'autorise ni Resend ni le MX reel (`smtp.google.com`, Google Workspace) — reste d'une ancienne configuration mail jamais mise a jour. Cree T-018 ; correction DNS chez le registrar, hors de portee ici | T-018 | MAX |
