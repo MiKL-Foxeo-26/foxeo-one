@@ -20,6 +20,8 @@ export { ProjectTile, type ProjectTileProps } from './project-tile'
 export { SectionTitle, type SectionTitleProps } from './section-title'
 export { CockpitPanel, type CockpitPanelProps } from './cockpit-panel'
 export { CockpitCallout, type CockpitCalloutProps } from './cockpit-callout'
+export { CockpitZone, type CockpitZoneProps } from './cockpit-zone'
+export { EmptyRow, type EmptyRowProps } from './empty-row'
 export {
   HeroStatSkeleton,
   StatCardSkeleton,

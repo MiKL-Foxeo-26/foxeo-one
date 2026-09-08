@@ -1,6 +1,13 @@
 import { Suspense } from 'react'
-import { LayoutDashboard } from 'lucide-react'
-import { CockpitHeader, StatusPill } from '@monprojetpro/ui'
+import { LayoutDashboard, Users, Wallet, CheckCircle2, CalendarDays } from 'lucide-react'
+import {
+  CockpitHeader,
+  StatusPill,
+  CockpitZone,
+  CockpitCallout,
+  EmptyRow,
+  HeroStat,
+} from '@monprojetpro/ui'
 import { createServerSupabaseClient } from '@monprojetpro/supabase'
 import { getTokenUsageSummary, getAlertThresholds, DEFAULT_ALERT_THRESHOLDS, listRecentEscalations } from '@monprojetpro/module-elio'
 import { buildElioSuggestions, type SilentClient, type StagnantParcoursClient } from '../../lib/elio-suggestions'
@@ -368,6 +375,12 @@ export default async function HubHomePage() {
 
   const tokenSummary = tokenSummaryResult.data
 
+  // Total de la zone « À traiter ». À zéro, la zone entière cède la place à un
+  // bandeau vert : un jour calme doit se lire comme une bonne nouvelle, pas
+  // comme quatre cadres vides à balayer.
+  const aTraiterTotal =
+    pendingValidations.length + recentEscalations.length + unreadCount + elioSuggestions.length
+
   const today = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
@@ -426,14 +439,32 @@ export default async function HubHomePage() {
         </a>
       )}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-        <MetricCard
-          title="Total clients"
-          value={String(totalClients)}
-          subtitle={`${labCount} Lab · ${oneCount} One`}
-          accentColor="primary"
+      {/* ── ZONE PILOTAGE ──────────────────────────────────────────────────
+          Les chiffres qui décrivent l'état des lieux. On les regarde, on n'agit
+          pas dessus depuis ici — d'où le ton cyan, ambiant, jamais alarmant.
+          Exception : les impayés passent au rouge dès qu'il y en a. */}
+
+      {/* Deux chiffres de tête. La rangée de 6 cartes débordait : 6 ne tombe
+          juste sur aucune grille responsive (2 / 3 / 4 colonnes). */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <HeroStat
+          icon={Users}
+          label="Total clients"
+          value={totalClients}
+          sub={`${labCount} Lab · ${oneCount} One`}
+          tone="cyan"
         />
+        <HeroStat
+          icon={Wallet}
+          label="MRR"
+          value={mrrDisplay}
+          sub="Abonnements actifs"
+          tone="cyan"
+        />
+      </div>
+
+      {/* Quatre cartes de détail, sur une grille qui tombe juste. */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <InteractiveMetricCard
           title="Clients Lab"
           value={String(labCount)}
@@ -481,12 +512,6 @@ export default async function HubHomePage() {
           ]}
         />
         <MetricCard
-          title="MRR"
-          value={mrrDisplay}
-          subtitle="Abonnements actifs"
-          accentColor={mrr > 0 ? 'primary' : 'muted'}
-        />
-        <MetricCard
           title="Devis en cours"
           value={String(pendingQuotesCount)}
           subtitle="devis en attente"
@@ -519,179 +544,188 @@ export default async function HubHomePage() {
         <ProjectCorner operatorId={operatorId} />
       </Suspense>
 
-      {/* Agenda + Validations */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <DashboardCard title="Agenda du jour" linkHref="/modules/visio">
-          {meetings.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted-foreground italic">
-              Aucune réunion programmée aujourd'hui
-            </p>
-          ) : (
-            meetings.map((m) => {
-              const minsUntil = minutesUntil(m.scheduled_at)
-              const isLive = m.status === 'in_progress'
-              const isSoon = minsUntil !== null && minsUntil > 0 && minsUntil <= 30
-              return (
-                <AgendaItem
-                  key={m.id}
-                  time={formatTime(m.scheduled_at)}
-                  title={m.title ?? 'Réunion'}
-                  detail={getClientName(m.clients) || undefined}
-                  actionLabel={m.meet_uri ? 'Rejoindre' : 'Détails'}
-                  actionHref={`/modules/visio/${m.id}`}
-                  badgeText={isLive ? 'En cours' : isSoon ? `Dans ${minsUntil} min` : undefined}
-                />
-              )
-            })
-          )}
-        </DashboardCard>
+      {/* ── ZONE À TRAITER ─────────────────────────────────────────────────
+          Tout ce qui attend une décision de MiKL aujourd'hui, sous un seul
+          cadre ambre avec le total en tête. Avant, ces quatre panneaux étaient
+          dispersés entre des blocs d'information, au même poids visuel. */}
+      {aTraiterTotal === 0 ? (
+        <CockpitCallout tone="emerald" icon={CheckCircle2} title="À traiter">
+          Rien à traiter — aucune validation, escalade, message ni suggestion en attente.
+        </CockpitCallout>
+      ) : (
+        <CockpitZone title="À traiter" count={aTraiterTotal} tone="amber">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <DashboardCard
+              title="Validations en attente"
+              badge={pendingValidations.length || undefined}
+              linkHref="/modules/validation-hub"
+            >
+              {pendingValidations.length === 0 ? (
+                <EmptyRow>Aucune validation en attente</EmptyRow>
+              ) : (
+                pendingValidations.map((v) => {
+                  const clientObj = Array.isArray(v.clients) ? v.clients[0] : v.clients
+                  const clientName = clientObj?.company || clientObj?.name || 'Client'
+                  const typeLabel = v.type === 'step_submission' ? 'Soumission étape' : v.type === 'brief_lab' ? 'Brief Lab' : v.type === 'evolution_one' ? 'Évolution One' : v.type
+                  return (
+                    <AlertItem
+                      key={v.id}
+                      icon="bell"
+                      title={v.title}
+                      detail={`${clientName} · ${typeLabel} · ${formatRelativeTime(v.created_at)}`}
+                      href="/modules/validation-hub"
+                    />
+                  )
+                })
+              )}
+            </DashboardCard>
 
-        <DashboardCard title="Validations en attente" badge={pendingValidations.length || undefined} linkHref="/modules/validation-hub">
-          {pendingValidations.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted-foreground italic">
-              Aucune validation en attente
-            </p>
-          ) : (
-            pendingValidations.map((v) => {
-              const clientObj = Array.isArray(v.clients) ? v.clients[0] : v.clients
-              const clientName = clientObj?.company || clientObj?.name || 'Client'
-              const typeLabel = v.type === 'step_submission' ? 'Soumission étape' : v.type === 'brief_lab' ? 'Brief Lab' : v.type === 'evolution_one' ? 'Évolution One' : v.type
-              return (
-                <AlertItem
-                  key={v.id}
-                  icon="bell"
-                  title={v.title}
-                  detail={`${clientName} · ${typeLabel} · ${formatRelativeTime(v.created_at)}`}
-                  href="/modules/validation-hub"
-                />
-              )
-            })
-          )}
-        </DashboardCard>
-      </div>
+            {/* Escalades Élio One — questions transmises par l'agent des clients gradués.
+                Réactif : RealtimeDashboardRefresh écoute déjà les INSERT notifications du user. */}
+            <DashboardCard
+              title="Escalades Élio One"
+              badge={recentEscalations.length || undefined}
+              linkHref="/elio/one"
+            >
+              {recentEscalations.length === 0 ? (
+                <EmptyRow>Aucune escalade — Élio répond seul aux clients gradués</EmptyRow>
+              ) : (
+                recentEscalations.map((esc) => (
+                  <AlertItem
+                    key={esc.id}
+                    icon="warning"
+                    title={esc.title}
+                    detail={formatRelativeTime(esc.createdAt)}
+                    iconColor="text-amber-400"
+                    href="/elio/one"
+                  />
+                ))
+              )}
+            </DashboardCard>
 
-      {/* Escalades Élio One — questions transmises par l'agent des clients gradués.
-          Réactif : RealtimeDashboardRefresh écoute déjà les INSERT notifications du user. */}
-      <DashboardCard
-        title="Escalades Élio One"
-        badge={recentEscalations.length || undefined}
-        linkHref="/elio/one"
-      >
-        {recentEscalations.length === 0 ? (
-          <p className="px-3 py-4 text-sm text-muted-foreground italic">
-            Aucune escalade — Élio répond seul aux clients gradués
-          </p>
-        ) : (
-          recentEscalations.map((esc) => (
-            <AlertItem
-              key={esc.id}
-              icon="warning"
-              title={esc.title}
-              detail={formatRelativeTime(esc.createdAt)}
-              iconColor="text-amber-400"
-              href="/elio/one"
-            />
-          ))
-        )}
-      </DashboardCard>
+            <DashboardCard title="Messages non lus" badge={unreadCount} linkHref="/modules/chat">
+              {recentMessages.length === 0 ? (
+                <EmptyRow>Aucun message en attente</EmptyRow>
+              ) : (
+                recentMessages.map((msg) => {
+                  const clientName = clientNameMap.get(msg.client_id) ?? 'Client'
+                  return (
+                    <MessageItem
+                      key={msg.id}
+                      sender={clientName}
+                      preview={msg.content}
+                      time={formatRelativeTime(msg.created_at)}
+                      href={`/modules/chat/${msg.client_id}`}
+                    />
+                  )
+                })
+              )}
+            </DashboardCard>
 
-      {/* Nouveaux prospects non vus */}
-      {newProspects.length > 0 && (
-        <DashboardCard
-          title="Nouveaux prospects"
-          badge={newProspects.length}
-          linkHref="/modules/crm?status=prospect"
-        >
-          {newProspects.map((p) => {
-            const displayName = p.first_name ? `${p.first_name} ${p.name}` : p.name
-            return (
-              <div
-                key={p.id}
-                className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
-              >
-                <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-400 animate-pulse" />
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-100">{displayName}</p>
-                  <p className="truncate text-xs text-gray-500">{p.company} · {p.email}</p>
-                  {p.lead_message && (
-                    <p className="mt-0.5 line-clamp-1 text-xs italic text-gray-600">
-                      {p.lead_message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </DashboardCard>
+            <DashboardCard
+              title="Alertes & Actions — Suggestions Élio"
+              badge={elioSuggestions.length || undefined}
+              linkHref="/elio/hub"
+            >
+              {elioSuggestions.length === 0 ? (
+                <EmptyRow>Rien à signaler</EmptyRow>
+              ) : (
+                elioSuggestions.map((s) => (
+                  <AlertItem
+                    key={s.key}
+                    icon={s.icon}
+                    title={s.title}
+                    detail={s.detail}
+                    iconColor={s.iconColor}
+                    href={s.href}
+                  />
+                ))
+              )}
+            </DashboardCard>
+          </div>
+        </CockpitZone>
       )}
 
-      {/* Clients en pause */}
-      {pausedClients.length > 0 && (
-        <DashboardCard title="Parcours en pause" badge={pausedClients.length}>
-          {pausedClients.map((p) => {
-            const c = Array.isArray(p.clients) ? p.clients[0] : p.clients
-            const clientName = c?.company || c?.name || 'Client'
-            const reason = p.abandonment_reason ? `Raison : ${p.abandonment_reason}` : 'Aucune raison précisée'
-            return (
-              <AlertItem
-                key={p.id}
-                icon="warning"
-                title={`${clientName} a mis son parcours en pause`}
-                detail={reason}
-                iconColor="text-amber-400"
-                href={`/modules/crm/clients/${p.client_id}`}
-              />
-            )
-          })}
-        </DashboardCard>
-      )}
+      {/* ── ZONE RADAR ─────────────────────────────────────────────────────
+          Contexte ambiant : utile à savoir, aucune action requise dans
+          l'instant. Repliable, et le choix est retenu par navigateur.
+          Les deux panneaux conditionnels (prospects, parcours en pause) sont
+          fusionnés ici : avant, ils apparaissaient et disparaissaient selon les
+          données, et toute la page sautait. */}
+      <CockpitZone title="Radar" tone="gray" collapsible storageKey="hub-home-radar">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <DashboardCard title="Agenda du jour" linkHref="/modules/visio">
+            {meetings.length === 0 ? (
+              <EmptyRow icon={CalendarDays}>Aucune réunion programmée aujourd&apos;hui</EmptyRow>
+            ) : (
+              meetings.map((m) => {
+                const minsUntil = minutesUntil(m.scheduled_at)
+                const isLive = m.status === 'in_progress'
+                const isSoon = minsUntil !== null && minsUntil > 0 && minsUntil <= 30
+                return (
+                  <AgendaItem
+                    key={m.id}
+                    time={formatTime(m.scheduled_at)}
+                    title={m.title ?? 'Réunion'}
+                    detail={getClientName(m.clients) || undefined}
+                    actionLabel={m.meet_uri ? 'Rejoindre' : 'Détails'}
+                    actionHref={`/modules/visio/${m.id}`}
+                    badgeText={isLive ? 'En cours' : isSoon ? `Dans ${minsUntil} min` : undefined}
+                  />
+                )
+              })
+            )}
+          </DashboardCard>
 
-      {/* Messages + Alertes Élio */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <DashboardCard title="Messages non lus" badge={unreadCount} linkHref="/modules/chat">
-          {recentMessages.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted-foreground italic">
-              Aucun message en attente
-            </p>
-          ) : (
-            recentMessages.map((msg) => {
-              const clientName = clientNameMap.get(msg.client_id) ?? 'Client'
-              return (
-                <MessageItem
-                  key={msg.id}
-                  sender={clientName}
-                  preview={msg.content}
-                  time={formatRelativeTime(msg.created_at)}
-                  href={`/modules/chat/${msg.client_id}`}
-                />
-              )
-            })
-          )}
-        </DashboardCard>
-
-        <DashboardCard
-          title="Alertes & Actions — Suggestions Élio"
-          badge={elioSuggestions.length || undefined}
-          linkHref="/elio/hub"
-        >
-          {elioSuggestions.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-muted-foreground italic">
-              Rien à signaler — tout roule 🦊
-            </p>
-          ) : (
-            elioSuggestions.map((s) => (
-              <AlertItem
-                key={s.key}
-                icon={s.icon}
-                title={s.title}
-                detail={s.detail}
-                iconColor={s.iconColor}
-                href={s.href}
-              />
-            ))
-          )}
-        </DashboardCard>
-      </div>
+          <DashboardCard
+            title="Mouvements clients"
+            badge={newProspects.length + pausedClients.length || undefined}
+            linkHref="/modules/crm"
+          >
+            {newProspects.length === 0 && pausedClients.length === 0 ? (
+              <EmptyRow>Aucun mouvement — ni nouveau prospect, ni parcours en pause</EmptyRow>
+            ) : (
+              <>
+                {newProspects.map((p) => {
+                  const displayName = p.first_name ? `${p.first_name} ${p.name}` : p.name
+                  return (
+                    <div
+                      key={p.id}
+                      className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
+                    >
+                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-400 animate-pulse" />
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-100">{displayName}</p>
+                        <p className="truncate text-xs text-gray-500">{p.company} · {p.email}</p>
+                        {p.lead_message && (
+                          <p className="mt-0.5 line-clamp-1 text-xs italic text-gray-600">
+                            {p.lead_message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+                {pausedClients.map((p) => {
+                  const c = Array.isArray(p.clients) ? p.clients[0] : p.clients
+                  const clientName = c?.company || c?.name || 'Client'
+                  const reason = p.abandonment_reason ? `Raison : ${p.abandonment_reason}` : 'Aucune raison précisée'
+                  return (
+                    <AlertItem
+                      key={p.id}
+                      icon="warning"
+                      title={`${clientName} a mis son parcours en pause`}
+                      detail={reason}
+                      iconColor="text-amber-400"
+                      href={`/modules/crm/clients/${p.client_id}`}
+                    />
+                  )
+                })}
+              </>
+            )}
+          </DashboardCard>
+        </div>
+      </CockpitZone>
     </div>
   )
 }
