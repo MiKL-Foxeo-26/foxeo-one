@@ -402,330 +402,274 @@ export default async function HubHomePage() {
       {/* Alerte système — s'affiche uniquement si un voyant du monitoring est orange/rouge (Realtime) */}
       <SystemHealthAlert />
 
-      {/* Encart Coût IA */}
-      {tokenSummary && (
-        <a
-          href="/elio/lab"
-          className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-white/10 bg-cyan-400/[0.05] px-5 py-3.5 transition-colors hover:bg-cyan-400/[0.08]"
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -left-10 -top-16 h-40 w-40 rounded-full bg-cyan-400/10 blur-3xl"
-          />
-          <div className="relative flex items-center gap-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/25 bg-cyan-400/10 text-lg">🤖</span>
-            <div>
-              <p className="text-xs text-gray-500">Coût IA ce mois</p>
-              <p className="text-lg font-semibold leading-tight text-cyan-300">
-                {tokenSummary.totalCostEur.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
-              </p>
+      {/* ── COCKPIT DEUX COLONNES ──────────────────────────────────────────
+          A gauche le TRAVAIL : ce qui attend une reponse, puis le radar.
+          A droite les CONSTANTES : chiffres et projets, dans une colonne qui
+          reste a l'ecran pendant qu'on fait defiler.
+          Retour MiKL sur la version precedente : « a traiter devrait
+          apparaitre plus tot dans le scroll, c'est le plus important ; le
+          nombre de clients et le MRR, c'est pas le plus important ». L'action
+          passe donc devant, et les chiffres deviennent du contexte lateral. */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {/* ── COLONNE PRINCIPALE : le travail ──────────────────────────── */}
+        <div className="space-y-5 lg:col-span-2">
+          {/* ── ZONE À TRAITER ─────────────────────────────────────────────────
+              Tout ce qui attend une décision de MiKL aujourd'hui, sous un seul
+              cadre ambre avec le total en tête. Avant, ces quatre panneaux étaient
+              dispersés entre des blocs d'information, au même poids visuel. */}
+          {aTraiterTotal === 0 ? (
+            <CockpitCallout tone="emerald" icon={CheckCircle2} title="À traiter">
+              Rien à traiter — aucune validation, escalade, message ni suggestion en attente.
+            </CockpitCallout>
+          ) : (
+            <CockpitZone title="À traiter" count={aTraiterTotal} tone="amber">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <DashboardCard
+                  title="Validations en attente"
+                  badge={pendingValidations.length || undefined}
+                  linkHref="/modules/validation-hub"
+                >
+                  {pendingValidations.length === 0 ? (
+                    <EmptyRow>Aucune validation en attente</EmptyRow>
+                  ) : (
+                    pendingValidations.map((v) => {
+                      const clientObj = Array.isArray(v.clients) ? v.clients[0] : v.clients
+                      const clientName = clientObj?.company || clientObj?.name || 'Client'
+                      const typeLabel = v.type === 'step_submission' ? 'Soumission étape' : v.type === 'brief_lab' ? 'Brief Lab' : v.type === 'evolution_one' ? 'Évolution One' : v.type
+                      return (
+                        <AlertItem
+                          key={v.id}
+                          icon="bell"
+                          title={v.title}
+                          detail={`${clientName} · ${typeLabel} · ${formatRelativeTime(v.created_at)}`}
+                          href="/modules/validation-hub"
+                        />
+                      )
+                    })
+                  )}
+                </DashboardCard>
+
+                {/* Escalades Élio One — questions transmises par l'agent des clients gradués.
+                    Réactif : RealtimeDashboardRefresh écoute déjà les INSERT notifications du user. */}
+                <DashboardCard
+                  title="Escalades Élio One"
+                  badge={recentEscalations.length || undefined}
+                  linkHref="/elio/one"
+                >
+                  {recentEscalations.length === 0 ? (
+                    <EmptyRow>Aucune escalade — Élio répond seul aux clients gradués</EmptyRow>
+                  ) : (
+                    recentEscalations.map((esc) => (
+                      <AlertItem
+                        key={esc.id}
+                        icon="warning"
+                        title={esc.title}
+                        detail={formatRelativeTime(esc.createdAt)}
+                        iconColor="text-amber-400"
+                        href="/elio/one"
+                      />
+                    ))
+                  )}
+                </DashboardCard>
+
+                <DashboardCard title="Messages non lus" badge={unreadCount} linkHref="/modules/chat">
+                  {recentMessages.length === 0 ? (
+                    <EmptyRow>Aucun message en attente</EmptyRow>
+                  ) : (
+                    recentMessages.map((msg) => {
+                      const clientName = clientNameMap.get(msg.client_id) ?? 'Client'
+                      return (
+                        <MessageItem
+                          key={msg.id}
+                          sender={clientName}
+                          preview={msg.content}
+                          time={formatRelativeTime(msg.created_at)}
+                          href={`/modules/chat/${msg.client_id}`}
+                        />
+                      )
+                    })
+                  )}
+                </DashboardCard>
+
+                <DashboardCard
+                  title="Alertes & Actions — Suggestions Élio"
+                  badge={elioSuggestions.length || undefined}
+                  linkHref="/elio/hub"
+                >
+                  {elioSuggestions.length === 0 ? (
+                    <EmptyRow>Rien à signaler</EmptyRow>
+                  ) : (
+                    elioSuggestions.map((s) => (
+                      <AlertItem
+                        key={s.key}
+                        icon={s.icon}
+                        title={s.title}
+                        detail={s.detail}
+                        iconColor={s.iconColor}
+                        href={s.href}
+                      />
+                    ))
+                  )}
+                </DashboardCard>
+              </div>
+            </CockpitZone>
+          )}
+
+          {/* ── ZONE RADAR ─────────────────────────────────────────────────────
+              Contexte ambiant : utile à savoir, aucune action requise dans
+              l'instant. Repliable, et le choix est retenu par navigateur.
+              Les deux panneaux conditionnels (prospects, parcours en pause) sont
+              fusionnés ici : avant, ils apparaissaient et disparaissaient selon les
+              données, et toute la page sautait. */}
+          <CockpitZone title="Radar" tone="gray" collapsible storageKey="hub-home-radar">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <DashboardCard title="Agenda du jour" linkHref="/modules/visio">
+                {meetings.length === 0 ? (
+                  <EmptyRow icon={CalendarDays}>Aucune réunion programmée aujourd&apos;hui</EmptyRow>
+                ) : (
+                  meetings.map((m) => {
+                    const minsUntil = minutesUntil(m.scheduled_at)
+                    const isLive = m.status === 'in_progress'
+                    const isSoon = minsUntil !== null && minsUntil > 0 && minsUntil <= 30
+                    return (
+                      <AgendaItem
+                        key={m.id}
+                        time={formatTime(m.scheduled_at)}
+                        title={m.title ?? 'Réunion'}
+                        detail={getClientName(m.clients) || undefined}
+                        actionLabel={m.meet_uri ? 'Rejoindre' : 'Détails'}
+                        actionHref={`/modules/visio/${m.id}`}
+                        badgeText={isLive ? 'En cours' : isSoon ? `Dans ${minsUntil} min` : undefined}
+                      />
+                    )
+                  })
+                )}
+              </DashboardCard>
+
+              <DashboardCard
+                title="Mouvements clients"
+                badge={newProspects.length + pausedClients.length || undefined}
+                linkHref="/modules/crm"
+              >
+                {newProspects.length === 0 && pausedClients.length === 0 ? (
+                  <EmptyRow>Aucun mouvement — ni nouveau prospect, ni parcours en pause</EmptyRow>
+                ) : (
+                  <>
+                    {newProspects.map((p) => {
+                      const displayName = p.first_name ? `${p.first_name} ${p.name}` : p.name
+                      return (
+                        <div
+                          key={p.id}
+                          className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
+                        >
+                          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-400 animate-pulse" />
+                          <div className="flex-1 min-w-0">
+                            <p className="truncate text-sm font-medium text-gray-100">{displayName}</p>
+                            <p className="truncate text-xs text-gray-500">{p.company} · {p.email}</p>
+                            {p.lead_message && (
+                              <p className="mt-0.5 line-clamp-1 text-xs italic text-gray-600">
+                                {p.lead_message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {pausedClients.map((p) => {
+                      const c = Array.isArray(p.clients) ? p.clients[0] : p.clients
+                      const clientName = c?.company || c?.name || 'Client'
+                      const reason = p.abandonment_reason ? `Raison : ${p.abandonment_reason}` : 'Aucune raison précisée'
+                      return (
+                        <AlertItem
+                          key={p.id}
+                          icon="warning"
+                          title={`${clientName} a mis son parcours en pause`}
+                          detail={reason}
+                          iconColor="text-amber-400"
+                          href={`/modules/crm/clients/${p.client_id}`}
+                        />
+                      )
+                    })}
+                  </>
+                )}
+              </DashboardCard>
             </div>
-            <div className="hidden border-l border-white/10 pl-4 sm:block">
-              <p className="text-xs text-gray-500">Tokens</p>
-              <p className="text-sm font-medium tabular-nums text-gray-200">
-                {tokenSummary.totalTokens.toLocaleString('fr-FR')}
-              </p>
-            </div>
-            <div className="hidden border-l border-white/10 pl-4 md:block">
-              <p className="text-xs text-gray-500">Agents actifs</p>
-              <p className="text-sm font-medium tabular-nums text-gray-200">
-                {tokenSummary.byAgent.length}
-              </p>
-            </div>
-          </div>
-          <span className="relative text-xs text-cyan-300/60 transition-colors group-hover:text-cyan-300">
-            Voir le détail →
-          </span>
-        </a>
-      )}
-
-      {/* ── ZONE PILOTAGE ──────────────────────────────────────────────────
-          Les chiffres qui décrivent l'état des lieux. On les regarde, on n'agit
-          pas dessus depuis ici — d'où le ton cyan, ambiant, jamais alarmant.
-          Exception : les impayés passent au rouge dès qu'il y en a. */}
-
-      {/* Deux chiffres de tête. La rangée de 6 cartes débordait : 6 ne tombe
-          juste sur aucune grille responsive (2 / 3 / 4 colonnes). */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <HeroStat
-          icon={Users}
-          label="Total clients"
-          value={totalClients}
-          sub={`${labCount} Lab · ${oneCount} One`}
-          tone="cyan"
-        />
-        <HeroStat
-          icon={Wallet}
-          label="MRR"
-          value={mrrDisplay}
-          sub="Abonnements actifs"
-          tone="cyan"
-        />
-      </div>
-
-      {/* Quatre cartes de détail, sur une grille qui tombe juste. */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <InteractiveMetricCard
-          title="Clients Lab"
-          value={String(labCount)}
-          subtitle={[
-            breakdown.lab.pendingPayment.length > 0 ? `${breakdown.lab.pendingPayment.length} en attente` : null,
-            breakdown.lab.active.length > 0 ? `${breakdown.lab.active.length} actifs` : null,
-            breakdown.lab.suspended.length > 0 ? `${breakdown.lab.suspended.length} suspendu${breakdown.lab.suspended.length > 1 ? 's' : ''}` : null,
-          ].filter(Boolean).join(' · ') || 'Aucun client Lab'}
-          sections={[
-            {
-              label: 'En attente de paiement',
-              count: breakdown.lab.pendingPayment.length,
-              items: breakdown.lab.pendingPayment,
-              emptyText: 'Aucun client en attente',
-              accentColor: 'yellow',
-            },
-            {
-              label: 'Lab actifs',
-              count: breakdown.lab.active.length,
-              items: breakdown.lab.active,
-              emptyText: 'Aucun client Lab actif',
-              accentColor: 'green',
-            },
-            {
-              label: 'Suspendus (parcours en pause)',
-              count: breakdown.lab.suspended.length,
-              items: breakdown.lab.suspended,
-              emptyText: 'Aucun parcours suspendu',
-              accentColor: 'red',
-            },
-          ]}
-        />
-        <InteractiveMetricCard
-          title="Clients One"
-          value={String(oneCount)}
-          subtitle={`${breakdown.one.active.length} actifs`}
-          sections={[
-            {
-              label: 'Clients One actifs',
-              count: breakdown.one.active.length,
-              items: breakdown.one.active,
-              emptyText: 'Aucun client One',
-              accentColor: 'green',
-            },
-          ]}
-        />
-        <MetricCard
-          title="Devis en cours"
-          value={String(pendingQuotesCount)}
-          subtitle="devis en attente"
-          accentColor={pendingQuotesCount > 0 ? 'primary' : 'muted'}
-        />
-        <InteractiveMetricCard
-          title="Impayés"
-          value={unpaidDisplay}
-          subtitle={`${breakdown.unpaidInvoices.length} facture${breakdown.unpaidInvoices.length > 1 ? 's' : ''} en attente`}
-          accentColor={unpaidAmount > 0 ? 'destructive' : 'muted'}
-          sections={[
-            {
-              label: 'Factures impayées',
-              count: breakdown.unpaidInvoices.length,
-              items: breakdown.unpaidInvoices.map((inv) => ({
-                id: inv.clientId,
-                name: inv.clientName,
-                company: `${inv.amount.toLocaleString('fr-FR')} €`,
-              })),
-              emptyText: 'Aucune facture impayée',
-              accentColor: breakdown.unpaidInvoices.length > 0 ? 'red' : 'default',
-            },
-          ]}
-        />
-      </div>
-
-      {/* Coin « Mes projets » — sources externes (HTTP) : rendu derrière un
-          Suspense pour qu'un guichet lent ne retarde pas tout l'accueil. */}
-      <Suspense fallback={<ProjectCornerSkeleton />}>
-        <ProjectCorner operatorId={operatorId} />
-      </Suspense>
-
-      {/* ── ZONE À TRAITER ─────────────────────────────────────────────────
-          Tout ce qui attend une décision de MiKL aujourd'hui, sous un seul
-          cadre ambre avec le total en tête. Avant, ces quatre panneaux étaient
-          dispersés entre des blocs d'information, au même poids visuel. */}
-      {aTraiterTotal === 0 ? (
-        <CockpitCallout tone="emerald" icon={CheckCircle2} title="À traiter">
-          Rien à traiter — aucune validation, escalade, message ni suggestion en attente.
-        </CockpitCallout>
-      ) : (
-        <CockpitZone title="À traiter" count={aTraiterTotal} tone="amber">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <DashboardCard
-              title="Validations en attente"
-              badge={pendingValidations.length || undefined}
-              linkHref="/modules/validation-hub"
-            >
-              {pendingValidations.length === 0 ? (
-                <EmptyRow>Aucune validation en attente</EmptyRow>
-              ) : (
-                pendingValidations.map((v) => {
-                  const clientObj = Array.isArray(v.clients) ? v.clients[0] : v.clients
-                  const clientName = clientObj?.company || clientObj?.name || 'Client'
-                  const typeLabel = v.type === 'step_submission' ? 'Soumission étape' : v.type === 'brief_lab' ? 'Brief Lab' : v.type === 'evolution_one' ? 'Évolution One' : v.type
-                  return (
-                    <AlertItem
-                      key={v.id}
-                      icon="bell"
-                      title={v.title}
-                      detail={`${clientName} · ${typeLabel} · ${formatRelativeTime(v.created_at)}`}
-                      href="/modules/validation-hub"
-                    />
-                  )
-                })
-              )}
-            </DashboardCard>
-
-            {/* Escalades Élio One — questions transmises par l'agent des clients gradués.
-                Réactif : RealtimeDashboardRefresh écoute déjà les INSERT notifications du user. */}
-            <DashboardCard
-              title="Escalades Élio One"
-              badge={recentEscalations.length || undefined}
-              linkHref="/elio/one"
-            >
-              {recentEscalations.length === 0 ? (
-                <EmptyRow>Aucune escalade — Élio répond seul aux clients gradués</EmptyRow>
-              ) : (
-                recentEscalations.map((esc) => (
-                  <AlertItem
-                    key={esc.id}
-                    icon="warning"
-                    title={esc.title}
-                    detail={formatRelativeTime(esc.createdAt)}
-                    iconColor="text-amber-400"
-                    href="/elio/one"
-                  />
-                ))
-              )}
-            </DashboardCard>
-
-            <DashboardCard title="Messages non lus" badge={unreadCount} linkHref="/modules/chat">
-              {recentMessages.length === 0 ? (
-                <EmptyRow>Aucun message en attente</EmptyRow>
-              ) : (
-                recentMessages.map((msg) => {
-                  const clientName = clientNameMap.get(msg.client_id) ?? 'Client'
-                  return (
-                    <MessageItem
-                      key={msg.id}
-                      sender={clientName}
-                      preview={msg.content}
-                      time={formatRelativeTime(msg.created_at)}
-                      href={`/modules/chat/${msg.client_id}`}
-                    />
-                  )
-                })
-              )}
-            </DashboardCard>
-
-            <DashboardCard
-              title="Alertes & Actions — Suggestions Élio"
-              badge={elioSuggestions.length || undefined}
-              linkHref="/elio/hub"
-            >
-              {elioSuggestions.length === 0 ? (
-                <EmptyRow>Rien à signaler</EmptyRow>
-              ) : (
-                elioSuggestions.map((s) => (
-                  <AlertItem
-                    key={s.key}
-                    icon={s.icon}
-                    title={s.title}
-                    detail={s.detail}
-                    iconColor={s.iconColor}
-                    href={s.href}
-                  />
-                ))
-              )}
-            </DashboardCard>
-          </div>
-        </CockpitZone>
-      )}
-
-      {/* ── ZONE RADAR ─────────────────────────────────────────────────────
-          Contexte ambiant : utile à savoir, aucune action requise dans
-          l'instant. Repliable, et le choix est retenu par navigateur.
-          Les deux panneaux conditionnels (prospects, parcours en pause) sont
-          fusionnés ici : avant, ils apparaissaient et disparaissaient selon les
-          données, et toute la page sautait. */}
-      <CockpitZone title="Radar" tone="gray" collapsible storageKey="hub-home-radar">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <DashboardCard title="Agenda du jour" linkHref="/modules/visio">
-            {meetings.length === 0 ? (
-              <EmptyRow icon={CalendarDays}>Aucune réunion programmée aujourd&apos;hui</EmptyRow>
-            ) : (
-              meetings.map((m) => {
-                const minsUntil = minutesUntil(m.scheduled_at)
-                const isLive = m.status === 'in_progress'
-                const isSoon = minsUntil !== null && minsUntil > 0 && minsUntil <= 30
-                return (
-                  <AgendaItem
-                    key={m.id}
-                    time={formatTime(m.scheduled_at)}
-                    title={m.title ?? 'Réunion'}
-                    detail={getClientName(m.clients) || undefined}
-                    actionLabel={m.meet_uri ? 'Rejoindre' : 'Détails'}
-                    actionHref={`/modules/visio/${m.id}`}
-                    badgeText={isLive ? 'En cours' : isSoon ? `Dans ${minsUntil} min` : undefined}
-                  />
-                )
-              })
-            )}
-          </DashboardCard>
-
-          <DashboardCard
-            title="Mouvements clients"
-            badge={newProspects.length + pausedClients.length || undefined}
-            linkHref="/modules/crm"
-          >
-            {newProspects.length === 0 && pausedClients.length === 0 ? (
-              <EmptyRow>Aucun mouvement — ni nouveau prospect, ni parcours en pause</EmptyRow>
-            ) : (
-              <>
-                {newProspects.map((p) => {
-                  const displayName = p.first_name ? `${p.first_name} ${p.name}` : p.name
-                  return (
-                    <div
-                      key={p.id}
-                      className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
-                    >
-                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-400 animate-pulse" />
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-100">{displayName}</p>
-                        <p className="truncate text-xs text-gray-500">{p.company} · {p.email}</p>
-                        {p.lead_message && (
-                          <p className="mt-0.5 line-clamp-1 text-xs italic text-gray-600">
-                            {p.lead_message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-                {pausedClients.map((p) => {
-                  const c = Array.isArray(p.clients) ? p.clients[0] : p.clients
-                  const clientName = c?.company || c?.name || 'Client'
-                  const reason = p.abandonment_reason ? `Raison : ${p.abandonment_reason}` : 'Aucune raison précisée'
-                  return (
-                    <AlertItem
-                      key={p.id}
-                      icon="warning"
-                      title={`${clientName} a mis son parcours en pause`}
-                      detail={reason}
-                      iconColor="text-amber-400"
-                      href={`/modules/crm/clients/${p.client_id}`}
-                    />
-                  )
-                })}
-              </>
-            )}
-          </DashboardCard>
+          </CockpitZone>
         </div>
-      </CockpitZone>
+
+        {/* ── COLONNE LATERALE : les constantes ─────────────────────────
+            Chiffres et projets. « lg:sticky » : ils restent a l'ecran
+            pendant qu'on fait defiler le travail a gauche — c'est tout
+            l'interet du cockpit deux colonnes. */}
+        <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+          {/* Chiffres — en LIGNES, pas en cartes. Six cartes pleines pour six
+              nombres, c'etait « trop de place pour rien ». */}
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+            <p className="border-b border-white/10 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wider text-gray-500">
+              Chiffres
+            </p>
+            <div className="divide-y divide-white/[0.06] py-1">
+              <MetricCard compact title="Total clients" value={String(totalClients)} subtitle={`${labCount} Lab · ${oneCount} One`} accentColor="primary" />
+              <InteractiveMetricCard
+                compact
+                title="Clients Lab"
+                value={String(labCount)}
+                subtitle={[
+                  breakdown.lab.pendingPayment.length > 0 ? `${breakdown.lab.pendingPayment.length} en attente` : null,
+                  breakdown.lab.active.length > 0 ? `${breakdown.lab.active.length} actifs` : null,
+                  breakdown.lab.suspended.length > 0 ? `${breakdown.lab.suspended.length} suspendu${breakdown.lab.suspended.length > 1 ? 's' : ''}` : null,
+                ].filter(Boolean).join(' · ') || 'Aucun client Lab'}
+                sections={[
+                  { label: 'En attente de paiement', count: breakdown.lab.pendingPayment.length, items: breakdown.lab.pendingPayment, emptyText: 'Aucun client en attente', accentColor: 'yellow' },
+                  { label: 'Lab actifs', count: breakdown.lab.active.length, items: breakdown.lab.active, emptyText: 'Aucun client Lab actif', accentColor: 'green' },
+                  { label: 'Suspendus (parcours en pause)', count: breakdown.lab.suspended.length, items: breakdown.lab.suspended, emptyText: 'Aucun parcours suspendu', accentColor: 'red' },
+                ]}
+              />
+              <InteractiveMetricCard
+                compact
+                title="Clients One"
+                value={String(oneCount)}
+                subtitle={`${breakdown.one.active.length} actifs`}
+                sections={[
+                  { label: 'Clients One actifs', count: breakdown.one.active.length, items: breakdown.one.active, emptyText: 'Aucun client One', accentColor: 'green' },
+                ]}
+              />
+              <MetricCard compact title="MRR" value={mrrDisplay} subtitle="Abonnements actifs" accentColor={mrr > 0 ? 'primary' : 'muted'} />
+              <MetricCard compact title="Devis en cours" value={String(pendingQuotesCount)} subtitle="devis en attente" accentColor={pendingQuotesCount > 0 ? 'primary' : 'muted'} />
+              <InteractiveMetricCard
+                compact
+                title="Impayes"
+                value={unpaidDisplay}
+                subtitle={`${breakdown.unpaidInvoices.length} facture${breakdown.unpaidInvoices.length > 1 ? 's' : ''} en attente`}
+                accentColor={unpaidAmount > 0 ? 'destructive' : 'muted'}
+                sections={[
+                  {
+                    label: 'Factures impayees',
+                    count: breakdown.unpaidInvoices.length,
+                    items: breakdown.unpaidInvoices.map((inv) => ({ id: inv.clientId, name: inv.clientName, company: `${inv.amount.toLocaleString('fr-FR')} €` })),
+                    emptyText: 'Aucune facture impayee',
+                    accentColor: breakdown.unpaidInvoices.length > 0 ? 'red' : 'default',
+                  },
+                ]}
+              />
+              {tokenSummary && (
+                <a href="/elio/lab" className="flex items-baseline justify-between gap-3 px-3 py-2 transition-colors hover:bg-white/[0.04]">
+                  <span className="truncate text-xs text-gray-400">Cout IA ce mois</span>
+                  <span className="shrink-0 text-sm font-semibold tabular-nums text-cyan-300">
+                    {tokenSummary.totalCostEur.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                  </span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Mes projets — une carte par projet, avec sa pastille de couleur.
+              MiKL en aura plusieurs : ils doivent se distinguer au regard. */}
+          <Suspense fallback={<ProjectCornerSkeleton />}>
+            <ProjectCorner operatorId={operatorId} compact />
+          </Suspense>
+        </aside>
+      </div>
     </div>
   )
 }

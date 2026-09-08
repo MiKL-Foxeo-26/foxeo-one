@@ -5,18 +5,37 @@ interface MetricCardProps {
   value: string
   subtitle: string
   accentColor?: 'primary' | 'destructive' | 'muted'
+  /**
+   * Rendu en LIGNE (libellé à gauche, valeur à droite) au lieu d'une carte.
+   * Sert dans la colonne latérale du cockpit : un chiffre de contexte n'a pas
+   * à occuper la place d'une carte pleine, MiKL l'a signalé sur la v2.
+   */
+  compact?: boolean
 }
 
 /**
  * Carte métrique compacte — style « cockpit » (verre sur fond noir profond).
  * Le liseré supérieur teinté conserve le repère visuel de l'accent.
  */
-export function MetricCard({ title, value, subtitle, accentColor = 'muted' }: MetricCardProps) {
+export function MetricCard({ title, value, subtitle, accentColor = 'muted', compact = false }: MetricCardProps) {
   const accent = {
     primary: { top: 'border-t-cyan-400/50', value: 'text-white', glow: 'bg-cyan-400/10' },
     destructive: { top: 'border-t-red-400/50', value: 'text-red-200', glow: 'bg-red-400/10' },
     muted: { top: 'border-t-white/15', value: 'text-white', glow: 'bg-white/5' },
   }[accentColor]
+
+  if (compact) {
+    return (
+      <div className="flex items-baseline justify-between gap-3 px-3 py-2">
+        <span className="truncate text-xs text-gray-400" title={subtitle}>
+          {title}
+        </span>
+        <span className={cn('shrink-0 text-sm font-semibold tabular-nums', accent.value)}>
+          {value}
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div

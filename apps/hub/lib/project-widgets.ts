@@ -32,6 +32,11 @@ export interface ProjectDef {
   name: string
   /** Lien « voir tout » de la carte. */
   href: string
+  /**
+   * Couleur d'identité du projet. Avec plusieurs projets suivis, c'est ce qui
+   * permet de les distinguer d'un coup d'œil — chacun garde SA couleur, à la
+   * manière d'un onglet de classeur. Éviter le cyan, réservé au Hub lui-même.
+   */
   tone: CockpitTone
   widgets: ProjectWidgetDef[]
   /**

@@ -24,6 +24,11 @@ interface InteractiveMetricCardProps {
   subtitle: string
   accentColor?: 'primary' | 'destructive' | 'muted'
   sections: PopupSection[]
+  /**
+   * Rendu en LIGNE cliquable au lieu d'une carte pleine. Le détail dépliable
+   * reste identique — seul l'encombrement change.
+   */
+  compact?: boolean
 }
 
 const sectionAccents: Record<string, string> = {
@@ -39,6 +44,7 @@ export function InteractiveMetricCard({
   subtitle,
   accentColor = 'muted',
   sections,
+  compact = false,
 }: InteractiveMetricCardProps) {
   const [open, setOpen] = useState(false)
 
@@ -50,6 +56,20 @@ export function InteractiveMetricCard({
 
   return (
     <>
+      {compact ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex w-full items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-white/[0.04]"
+        >
+          <span className="truncate text-xs text-gray-400" title={subtitle}>
+            {title}
+          </span>
+          <span className={cn('shrink-0 text-sm font-semibold tabular-nums', accent.value)}>
+            {value}
+          </span>
+        </button>
+      ) : (
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -71,6 +91,7 @@ export function InteractiveMetricCard({
         <p className="relative mt-0.5 text-xs text-gray-500">{subtitle}</p>
         <p className="relative mt-2 text-[0.65rem] text-cyan-300/60">Cliquer pour le détail →</p>
       </button>
+      )}
 
       {/* Popup overlay */}
       {open && (
