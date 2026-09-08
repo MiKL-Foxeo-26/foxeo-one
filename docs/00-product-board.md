@@ -180,6 +180,7 @@ bibliotheque reutilisable (doctrine FORGE) plutot que d'etre recode. [a confirme
 | Fournir `VERCEL_TOKEN` / `SUPABASE_MANAGEMENT_TOKEN` pour un kit de sortie complet (non urgent) | MiKL | F-007 si rouvert | 2026-07-03 |
 | Confirmer DNS/SSL `hub.`/`app.`/vitrine — **suspect deja fait**, commits d'aout montrent la bascule | MiKL | Mise en prod | 2026-04-15 |
 | Compte Pennylane prod actif, backups Supabase actives | MiKL | Onboarding client | 2026-04-15 |
+| Trancher : le coin « Mes projets » (tuiles configurables) doit-il entrer au catalogue FORGE pour resservir ailleurs ? Question posee le 2026-09-08, sans reponse a ce jour — l'item reste candidat | MiKL | F-012 (extraction) | 2026-09-08 |
 
 > Suspects "traite mais jamais coche" (a trancher MiKL, non retires) : DNS ci-dessus ; T-010 ; T-003.
 
