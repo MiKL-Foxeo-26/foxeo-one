@@ -16,6 +16,7 @@ export {
 } from './pill-tabs'
 export { HeroStat, HeroStatGrid, type HeroStatProps } from './hero-stat'
 export { StatCard, type StatCardProps } from './stat-card'
+export { ProjectTile, type ProjectTileProps } from './project-tile'
 export { SectionTitle, type SectionTitleProps } from './section-title'
 export { CockpitPanel, type CockpitPanelProps } from './cockpit-panel'
 export { CockpitCallout, type CockpitCalloutProps } from './cockpit-callout'

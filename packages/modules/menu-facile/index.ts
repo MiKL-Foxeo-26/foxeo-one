@@ -27,6 +27,8 @@ export { useReports, useModerationActions, useRecipeFull } from './hooks/use-mod
 export { useContactMessages, useContactThread, useContactActions } from './hooks/use-contact-messages'
 export { useOfficialRecipes, useOfficialRecipe, useOfficialRecipeActions } from './hooks/use-official-recipes'
 export { getMenuFacileMetrics } from './actions/get-metrics'
+export { getMenuFacileHomeWidgets } from './actions/get-home-widgets'
+export type { MenuFacileHomeWidgets } from './actions/get-home-widgets'
 // Agent Élio Hub (get_menufacile_report) — l'action existait déjà, on l'expose au barrel.
 export { getMenuFacileTimeseries } from './actions/get-timeseries'
 export { getMenuFacileReports } from './actions/get-reports'

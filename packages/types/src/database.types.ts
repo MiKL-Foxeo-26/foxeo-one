@@ -390,6 +390,36 @@ export type Database = {
           },
         ]
       }
+      /** Coin « Mes projets » de l'accueil Hub — migration 20260908120000. */
+      hub_project_widget_prefs: {
+        Row: {
+          operator_id: string
+          widget_key: string
+          enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          operator_id: string
+          widget_key: string
+          enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          operator_id?: string
+          widget_key?: string
+          enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'hub_project_widget_prefs_operator_id_fkey'
+            columns: ['operator_id']
+            isOneToOne: false
+            referencedRelation: 'operators'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {

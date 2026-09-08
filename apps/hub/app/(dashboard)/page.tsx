@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { LayoutDashboard } from 'lucide-react'
 import { CockpitHeader, StatusPill } from '@monprojetpro/ui'
 import { createServerSupabaseClient } from '@monprojetpro/supabase'
@@ -11,6 +12,7 @@ import { AlertItem } from '../../components/dashboard/alert-item'
 import { DashboardCard } from '../../components/dashboard/dashboard-card'
 import { SystemHealthAlert } from '@monprojetpro/module-admin'
 import { getClientsBreakdown } from '../../actions/get-clients-breakdown'
+import { ProjectCorner, ProjectCornerSkeleton } from '../../components/dashboard/project-corner'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -510,6 +512,12 @@ export default async function HubHomePage() {
           ]}
         />
       </div>
+
+      {/* Coin « Mes projets » — sources externes (HTTP) : rendu derrière un
+          Suspense pour qu'un guichet lent ne retarde pas tout l'accueil. */}
+      <Suspense fallback={<ProjectCornerSkeleton />}>
+        <ProjectCorner operatorId={operatorId} />
+      </Suspense>
 
       {/* Agenda + Validations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
