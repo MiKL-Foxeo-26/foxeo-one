@@ -46,7 +46,22 @@ export function useChatMessages(clientId: string) {
         queryClient.setQueryData(['messages', clientId], context.previous)
       }
     },
-    // onSettled non nécessaire : Realtime fera l'invalidation
+    /**
+     * ⚠️ Ce `onSettled` a longtemps été absent, au motif que « Realtime fera
+     * l'invalidation ». C'était un pari sur un mécanisme qui peut tomber en
+     * silence (table hors publication, RLS qui refuse — voir `useChatRealtime`).
+     * Quand l'abonnement est mort, le message provisoire garde son identifiant
+     * temporaire et n'est jamais remplacé par sa version serveur : l'utilisateur
+     * croit son message parti alors qu'il ne l'est peut-être pas.
+     *
+     * L'envoi ne dépend donc plus de rien d'autre que de sa propre réponse.
+     * Si Realtime fonctionne, la double invalidation est sans conséquence :
+     * TanStack Query dédoublonne les requêtes concurrentes.
+     */
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', clientId] })
+      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+    },
   })
 
   return {

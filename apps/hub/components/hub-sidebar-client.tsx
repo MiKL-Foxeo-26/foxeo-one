@@ -8,6 +8,7 @@ import { cn } from '@monprojetpro/utils'
 import { useValidationBadge, useValidationRealtime } from '@monprojetpro/modules-validation-hub'
 import { usePendingRemindersCount } from '@monprojetpro/modules-facturation'
 import { useConversations, useConversationsRealtime } from '@monprojetpro/modules-chat'
+import { useMenuFacileMetrics } from '@monprojetpro/module-menu-facile'
 import { ElioQueryBox } from './elio-query-box'
 
 const navItems = [
@@ -27,7 +28,7 @@ const navItems = [
 
 // Section « Produits » — produits externes pilotés depuis le Hub (cockpits).
 const produitItems = [
-  { icon: ChefHat, label: 'MenuFacile', href: '/modules/menu-facile' },
+  { icon: ChefHat, label: 'MenuFacile', href: '/modules/menu-facile', badgeKey: 'menu-facile' as const },
 ]
 
 export function HubSidebarClient({ operatorId, userId }: { operatorId: string; userId: string }) {
@@ -44,6 +45,15 @@ export function HubSidebarClient({ operatorId, userId }: { operatorId: string; u
   const { data: conversations } = useConversations()
   useConversationsRealtime({ operatorId })
   const unreadChatCount = conversations?.reduce((sum, c) => sum + c.unreadCount, 0) ?? 0
+
+  // Badge « MenuFacile » — messages du guichet au statut « nouveau ».
+  // La base de MenuFacile est séparée : pas de Realtime possible, le hook
+  // relit toutes les 60 s. Sans ce badge, un message arrivait sans que rien
+  // ne le signale hors du module lui-même (signalé par MiKL le 2026-09-09).
+  const { data: menuFacileMetrics } = useMenuFacileMetrics()
+  // `contact` est optionnel dans le contrat du guichet : absent = pas de badge,
+  // surtout pas un zéro affiché comme une certitude.
+  const menuFacileNewCount = menuFacileMetrics?.contact?.new ?? 0
 
   return (
     <aside className="w-64 shrink-0 border-r border-sidebar-border bg-sidebar flex flex-col">
@@ -91,6 +101,7 @@ export function HubSidebarClient({ operatorId, userId }: { operatorId: string; u
           </p>
           {produitItems.map((item) => {
             const isActive = pathname?.startsWith(item.href)
+            const badge = item.badgeKey === 'menu-facile' ? menuFacileNewCount : undefined
             return (
               <Link
                 key={item.href}
@@ -104,6 +115,14 @@ export function HubSidebarClient({ operatorId, userId }: { operatorId: string; u
               >
                 <item.icon className="h-4 w-4 shrink-0" />
                 <span className="flex-1">{item.label}</span>
+                {badge !== undefined && badge > 0 && (
+                  <Badge
+                    className="text-[0.6rem] px-1.5 py-0 h-4 min-w-[1.25rem] flex items-center justify-center"
+                    aria-label={`${badge} message${badge > 1 ? 's' : ''} à traiter`}
+                  >
+                    {badge}
+                  </Badge>
+                )}
               </Link>
             )
           })}

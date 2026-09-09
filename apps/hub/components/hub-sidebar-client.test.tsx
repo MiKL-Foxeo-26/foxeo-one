@@ -36,6 +36,13 @@ vi.mock('@monprojetpro/modules-chat', () => ({
   useConversationsRealtime: vi.fn(),
 }))
 
+// Mock MenuFacile metrics (badge « messages a traiter » de la section Produits).
+// Le guichet MenuFacile est un service HTTP externe : jamais appele en test.
+const mockUseMenuFacileMetrics = vi.fn(() => ({ data: undefined }) as { data: unknown })
+vi.mock('@monprojetpro/module-menu-facile', () => ({
+  useMenuFacileMetrics: () => mockUseMenuFacileMetrics(),
+}))
+
 // Mock ElioQueryBox to avoid loading @monprojetpro/module-elio
 vi.mock('./elio-query-box', () => ({
   ElioQueryBox: () => null,
@@ -188,5 +195,34 @@ describe('HubSidebarClient', () => {
     const profileIndex = navHrefs.indexOf('/settings')
     const maintenanceIndex = navHrefs.indexOf('/modules/admin/system')
     expect(profileIndex).toBeGreaterThan(maintenanceIndex)
+  })
+
+  // Badge « MenuFacile » — signale un message a traiter hors du module lui-meme.
+  // Sans lui, un message arrivait sans que rien ne le montre dans la navigation
+  // (constate par MiKL le 2026-09-09).
+  describe('badge MenuFacile (section Produits)', () => {
+    it('affiche le nombre de messages a traiter', () => {
+      mockUseMenuFacileMetrics.mockReturnValue({ data: { contact: { new: 3, total: 9 } } })
+      render(<HubSidebarClient operatorId="op-1" userId="u-1" />)
+      const link = screen.getByRole('link', { name: /MenuFacile/i })
+      expect(link).toHaveTextContent('3')
+    })
+
+    it('n\'affiche aucun badge quand il n\'y a rien a traiter', () => {
+      mockUseMenuFacileMetrics.mockReturnValue({ data: { contact: { new: 0, total: 9 } } })
+      render(<HubSidebarClient operatorId="op-1" userId="u-1" />)
+      const link = screen.getByRole('link', { name: /MenuFacile/i })
+      expect(link).not.toHaveTextContent('0')
+    })
+
+    it('ne fabrique pas de zero quand le guichet ne repond pas', () => {
+      // `contact` est optionnel dans le contrat du guichet, et la requete peut
+      // echouer : dans les deux cas, pas de badge — surtout pas un « 0 » qui
+      // affirmerait qu'il n'y a rien a traiter.
+      mockUseMenuFacileMetrics.mockReturnValue({ data: undefined })
+      render(<HubSidebarClient operatorId="op-1" userId="u-1" />)
+      const link = screen.getByRole('link', { name: /MenuFacile/i })
+      expect(link).toHaveTextContent(/^MenuFacile$/)
+    })
   })
 })
