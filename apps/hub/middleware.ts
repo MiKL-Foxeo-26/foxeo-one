@@ -37,10 +37,20 @@ export async function middleware(request: NextRequest) {
 
   const isPublic = isPublicPath(request.nextUrl.pathname)
 
-  // 2. Unauthenticated user on protected route → login
+  // 2. Non authentifié sur une route protégée → ENTRÉE DE CONNEXION UNIQUE.
+  //
+  // ⚠️ Ce branchement pointait vers `/login` du Hub — la page d'avant l'entrée
+  // unique, sans branding ni « mot de passe oublié ». C'était LE chemin emprunté
+  // par tous les liens profonds : un clic sur « Voir le message » depuis un email,
+  // session expirée, et MiKL atterrissait sur l'ancienne page (signalé le
+  // 2026-09-09). Les deux autres redirections de ce même fichier utilisaient
+  // déjà `getLoginEntryUrl()` : c'était une incohérence interne, pas une doctrine.
+  //
+  // La destination voulue voyage en clair jusqu'à la passerelle, qui la
+  // reposera après connexion — d'où le nettoyage à l'arrivée, jamais ici.
   if (!user && !isPublic) {
-    const redirectUrl = new URL('/login', request.url)
-    redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
+    const redirectUrl = new URL(getLoginEntryUrl())
+    redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname + request.nextUrl.search)
     const redirectResponse = NextResponse.redirect(redirectUrl)
     setLocaleCookie(redirectResponse, locale)
     return redirectResponse
@@ -73,9 +83,12 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!operator) {
-      // Not an operator — sign out and redirect
+      // Compte non-opérateur : on referme la session et on renvoie vers l'entrée
+      // unique, comme partout ailleurs. Le renvoyer sur `/login` du Hub lui
+      // montrerait une page qui ne le concerne pas — il n'a rien à faire ici,
+      // sa place est à la porte commune.
       await supabase.auth.signOut()
-      const redirectUrl = new URL('/login', request.url)
+      const redirectUrl = new URL(getLoginEntryUrl())
       redirectUrl.searchParams.set('error', 'unauthorized')
       const redirectResponse = NextResponse.redirect(redirectUrl)
       setLocaleCookie(redirectResponse, locale)

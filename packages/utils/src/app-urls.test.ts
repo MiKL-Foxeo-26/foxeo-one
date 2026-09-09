@@ -4,6 +4,7 @@ import {
   getHubUrl,
   getSiteUrl,
   getLoginEntryUrl,
+  sanitizeReturnPath,
   DEFAULT_CLIENT_APP_URL,
   DEFAULT_HUB_URL,
   DEFAULT_SITE_URL,
@@ -93,5 +94,54 @@ describe('getLoginEntryUrl', () => {
   it('never produces a double slash', () => {
     process.env.NEXT_PUBLIC_CLIENT_URL = 'https://app.monprojet-pro.com/'
     expect(getLoginEntryUrl()).not.toContain('.com//')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// sanitizeReturnPath — garde-fou anti-redirection ouverte.
+//
+// La destination de retour traverse deux domaines sous forme de parametre
+// d'URL. Sans filtre, un lien forge renverrait l'utilisateur vers un site
+// exterieur APRES une connexion parfaitement reussie : l'hameconnage ideal,
+// puisque la victime vient de s'authentifier pour de vrai.
+// ---------------------------------------------------------------------------
+
+describe('sanitizeReturnPath', () => {
+  it('laisse passer un chemin interne', () => {
+    expect(sanitizeReturnPath('/modules/chat/abc')).toBe('/modules/chat/abc')
+    expect(sanitizeReturnPath('/')).toBe('/')
+    expect(sanitizeReturnPath('/modules/chat?tab=1')).toBe('/modules/chat?tab=1')
+  })
+
+  it('refuse une URL absolue', () => {
+    expect(sanitizeReturnPath('https://evil.test')).toBeNull()
+    expect(sanitizeReturnPath('http://evil.test/x')).toBeNull()
+  })
+
+  it('refuse une URL protocol-relative (le piege le plus courant)', () => {
+    // `//evil.test` commence bien par un slash mais sort du site.
+    expect(sanitizeReturnPath('//evil.test/x')).toBeNull()
+  })
+
+  it('refuse les variantes a antislash, normalisees en slash par certains navigateurs', () => {
+    expect(sanitizeReturnPath('/\\evil.test')).toBeNull()
+    expect(sanitizeReturnPath('/modules\\..\\x')).toBeNull()
+  })
+
+  it('refuse un schema deguise', () => {
+    expect(sanitizeReturnPath('javascript:alert(1)')).toBeNull()
+    expect(sanitizeReturnPath('/javascript:alert(1)')).toBeNull()
+    expect(sanitizeReturnPath('data:text/html,x')).toBeNull()
+  })
+
+  it('refuse le vide et la valeur absente', () => {
+    expect(sanitizeReturnPath(null)).toBeNull()
+    expect(sanitizeReturnPath(undefined)).toBeNull()
+    expect(sanitizeReturnPath('')).toBeNull()
+    expect(sanitizeReturnPath('   ')).toBeNull()
+  })
+
+  it('refuse un chemin relatif sans slash initial', () => {
+    expect(sanitizeReturnPath('modules/chat')).toBeNull()
   })
 })

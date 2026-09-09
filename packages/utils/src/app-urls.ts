@@ -60,3 +60,34 @@ export function getSiteUrl(): string {
 export function getLoginEntryUrl(): string {
   return `${getClientAppUrl()}${LOGIN_ENTRY_PATH}`
 }
+
+/**
+ * Nettoie une destination de retour après connexion.
+ *
+ * ⚠️ GARDE-FOU DE SÉCURITÉ, pas une commodité. La destination traverse l'entrée
+ * de connexion puis la passerelle vers le Hub sous forme de paramètre d'URL :
+ * sans ce filtre, n'importe qui pourrait forger un lien qui, après une
+ * connexion parfaitement légitime, renverrait l'utilisateur sur un site
+ * extérieur — une redirection ouverte, et l'hameçonnage qui va avec.
+ *
+ * Ne laisse passer qu'un chemin interne :
+ *   ✅ `/modules/chat/abc`
+ *   ❌ `//evil.test/x` (URL protocol-relative — le piège le plus courant)
+ *   ❌ `https://evil.test`, `javascript:...`, `\evil.test` (antislash : certains
+ *      navigateurs le normalisent en slash)
+ *
+ * Renvoie `null` si la valeur n'est pas exploitable — l'appelant retombe alors
+ * sur sa destination par défaut.
+ */
+export function sanitizeReturnPath(path: string | null | undefined): string | null {
+  const value = path?.trim()
+  if (!value) return null
+  if (!value.startsWith('/')) return null
+  // `//host` et `/\host` sortent du site tout en commençant par un slash.
+  if (value.startsWith('//') || value.startsWith('/\\')) return null
+  if (value.includes('\\')) return null
+  // Un `:` avant le premier `/` trahirait un schéma (`javascript:`, `data:`).
+  const firstSegment = value.slice(1).split('/')[0] ?? ''
+  if (firstSegment.includes(':')) return null
+  return value
+}

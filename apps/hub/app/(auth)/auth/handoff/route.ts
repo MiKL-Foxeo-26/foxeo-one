@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@monprojetpro/supabase'
-import { getLoginEntryUrl } from '@monprojetpro/utils'
+import { getLoginEntryUrl, sanitizeReturnPath } from '@monprojetpro/utils'
 
 // Entrée de connexion UNIQUE — arrivée côté Hub (décision MiKL du 2026-08-03).
 //
@@ -58,6 +58,17 @@ export async function GET(request: NextRequest) {
     return fail('handoff_unauthorized')
   }
 
-  // 3. Le middleware prend le relais : il exigera le code 2FA avant d'ouvrir le cockpit.
-  return NextResponse.redirect(new URL('/', request.url))
+  // 3. Retour à la page visée avant la connexion (lien profond d'un email, par
+  //    exemple), à défaut l'accueil.
+  //
+  //    `sanitizeReturnPath` n'est pas une politesse : ce paramètre a traversé
+  //    deux domaines en clair. Sans filtre, un lien forgé renverrait l'opérateur
+  //    vers un site extérieur APRÈS une connexion réussie — le scénario
+  //    d'hameçonnage le plus crédible qui soit.
+  //
+  //    Le middleware prend ensuite le relais : il exigera le code 2FA avant
+  //    d'ouvrir quoi que ce soit. Cette passerelle raccourcit le chemin, jamais
+  //    les exigences.
+  const next = sanitizeReturnPath(new URL(request.url).searchParams.get('next'))
+  return NextResponse.redirect(new URL(next ?? '/', request.url))
 }

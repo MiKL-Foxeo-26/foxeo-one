@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { getHubUrl } from '@monprojetpro/utils'
+import { getHubUrl, sanitizeReturnPath } from '@monprojetpro/utils'
 
 // Entrée de connexion UNIQUE (décision MiKL du 2026-08-03).
 //
@@ -26,6 +26,16 @@ export const HUB_HANDOFF_CALLBACK_PATH = '/auth/handoff'
 export interface BuildHubHandoffLinkParams {
   /** Email de l'opérateur déjà authentifié par mot de passe. */
   email: string
+  /**
+   * Page du Hub à ouvrir une fois la session posée — la destination que
+   * l'opérateur visait avant d'être arrêté par la connexion (le lien profond
+   * d'un email, par exemple). Sans elle, il repart de l'accueil et doit
+   * retrouver à la main ce qu'il venait voir.
+   *
+   * Passée telle quelle : c'est la route d'arrivée qui la valide, au plus près
+   * de la redirection. Valider ici ne dispenserait pas de valider là-bas.
+   */
+  next?: string | null
   /** Injectable pour les tests — sinon construit depuis les env vars service-role. */
   adminClient?: SupabaseClient
 }
@@ -73,6 +83,9 @@ export async function buildHubHandoffLink(
 
     const url = new URL(`${hubBase}${HUB_HANDOFF_CALLBACK_PATH}`)
     url.searchParams.set('token_hash', hashedToken)
+
+    const next = sanitizeReturnPath(params.next)
+    if (next) url.searchParams.set('next', next)
 
     return { url: url.toString() }
   } catch (err) {

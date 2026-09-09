@@ -47,6 +47,10 @@ export function LoginForm() {
       const formData = new FormData()
       formData.set('email', data.email)
       formData.set('password', data.password)
+      // Destination visée avant d'être arrêté par la connexion. Pour un client,
+      // elle est rejouée ici même (plus bas) ; pour un opérateur, elle doit
+      // traverser la passerelle vers le Hub — d'où sa transmission au serveur.
+      formData.set('redirectTo', redirectTo)
 
       const result = await loginAction(formData)
 

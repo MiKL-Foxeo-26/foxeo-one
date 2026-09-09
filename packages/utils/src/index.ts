@@ -8,6 +8,7 @@ export {
   getHubUrl,
   getSiteUrl,
   getLoginEntryUrl,
+  sanitizeReturnPath,
   DEFAULT_CLIENT_APP_URL,
   DEFAULT_HUB_URL,
   DEFAULT_SITE_URL,

@@ -29,6 +29,10 @@ export async function loginAction(
     email: formData.get('email'),
     password: formData.get('password'),
   }
+  // Hors schéma de validation : facultatif, et de toute façon refiltré plus loin
+  // par `sanitizeReturnPath`. L'échec de sa lecture ne doit pas empêcher de se
+  // connecter.
+  const rawRedirectTo = formData.get('redirectTo')
 
   const parsed = loginSchema.safeParse(raw)
   if (!parsed.success) {
@@ -105,7 +109,14 @@ export async function loginAction(
     .maybeSingle()
 
   if (operator) {
-    const handoff = await buildHubHandoffLink({ email: authData.user.email ?? email })
+    // La destination visée avant la connexion voyage jusqu'au Hub : sans elle,
+    // un clic sur « Voir le message » depuis un email ramènerait l'opérateur à
+    // l'accueil, à charge pour lui de retrouver ce qu'il venait consulter.
+    // `buildHubHandoffLink` la filtre, et la route d'arrivée la refiltre.
+    const handoff = await buildHubHandoffLink({
+      email: authData.user.email ?? email,
+      next: typeof rawRedirectTo === 'string' ? rawRedirectTo : null,
+    })
 
     // Scope 'local' : on referme CETTE session (un opérateur n'a pas de ligne dans
     // `clients`, elle ne lui sert à rien ici) sans toucher à ses autres sessions.
